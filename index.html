@@ -7,36 +7,12 @@
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="mobile-web-app-capable" content="yes">
     <meta name="theme-color" content="#090910">
+    <meta name="application-name" content="CASECLOSED">
     <title>CASECLOSED - Điệp Vụ Tối Mật</title>
-    
-    <!-- LOGO WEB & "THÊM VÀO MÀN HÌNH CHÍNH" ĐIỆN THOẠI (SVG TĨNH) -->
-    <script>
-        (function() {
-            var c = {'0':'transparent','1':'#4a3018','2':'#ffcba4','3':'#2980b9','4':'#2b2b2b','5':'#ecf0f1','6':'#000000','8':'#e74c3c'};
-            var s = ["0000100000", "0001111000", "0011111100", "0012222100", "0056226500", "0022222200", "0003883000", "0033553300", "0333553330", "0333333330", "0660000660"];
-            var scale = 20; 
-            var canvas = document.createElement('canvas');
-            canvas.width = s[0].length * scale; canvas.height = s.length * scale;
-            var ctx = canvas.getContext('2d');
-            ctx.fillStyle = '#f7d51d'; 
-            ctx.fillRect(0, 0, canvas.width, canvas.height);
-            for(var y=0; y<s.length; y++) {
-                for(var x=0; x<s[y].length; x++) {
-                    if(s[y][x] !== '0') {
-                        ctx.fillStyle = c[s[y][x]];
-                        ctx.fillRect(x*scale, y*scale, scale, scale);
-                    }
-                }
-            }
-            var dataUrl = canvas.toDataURL('image/png');
-            var linkIcon = document.createElement('link'); linkIcon.rel = 'icon'; linkIcon.type = 'image/png'; linkIcon.href = dataUrl;
-            document.head.appendChild(linkIcon);
-            var appleIcon = document.createElement('link'); appleIcon.rel = 'apple-touch-icon'; appleIcon.href = dataUrl;
-            document.head.appendChild(appleIcon);
-            var appTitle = document.createElement('meta'); appTitle.name = 'apple-mobile-web-app-title'; appTitle.content = 'CASECLOSED';
-            document.head.appendChild(appTitle);
-        })();
-    </script>
+    <link rel="icon" type="image/png" sizes="192x192" href="icons/icon-192.png">
+    <link rel="apple-touch-icon" sizes="180x180" href="icons/apple-touch-icon.png">
+    <link rel="manifest" href="site.webmanifest">
+    <meta name="apple-mobile-web-app-title" content="CASECLOSED">
     
     <link href="https://fonts.googleapis.com/css2?family=VT323&display=swap" rel="stylesheet">
     <link href="https://unpkg.com/nes.css@2.3.0/css/nes.min.css" rel="stylesheet" />
@@ -178,6 +154,7 @@
             <button class="nes-btn is-primary" style="width: 100%; margin-top: 20px; padding: 12px;" onclick="startNewSession()">Mở Hồ Sơ Mới</button>
             <button id="btn-continue" class="nes-btn is-success" style="width: 100%; margin-top: 15px; padding: 12px; display: none;" onclick="showLoadScreen()">Tiếp Tục Điều Tra</button>
             <button class="nes-btn is-warning" style="width: 100%; margin-top: 15px; padding: 12px;" onclick="showRules()">[ LUẬT CHƠI ]</button>
+            <button id="music-toggle-btn" class="nes-btn" style="width: 100%; margin-top: 15px; padding: 12px;" onclick="toggleMusic()">[ NHẠC: BẬT ]</button>
         </div>
     </div>
 
@@ -464,6 +441,27 @@
 
         const themeBgm = new Audio('THEME.mp3'); 
         themeBgm.loop = true; themeBgm.volume = 0.5;
+        let musicEnabled = localStorage.getItem('caseclosed_music_enabled') !== 'false';
+
+        function syncMusicButton() {
+            const button = document.getElementById('music-toggle-btn');
+            if (!button) return;
+            button.innerText = musicEnabled ? '[ NHẠC: BẬT ]' : '[ NHẠC: TẮT ]';
+            button.className = musicEnabled ? 'nes-btn is-success' : 'nes-btn';
+        }
+
+        function playBackgroundMusic() {
+            if (!musicEnabled) return;
+            themeBgm.play().catch(() => {});
+        }
+
+        function toggleMusic() {
+            musicEnabled = !musicEnabled;
+            localStorage.setItem('caseclosed_music_enabled', String(musicEnabled));
+            if (musicEnabled) playBackgroundMusic();
+            else themeBgm.pause();
+            syncMusicButton();
+        }
 
         document.addEventListener('click', (e) => {
             if (e.target.classList.contains('nes-btn') && !e.target.classList.contains('pill-item') && !e.target.classList.contains('btn-eliminated')) SFX.click();
@@ -481,7 +479,7 @@
             introScreen.classList.add('hidden'); 
             setTimeout(() => {
                 introScreen.style.display = 'none'; document.getElementById('init-screen').classList.add('active'); 
-                themeBgm.play().catch(e => console.log(e));
+                playBackgroundMusic();
             }, 800); 
         }
 
@@ -644,6 +642,7 @@
             drawPixelArt('bomb-icon', spriteDynamite, 6);
             
             updateMenuButtons();
+            syncMusicButton();
         });
 
         function updateMenuButtons() {
@@ -793,6 +792,106 @@
         }
 
         const rawWordDatabase = [
+            { a: "Chó", b: "Mèo" }, { a: "Bánh pizza", b: "Bánh mì kẹp thịt" }, { a: "Bãi biển", b: "Ngọn núi" },
+            { a: "Cà phê", b: "Trà" }, { a: "Ô tô", b: "Xe buýt" }, { a: "Mặt trời", b: "Mặt trăng" },
+            { a: "Quả chuối", b: "Quả táo" }, { a: "Nước hoa", b: "Lăn khử mùi" }, { a: "Adidas", b: "Nike" },
+            { a: "Ba lô", b: "Va li" }, { a: "Bồn sục", b: "Phòng xông hơi" }, { a: "Giày thể thao", b: "Xăng đan" },
+            { a: "Kính râm", b: "Kính cận" }, { a: "Đàn piano", b: "Đàn guitar" }, { a: "Du thuyền", b: "Xe dã ngoại" },
+            { a: "Sushi", b: "Bánh pizza" }, { a: "Bánh mì kẹp thịt", b: "Xúc xích" }, { a: "Sô cô la", b: "Vani" },
+            { a: "Bia", b: "Rượu vang" }, { a: "Rượu whiskey", b: "Rượu vodka" }, { a: "Sữa", b: "Nước ép" },
+            { a: "Bánh mì", b: "Bơ" }, { a: "Cơm", b: "Mì ống" }, { a: "Thịt gà", b: "Thịt bò" },
+            { a: "Quả táo", b: "Quả cam" }, { a: "Quả chuối", b: "Dâu tây" }, { a: "Cà rốt", b: "Súp lơ" },
+            { a: "Khoai tây", b: "Cà chua" }, { a: "Hành tây", b: "Tỏi" }, { a: "Muối", b: "Hạt tiêu" },
+            { a: "Đường", b: "Mật ong" }, { a: "Nước lọc", b: "Nước ngọt" }, { a: "Apple", b: "Microsoft" },
+            { a: "Google", b: "Facebook" }, { a: "Amazon", b: "Netflix" }, { a: "Bánh xèo", b: "Bánh rán" },
+            { a: "Kem", b: "Bánh kem" }, { a: "McDonalds", b: "KFC" }, { a: "Ô tô", b: "Xe máy" },
+            { a: "Vi rút", b: "Vi khuẩn" }, { a: "Chúa tể những chiếc nhẫn", b: "Người Hobbit" }, { a: "Harry Potter", b: "Voldemort" },
+            { a: "Siêu nhân", b: "Người dơi" }, { a: "Người nhện", b: "Người sắt" }, { a: "Đội trưởng Mỹ", b: "Thần sấm" },
+            { a: "Bánh pizza", b: "Mì ống" }, { a: "Bóng đá", b: "Bóng rổ" }, { a: "Âm nhạc", b: "Khiêu vũ" },
+            { a: "Chó", b: "Chó sói" }, { a: "Quả táo", b: "Quả lê" }, { a: "Ô tô", b: "Xe tải" },
+            { a: "Bút chì", b: "Bút máy" }, { a: "Bánh pizza", b: "Lasagna" }, { a: "Facebook", b: "Instagram" },
+            { a: "Kính râm", b: "Kính bơi" }, { a: "Máy tính xách tay", b: "Máy tính bảng" }, { a: "Bác sĩ", b: "Bác sĩ phẫu thuật" },
+            { a: "Bitcoin", b: "Ethereum" }, { a: "Đồng hồ", b: "Nhẫn" }, { a: "Bom", b: "Súng" },
+            { a: "Einstein", b: "Newton" }, { a: "Áo sơ mi", b: "Áo len" }, { a: "Bóng đá", b: "Bóng bầu dục" },
+            { a: "Máy bay", b: "Trực thăng" }, { a: "Dòng sông", b: "Cái hồ" }, { a: "Đại dương", b: "Dòng sông" },
+            { a: "Giáo viên", b: "Giáo sư" }, { a: "Xe đạp", b: "Xe máy" }, { a: "Muối", b: "Đường" },
+            { a: "Dao", b: "Kéo" }, { a: "Cái ghế", b: "Ghế dài" }, { a: "Lâu đài", b: "Ngôi nhà" },
+            { a: "Tàu hỏa", b: "Xe buýt" }, { a: "Gương", b: "Cửa sổ" }, { a: "Con chuột", b: "Chuột cống" },
+            { a: "Dưa chuột", b: "Bí ngòi" }, { a: "Dâu tây", b: "Quả mâm xôi" }, { a: "Quả chuối", b: "Chuối tá quạ" },
+            { a: "Trái dừa", b: "Quả dứa" }, { a: "Con rồng", b: "Khủng long" }, { a: "Bóng ma", b: "Thây ma" },
+            { a: "Đầu bếp", b: "Quầy bếp" }, { a: "Cái xẻng", b: "Cái rìu" }, { a: "Kim tự tháp", b: "Đền thờ" },
+            { a: "Núi lửa", b: "Ngọn núi" }, { a: "Sa mạc", b: "Bãi cát" }, { a: "Đám mây", b: "Sương mù" },
+            { a: "Tuyết", b: "Mưa đá" }, { a: "Thám tử", b: "Tội phạm" }, { a: "Rừng rậm", b: "Rừng cây" },
+            { a: "Đồng hồ treo tường", b: "Đồng hồ đeo tay" }, { a: "Bánh mì", b: "Bánh nướng" }, { a: "Bức tranh", b: "Bản phác thảo" },
+            { a: "Cái ô", b: "Cái lọng" }, { a: "Đồ vest", b: "Cà vạt" }, { a: "Tất", b: "Bít tất" },
+            { a: "Thắt lưng", b: "Quần jean" }, { a: "Vương miện", b: "Cái mũ" }, { a: "Ba lê", b: "Hip Hop" },
+            { a: "Con vẹt", b: "Con quạ" }, { a: "Con dơi", b: "Cú mèo" }, { a: "Ngọn nến", b: "Đèn lồng" },
+            { a: "Thư viện", b: "Trường đại học" }, { a: "Bảo tàng", b: "Phòng trưng bày" }, { a: "Đài phát thanh", b: "Podcast" },
+            { a: "Báo mạng", b: "Tờ báo" }, { a: "Bút máy", b: "Tờ giấy" }, { a: "Mặt trăng", b: "Mặt trời" },
+            { a: "Quần vợt", b: "Cầu lông" }, { a: "Trượt tuyết", b: "Tuyết" }, { a: "Bơi lội", b: "Lặn biển" },
+            { a: "Chạy bộ", b: "Đi dạo" }, { a: "Thang máy", b: "Thang cuốn" }, { a: "Phà", b: "Du thuyền" },
+            { a: "Bản đồ", b: "Hệ thống định vị" }, { a: "Thuyền buồm", b: "Du thuyền" }, { a: "Sao băng", b: "Vệ tinh" },
+            { a: "Hành tinh", b: "Ngôi sao" }, { a: "Động đất", b: "Sóng thần" }, { a: "Sứa", b: "Bạch tuộc" },
+            { a: "Chó sói", b: "Con cáo" }, { a: "Chim ưng", b: "Kền kền" }, { a: "Thằn lằn", b: "Tắc kè" },
+            { a: "Elvis Presley", b: "The Beatles" }, { a: "Leonardo da Vinci", b: "Michelangelo" }, { a: "Napoleon", b: "Julius Caesar" },
+            { a: "Mario", b: "Luigi" }, { a: "Sonic", b: "Tails" }, { a: "Pac-Man", b: "Tetris" },
+            { a: "Fortnite", b: "Minecraft" }, { a: "Call of Duty", b: "Battlefield" }, { a: "Game of Thrones", b: "Chúa tể những chiếc nhẫn" },
+            { a: "Star Wars", b: "Star Trek" }, { a: "Harry Potter", b: "Percy Jackson" }, { a: "Dracula", b: "Frankenstein" },
+            { a: "James Bond", b: "Đặc vụ" }, { a: "Homer Simpson", b: "Peter Griffin" }, { a: "SpongeBob", b: "Patrick" },
+            { a: "Godzilla", b: "King Kong" }, { a: "Lego", b: "Playmobil" }, { a: "UNO", b: "Cờ tỷ phú" },
+            { a: "Catan", b: "Risk" }, { a: "Blackjack", b: "Xì phé" }, { a: "Bingo", b: "Roulette" },
+            { a: "New York", b: "Los Angeles" }, { a: "Paris", b: "London" }, { a: "Rome", b: "Athens" },
+            { a: "Sydney", b: "Melbourne" }, { a: "Rio de Janeiro", b: "Buenos Aires" }, { a: "Đỉnh Everest", b: "Nepal" },
+            { a: "Amazon", b: "Sông Nile" }, { a: "Grand Canyon", b: "Thác Niagara" }, { a: "Taj Mahal", b: "Vạn Lý Trường Thành" },
+            { a: "Tháp Eiffel", b: "Tượng Nữ thần Tự do" }, { a: "Big Ben", b: "Tháp nghiêng Pisa" }, { a: "Thế vận hội", b: "World Cup" },
+            { a: "NBA", b: "NFL" }, { a: "Đánh gôn", b: "Bóng chày" }, { a: "UFC", b: "WWE" },
+            { a: "Twitch", b: "Netflix" }, { a: "Twitter", b: "Facebook" }, { a: "SpaceX", b: "Tesla" },
+            { a: "Burger King", b: "McDonald’s" }, { a: "Sony", b: "Samsung" }, { a: "Mercedes", b: "BMW" },
+            { a: "Đại học Harvard", b: "Đại học MIT" }, { a: "Đại học Oxford", b: "Trường cấp 3" }, { a: "CIA", b: "FBI" },
+            { a: "Hitler", b: "Stalin" }, { a: "Tesla", b: "Porsche" }, { a: "iPhone", b: "Samsung" },
+            { a: "PlayStation", b: "Xbox" }, { a: "Windows", b: "MacOS" }, { a: "YouTube", b: "TikTok" },
+            { a: "Twitch", b: "Kick" }, { a: "Spotify", b: "Apple Music" }, { a: "Reddit", b: "Discord" },
+            { a: "Instagram", b: "Snapchat" }, { a: "ChatGPT", b: "Gemini" }, { a: "Đồng hồ", b: "Đồng hồ mặt trời" },
+            { a: "Máy tính xách tay", b: "Máy tính để bàn" }, { a: "Cá mập", b: "Cá heo" }, { a: "Chim cánh cụt", b: "Hải âu" },
+            { a: "Mặt trăng", b: "Hành tinh" }, { a: "Sao chổi", b: "Tiểu hành tinh" }, { a: "Cây cầu", b: "Đường hầm" },
+            { a: "Xe buýt", b: "Tàu điện" }, { a: "Tàu hỏa", b: "Tàu một ray" }, { a: "Con thuyền", b: "Tàu ngầm" },
+            { a: "Cuốn sổ", b: "Nhật ký" }, { a: "Cái thìa", b: "Cái nĩa" }, { a: "Cái đĩa", b: "Cái bát" },
+            { a: "Đài phun nước", b: "Thác nước" }, { a: "Hồ nước", b: "Ao nước" }, { a: "Hươu cao cổ", b: "Ngựa vằn" },
+            { a: "Con voi", b: "Tê giác" }, { a: "Cá sấu", b: "Cá sấu mõm dài" }, { a: "Con hàu", b: "Ngao" },
+            { a: "Vàng", b: "Bạc" }, { a: "Bạch kim", b: "Vàng" }, { a: "Vải bò", b: "Vải nhung" },
+            { a: "Áo khoác", b: "Áo choàng" }, { a: "Khăn quàng", b: "Cà vạt" }, { a: "Ủng", b: "Giày thể thao" },
+            { a: "Mũ bảo hiểm", b: "Cái mũ" }, { a: "Vòng cổ", b: "Vòng tay" }, { a: "Nhẫn", b: "Hoa tai" },
+            { a: "Mi cờ rô", b: "Cái loa" }, { a: "Tai nghe", b: "Tai nghe nhét tai" }, { a: "Tivi", b: "Đài phát thanh" },
+            { a: "Máy chiếu", b: "Màn hình" }, { a: "Máy tính", b: "Máy đánh chữ" }, { a: "Đèn pin", b: "Đèn lồng" },
+            { a: "Cái lều", b: "Nhà gỗ" }, { a: "La bàn", b: "Bản đồ" }, { a: "Thẻ lên máy bay", b: "Căn cước công dân" },
+            { a: "Vé", b: "Hóa đơn" }, { a: "Hộ chiếu", b: "Vé máy bay" }, { a: "Tàu điện ngầm", b: "Taxi" },
+            { a: "Bầu trời", b: "Máy bay phản lực" }, { a: "Xe máy", b: "Xe tay ga" }, { a: "Ván lướt sóng", b: "Ván trượt" },
+            { a: "Bóng chày", b: "Bóng đá" }, { a: "Bóng chuyền", b: "Bóng rổ" }, { a: "Bóng bàn", b: "Cầu lông" },
+            { a: "Tiệm bánh", b: "Người bán thịt" }, { a: "Câu đố", b: "Ô chữ" }, { a: "Thẻ bài", b: "Xúc xắc" },
+            { a: "Ném bowling", b: "Đánh gôn" }, { a: "Chạy việt dã", b: "Chạy nước rút" }, { a: "Đấu kiếm", b: "Bắn cung" },
+            { a: "Quyền anh", b: "Võ karate" }, { a: "Khúc côn cầu", b: "Bóng đá" }, { a: "Buổi hòa nhạc", b: "Lễ hội" },
+            { a: "Tiểu thuyết", b: "Bài thơ" }, { a: "Từ điển", b: "Bách khoa toàn thư" }, { a: "Dược sĩ", b: "Bác sĩ" },
+            { a: "Kỹ sư", b: "Kiến trúc sư" }, { a: "Lính cứu hỏa", b: "Cảnh sát" }, { a: "Nước Đức", b: "Nước Pháp" },
+            { a: "Phi công", b: "Phi hành gia" }, { a: "Thẩm phán", b: "Hình phạt" }, { a: "Thợ làm bánh", b: "Đầu bếp" },
+            { a: "Nông dân", b: "Ngư dân" }, { a: "Thợ rèn", b: "Thợ mộc" }, { a: "Thiên đường", b: "Địa ngục" },
+            { a: "Bầu trời", b: "Đám mây" }, { a: "Nhật Bản", b: "Trung Quốc" }, { a: "Nước Đức", b: "Bia" },
+            { a: "Bộ phim", b: "Diễn viên" }, { a: "Màn hình", b: "Tivi" }, { a: "Nước Pháp", b: "Tháp Eiffel" },
+            { a: "Thần sấm", b: "Tia chớp" }, { a: "Obi Wan", b: "Thần lực" }, { a: "Đĩa bay", b: "Thiết bị bay không người lái" },
+            { a: "Chúa trời", b: "Thiên đường" }, { a: "Bánh bột ngô", b: "Bánh xèo Mexico" }, { a: "Bánh mì Pháp", b: "Bánh mì Ý" },
+            { a: "Bánh mì kẹp xúc xích", b: "Xúc xích Đức" }, { a: "Nước tăng lực", b: "Nước ngọt" }, { a: "Nước cốt dừa", b: "Sữa đậu nành" },
+            { a: "Picasso", b: "Van Gogh" }, { a: "Mozart", b: "Beethoven" }, { a: "Messi", b: "Ronaldo" },
+            { a: "Bayern Munich", b: "Real Madrid" }, { a: "Ferrari", b: "Lamborghini" }, { a: "Coca-Cola", b: "Pepsi" },
+            { a: "London", b: "Paris" }, { a: "Los Angeles", b: "New York" }, { a: "Big Ben", b: "Tháp nghiêng Pisa" },
+            { a: "Tượng Nữ thần Tự do", b: "Tháp Eiffel" }, { a: "Con chuột", b: "Bàn phím" }, { a: "Tivi", b: "Máy tính xách tay" },
+            { a: "Tủ quần áo", b: "Tủ kính" }, { a: "Cây phong", b: "Cây bụi" }, { a: "Máy sưởi", b: "Máy sấy tóc" },
+            { a: "Cái đèn", b: "Ngọn nến" }, { a: "Cái gối", b: "Cái chăn" }, { a: "Mi cờ rô", b: "Máy ảnh" },
+            { a: "Lò nướng", b: "Lò vi sóng" }, { a: "Cái chảo", b: "Cái nồi" }, { a: "Máy tính bảng", b: "Điện thoại thông minh" },
+            { a: "Cầu thang", b: "Thang máy" }, { a: "Nhạc Techno", b: "Nhạc Rap" }, { a: "Nhạc Rock", b: "Nhạc Pop" },
+            { a: "Bóng bàn", b: "Cầu lông" }, { a: "Cửa sổ", b: "Cái cửa" }, { a: "Lò nướng", b: "Hệ thống sưởi" },
+            { a: "Đồng hồ đeo tay", b: "Đồng hồ báo thức" }, { a: "Giường ngủ", b: "Ghế sô pha" }, { a: "Quyển sách", b: "Tờ báo" },
+            { a: "Khu rừng", b: "Công viên" }, { a: "Rạp chiếu phim", b: "Sân bowling" }, { a: "Netflix", b: "Rạp chiếu phim" },
+            { a: "Hồ bơi", b: "Bãi biển" }, { a: "Cái ly", b: "Cái cốc" }, { a: "Công việc", b: "Sở thích" },
+            { a: "Chúa Giê-su", b: "Ông già Noel" }, { a: "Áo lót", b: "Bikini" },
             { a: "Sơn Tùng M-TP", b: "Jack" }, { a: "Độ Mixi", b: "PewPew" }, { a: "Trấn Thành", b: "Trường Giang" },
             { a: "Hồ Ngọc Hà", b: "Mỹ Tâm" }, { a: "Đen Vâu", b: "Binz" }, { a: "MONO", b: "HIEUTHUHAI" },
             { a: "Lê Dương Bảo Lâm", b: "Kiều Minh Tuấn" }, { a: "Ninh Dương Lan Ngọc", b: "Thúy Ngân" },
@@ -1356,7 +1455,7 @@
 
         function goToVoteScreen() {
             isReviewMode = false;
-            if(themeBgm.paused) { themeBgm.currentTime = 0; themeBgm.play().catch(e => console.log(e)); }
+            if(themeBgm.paused && musicEnabled) { themeBgm.currentTime = 0; playBackgroundMusic(); }
             
             switchScreen('vote-screen'); 
             
@@ -1614,7 +1713,7 @@
         function startNextRound() { goToVoteScreen(); }
 
         function showLeaderboard() {
-            if(themeBgm.paused) { themeBgm.currentTime = 0; themeBgm.play().catch(e => console.log(e)); }
+            if(themeBgm.paused && musicEnabled) { themeBgm.currentTime = 0; playBackgroundMusic(); }
             switchScreen('leaderboard-screen'); 
             const tbody = document.getElementById('leaderboard-body'); tbody.innerHTML = '';
             
