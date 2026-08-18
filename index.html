@@ -152,7 +152,7 @@
         <div class="nes-container is-dark is-centered" style="margin-top: 30px;">
             <p class="text-pop">HỆ THỐNG DỮ LIỆU</p>
             <button class="nes-btn is-primary" style="width: 100%; margin-top: 20px; padding: 12px;" onclick="startNewSession()">Mở Hồ Sơ Mới</button>
-            <button id="btn-continue" class="nes-btn is-success" style="width: 100%; margin-top: 15px; padding: 12px; display: none;" onclick="showLoadScreen()">Tiếp Tục Điều Tra</button>
+            <button id="btn-continue" class="nes-btn is-success" style="width: 100%; margin-top: 15px; padding: 12px; display: none;" onclick="showLoadScreen()">Mở Hồ Sơ Đã Lưu</button>
             <button class="nes-btn is-warning" style="width: 100%; margin-top: 15px; padding: 12px;" onclick="showRules()">[ LUẬT CHƠI ]</button>
             <button id="music-toggle-btn" class="nes-btn" style="width: 100%; margin-top: 15px; padding: 12px;" onclick="toggleMusic()">[ NHẠC: BẬT ]</button>
         </div>
@@ -215,6 +215,27 @@
     </div>
 
     <!-- MÀN HÌNH 2: CHỌN THUỐC -->
+    <div id="game-summary-screen" class="screen">
+        <h2 style="color: #f7d51d;" class="text-pop arcade-title">XÁC NHẬN CHUYÊN ÁN</h2>
+        <div class="nes-container is-dark with-title is-centered">
+            <p class="title text-pop">Bố Trí Lực Lượng</p>
+            <p style="color:#ddd; font-size:18px; margin-bottom:20px;" class="text-pop">Quản trò kiểm tra lần cuối trước khi phát hồ sơ mật.</p>
+            <div id="game-summary-details" style="display:grid; grid-template-columns:repeat(2, minmax(0, 1fr)); gap:10px; text-align:left;"></div>
+            <button type="button" class="nes-btn is-success" style="margin-top:25px; width:100%; padding:12px;" onclick="beginRoleDistribution()">XÁC NHẬN & PHÁT HỒ SƠ</button>
+            <button type="button" class="nes-btn" style="margin-top:15px; width:100%; padding:10px;" onclick="switchScreen('setup-screen')">Quay Lại Thiết Lập</button>
+        </div>
+    </div>
+
+    <!-- MÀN HÌNH 2.1: CHUYỀN MÁY AN TOÀN -->
+    <div id="handoff-screen" class="screen">
+        <div class="nes-container is-dark is-centered" style="margin-top:12vh; text-align:center;">
+            <p style="color:#ddd; font-size:20px;" class="text-pop">Hãy đưa điện thoại cho</p>
+            <h2 id="handoff-player-name" style="color:#f7d51d; font-size:38px; margin:20px 0 30px;" class="text-pop">ĐẶC VỤ</h2>
+            <p style="color:#ddd; font-size:18px;" class="text-pop">Chỉ người này chạm để mở hồ sơ mật.</p>
+            <button type="button" class="nes-btn is-primary" style="margin-top:25px; width:100%; padding:14px;" onclick="openRoleRevealForCurrentPlayer()">TÔI LÀ NGƯỜI NÀY</button>
+        </div>
+    </div>
+
     <div id="reveal-screen" class="screen">
         <div style="text-align: right; margin-bottom: 20px;">
             <button id="reroll-btn" class="nes-btn is-error" style="font-size: 16px; padding: 6px 12px;" onclick="rerollWords()">[ XÓA / ĐỔI MÃ ]</button>
@@ -281,6 +302,7 @@
             </div>
             
             <div style="text-align: center; margin-top: 25px;">
+                <button id="undo-elimination-btn" class="nes-btn" style="display: none; width: 100%; padding: 12px; margin-bottom: 12px;" onclick="undoLastElimination()">HOÀN TÁC LẦN LOẠI GẦN NHẤT</button>
                 <button id="next-round-btn" class="nes-btn is-warning" style="display: none; width: 100%; padding: 12px;" onclick="startNextRound()">Tiếp Tục Điều Tra</button>
                 <button id="btn-to-victory" class="nes-btn is-success" style="display: none; width: 100%; padding: 12px;" onclick="showVictoryScreen()">Xem Kết Quả Cuối Cùng</button>
             </div>
@@ -297,6 +319,12 @@
             <div class="nes-container is-dark" style="margin-top: 20px; padding: 20px; font-size: 20px; border-color: #f7d51d;">
                 <p style="color: #3498db; margin-bottom: 15px;" class="text-pop">Mật lệnh Thám Tử:<br><b id="victory-word-civ" style="font-size: 32px; color:#fff;"></b></p>
                 <p style="color: #e76e55; margin-bottom: 0;" class="text-pop">Mật lệnh Áo Đen:<br><b id="victory-word-spy" style="font-size: 32px; color:#fff;"></b></p>
+            </div>
+
+            <div class="nes-container is-dark" style="margin-top: 20px; padding: 20px; text-align:left; border-color: #555;">
+                <p style="color:#f7d51d; font-size:22px; text-align:center; margin:0 0 15px;" class="text-pop">HỒ SƠ KẾT VÁN</p>
+                <div id="victory-role-history" style="font-size:20px;"></div>
+                <div id="victory-elimination-history" style="font-size:18px; color:#ddd; margin-top:18px;"></div>
             </div>
             
             <button class="nes-btn is-success" style="margin-top: 30px; width: 100%; padding: 12px;" onclick="showLeaderboard()">Xem Bảng Xếp Hạng</button>
@@ -623,6 +651,7 @@
         let currentPlayerIndex = 0; let currentSpeakerIndex = 0; let pillPickCounter = 0;
         let civilianWordToGuess = ""; let spyWordToGuess = ""; let hasShotCurrentTurn = false; let playedHistory = [];
         let isReviewMode = false; let currentWinner = null; let roundPoints = {}; 
+        let pendingGameConfig = null; let lastElimination = null; let roundHistory = [];
 
         let timerInterval = null;
         let totalSeconds = 0;
@@ -1221,21 +1250,43 @@
             let numSpies = parseInt(document.getElementById('input-spies').value) || 0, numKids = parseInt(document.getElementById('input-kids').value) || 0;
             if (playerNamesInput.length < 4) { showModal("<div style='text-align:center'>Cần tối thiểu 4 người để lập chuyên án!</div>", "alert"); return; }
             if (playerNamesInput.length - numSpies - numKids < numSpies + numKids) { showModal("<div style='text-align:center'>Lỗi chiến thuật!<br><span style='color:#e76e55'>Thám tử ít hơn tổng số tội phạm.</span></div>", "alert"); return; }
-            
+
+            pendingGameConfig = {
+                spies: numSpies,
+                kids: numKids,
+                civilians: playerNamesInput.length - numSpies - numKids,
+                timerMinutes: parseInt(document.getElementById('input-timer').value) || 0,
+                defuserEnabled: document.getElementById('cb-defuser').checked
+            };
+            renderGameSummary();
+            switchScreen('game-summary-screen');
+        }
+
+        function renderGameSummary() {
+            const config = pendingGameConfig;
+            const c4Label = config.defuserEnabled ? (config.timerMinutes > 0 ? 'C4: BẬT' : 'C4 TỰ DO') : 'TẮT';
+            document.getElementById('game-summary-details').innerHTML = `
+                <div style="padding:12px; background:#000; border:2px solid #3498db;"><span style="color:#3498db;">THÁM TỬ</span><br><b style="font-size:30px;">${config.civilians}</b></div>
+                <div style="padding:12px; background:#000; border:2px solid #e76e55;"><span style="color:#e76e55;">ÁO ĐEN</span><br><b style="font-size:30px;">${config.spies}</b></div>
+                <div style="padding:12px; background:#000; border:2px solid #209cee;"><span style="color:#209cee;">SIÊU TRỘM</span><br><b style="font-size:30px;">${config.kids}</b></div>
+                <div style="padding:12px; background:#000; border:2px solid #f7d51d;"><span style="color:#f7d51d;">C4 / THỜI GIAN</span><br><b style="font-size:22px;">${c4Label}<br>${config.timerMinutes > 0 ? config.timerMinutes + ' PHÚT' : 'KHÔNG GIỚI HẠN'}</b></div>
+            `;
+        }
+
+        function beginRoleDistribution() {
+            const config = pendingGameConfig;
             themeBgm.pause(); SFX.doorclose(); 
+            isDefuserMode = config.defuserEnabled;
             
-            isDefuserMode = document.getElementById('cb-defuser').checked;
-            
-            generateWordsAndRoles(playerNamesInput.length - numSpies - numKids, numSpies, numKids);
+            generateWordsAndRoles(config.civilians, config.spies, config.kids);
             
             players = playerNamesInput.map(n => { return {id: n, isAlive: true, role: null, word: null, isDefuser: false}; });
             
             currentPlayerIndex = Math.floor(Math.random() * players.length);
             pillPickCounter = 0;
-            isReviewMode = false; roundPoints = {}; currentWinner = null;
+            isReviewMode = false; roundPoints = {}; currentWinner = null; lastElimination = null; roundHistory = [];
             
-            let timerMinutes = parseInt(document.getElementById('input-timer').value) || 0;
-            totalSeconds = timerMinutes * 60;
+            totalSeconds = config.timerMinutes * 60;
             isTimerActive = false;
             document.getElementById('bomb-container').style.display = 'none';
 
@@ -1246,7 +1297,7 @@
             document.getElementById('defuse-word-input').value = "";
             document.getElementById('defuse-error-1').style.display = 'none';
 
-            switchScreen('reveal-screen'); renderPills(); prepareNextShooter();
+            renderPills(); showHandoffScreen();
         }
 
         function updateTimerUI() {
@@ -1346,6 +1397,16 @@
             document.getElementById('next-player-btn').style.display = 'none';
         }
 
+        function showHandoffScreen() {
+            document.getElementById('handoff-player-name').innerText = players[currentPlayerIndex].id.toUpperCase();
+            switchScreen('handoff-screen');
+        }
+
+        function openRoleRevealForCurrentPlayer() {
+            switchScreen('reveal-screen');
+            prepareNextShooter();
+        }
+
         function takePill(pillCanvas, roleIndex) {
             if(hasShotCurrentTurn || pillCanvas.classList.contains('consumed')) return; 
             hasShotCurrentTurn = true; 
@@ -1381,7 +1442,7 @@
                 pillPickCounter++;
                 if (pillPickCounter < players.length) {
                     currentPlayerIndex = (currentPlayerIndex + 1) % players.length; 
-                    prepareNextShooter();
+                    showHandoffScreen();
                 }
                 else {
                     let validSpeakers = [];
@@ -1553,9 +1614,12 @@
         /* --- PHÁN QUYẾT TRUYỀN THỐNG --- */
         function eliminatePlayer(index) {
             SFX.eliminate();
-            const player = players[index]; player.isAlive = false; switchScreen('result-screen');
+            const player = players[index];
+            lastElimination = { playerIndex: index, previousSpeakerIndex: currentSpeakerIndex };
+            roundHistory.push({ playerId: player.id, role: player.role });
+            player.isAlive = false; switchScreen('result-screen');
             const msg = document.getElementById('result-message'), canvas = document.getElementById('mascot-display'), mwGuess = document.getElementById('mr-white-guess');
-            document.getElementById('next-round-btn').style.display = 'none'; document.getElementById('btn-to-victory').style.display = 'none';
+            document.getElementById('next-round-btn').style.display = 'none'; document.getElementById('undo-elimination-btn').style.display = 'none'; document.getElementById('btn-to-victory').style.display = 'none';
             mwGuess.style.display = 'none'; document.getElementById('guess-input').value = ""; 
 
             let nextIndex = (index + 1) % players.length;
@@ -1612,8 +1676,20 @@
                 document.getElementById('btn-to-victory').style.display = 'inline-block'; 
                 themeBgm.pause();
             } else {
+                document.getElementById('undo-elimination-btn').style.display = lastElimination ? 'inline-block' : 'none';
                 document.getElementById('next-round-btn').style.display = 'inline-block'; 
             }
+        }
+
+        function undoLastElimination() {
+            if (!lastElimination) return;
+            const { playerIndex, previousSpeakerIndex } = lastElimination;
+            players[playerIndex].isAlive = true;
+            currentSpeakerIndex = previousSpeakerIndex;
+            roundHistory.pop();
+            lastElimination = null;
+            document.getElementById('undo-elimination-btn').style.display = 'none';
+            goToVoteScreen();
         }
 
         function showVictoryScreen() {
@@ -1623,6 +1699,7 @@
             
             document.getElementById('victory-word-civ').innerText = civilianWordToGuess || "???";
             document.getElementById('victory-word-spy').innerText = spyWordToGuess || "???";
+            renderVictoryHistory();
 
             // SỬA LỖI ĐIỂM: TIME OUT -> Tất cả cùng thua
             if (currentWinner === 'TimeOut') {
@@ -1673,6 +1750,24 @@
             mascotContainer.classList.remove('reveal-mascot'); void mascotContainer.offsetWidth; mascotContainer.classList.add('reveal-mascot');
             
             distributePoints(currentWinner);
+        }
+
+        function getRolePresentation(role) {
+            if (role === 'Dan') return { label: 'THÁM TỬ', color: '#3498db' };
+            if (role === 'GianDiep') return { label: 'ÁO ĐEN', color: '#e76e55' };
+            return { label: 'SIÊU TRỘM', color: '#209cee' };
+        }
+
+        function renderVictoryHistory() {
+            const roleHistory = document.getElementById('victory-role-history');
+            const eliminationHistory = document.getElementById('victory-elimination-history');
+            roleHistory.innerHTML = players.map(player => {
+                const role = getRolePresentation(player.role);
+                return `<div style="display:flex; justify-content:space-between; gap:15px; padding:6px 0; border-bottom:1px dashed #555;"><span style="color:#fff;">${player.id}</span><b style="color:${role.color};">${role.label}</b></div>`;
+            }).join('');
+            eliminationHistory.innerHTML = roundHistory.length
+                ? `<p style="color:#f7d51d; margin:0 0 8px;">DIỄN BIẾN BẮT GIỮ</p>${roundHistory.map((item, index) => { const role = getRolePresentation(item.role); return `<div>${index + 1}. ${item.playerId} — <b style="color:${role.color};">${role.label}</b></div>`; }).join('')}`
+                : '<p style="margin:0;">Chưa có nghi phạm nào bị bắt giữ.</p>';
         }
 
         function distributePoints(winnerLabel) {
