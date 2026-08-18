@@ -388,8 +388,22 @@
                     <tbody id="leaderboard-body"></tbody>
                 </table>
             </div>
+            <button id="btn-edit-scores" type="button" class="nes-btn is-warning" style="margin-top: 25px; width: 100%; padding: 12px; display:none;" onclick="openScoreEditor()">[ SỬA ĐIỂM ]</button>
             <button id="btn-next-case" type="button" class="nes-btn is-primary" style="margin-top: 25px; width: 100%; padding: 12px; display:none;" onclick="switchScreen('setup-screen')">Vụ Án Mới</button>
             <button id="btn-menu" type="button" class="nes-btn" style="margin-top: 15px; width: 100%; padding: 12px; display:none;" onclick="exitToMenu()">Trở Về Menu</button>
+        </div>
+    </div>
+
+    <!-- OVERLAY SỬA ĐIỂM TỔNG -->
+    <div id="score-editor-overlay" style="display:none; position:fixed; inset:0; z-index:9999; background:rgba(0,0,0,0.92); justify-content:center; align-items:center; padding:20px;">
+        <div class="nes-container is-dark" style="width:100%; max-width:500px; max-height:90vh; overflow-y:auto; padding:20px; border-color:#f7d51d;">
+            <h3 style="color:#f7d51d; text-align:center; font-size:26px; margin:0 0 10px;" class="text-pop">SỬA ĐIỂM TỔNG</h3>
+            <p style="color:#ddd; font-size:18px; text-align:center; margin:0 0 20px;" class="text-pop">Nhập điểm tổng mới cho từng đặc vụ.</p>
+            <div id="score-editor-list" style="display:flex; flex-direction:column; gap:12px;"></div>
+            <div style="display:flex; gap:12px; margin-top:24px;">
+                <button type="button" class="nes-btn" style="flex:1;" onclick="closeScoreEditor()">HỦY</button>
+                <button type="button" class="nes-btn is-success" style="flex:1;" onclick="saveScoreEdits()">LƯU ĐIỂM</button>
+            </div>
         </div>
     </div>
 
@@ -1925,6 +1939,49 @@
 
         function startNextRound() { goToVoteScreen(); }
 
+        function openScoreEditor() {
+            const list = document.getElementById('score-editor-list');
+            list.innerHTML = '';
+            Object.keys(globalScores).sort((a, b) => a.localeCompare(b, 'vi')).forEach((name, index) => {
+                const row = document.createElement('label');
+                row.style.cssText = 'display:flex; align-items:center; gap:12px; padding:10px; background:#000; border:2px solid #555;';
+                const nameLabel = document.createElement('span');
+                nameLabel.className = 'text-pop';
+                nameLabel.style.cssText = 'flex:1; color:#fff; font-size:22px; overflow-wrap:anywhere;';
+                nameLabel.textContent = name;
+                const scoreInput = document.createElement('input');
+                scoreInput.type = 'number';
+                scoreInput.className = 'nes-input is-dark';
+                scoreInput.value = globalScores[name] || 0;
+                scoreInput.dataset.playerName = name;
+                scoreInput.id = `edit-score-${index}`;
+                scoreInput.style.cssText = 'width:110px; text-align:center; font-size:24px !important; padding:6px !important;';
+                row.append(nameLabel, scoreInput);
+                list.appendChild(row);
+            });
+            document.getElementById('score-editor-overlay').style.display = 'flex';
+        }
+
+        function closeScoreEditor() {
+            document.getElementById('score-editor-overlay').style.display = 'none';
+        }
+
+        function saveScoreEdits() {
+            const inputs = document.querySelectorAll('#score-editor-list input[data-player-name]');
+            for (const input of inputs) {
+                const score = Number.parseInt(input.value, 10);
+                if (!Number.isFinite(score)) {
+                    showModal("<div style='text-align:center'>Điểm phải là một số nguyên.</div>", 'alert');
+                    return;
+                }
+                globalScores[input.dataset.playerName] = score;
+            }
+            roundPoints = {};
+            saveData();
+            closeScoreEditor();
+            showLeaderboard();
+        }
+
         function showLeaderboard() {
             if(themeBgm.paused && musicEnabled) { themeBgm.currentTime = 0; playBackgroundMusic(); }
             switchScreen('leaderboard-screen'); 
@@ -1940,6 +1997,7 @@
             let hasAddedPoints = oldScoreArray.some(p => p.added !== 0);
 
             if(hasAddedPoints) {
+                document.getElementById('btn-edit-scores').style.display = 'none';
                 document.getElementById('btn-next-case').style.display = 'none';
                 document.getElementById('btn-menu').style.display = 'none';
 
@@ -1978,6 +2036,7 @@
                         });
                         
                         SFX.click();
+                        document.getElementById('btn-edit-scores').style.display = 'block';
                         document.getElementById('btn-next-case').style.display = 'block';
                         document.getElementById('btn-menu').style.display = 'block';
                         roundPoints = {}; 
@@ -1985,6 +2044,7 @@
                 }, 1000);
             } 
             else {
+                document.getElementById('btn-edit-scores').style.display = 'block';
                 document.getElementById('btn-next-case').style.display = 'block';
                 document.getElementById('btn-menu').style.display = 'block';
                 oldScoreArray.sort((a, b) => b.new - a.new);
