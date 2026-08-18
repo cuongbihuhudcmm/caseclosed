@@ -9,9 +9,10 @@
     <meta name="theme-color" content="#090910">
     <meta name="application-name" content="CASECLOSED">
     <title>CASECLOSED - Điệp Vụ Tối Mật</title>
-    <link rel="icon" type="image/png" sizes="192x192" href="icons/icon-192.png">
-    <link rel="apple-touch-icon" sizes="180x180" href="icons/apple-touch-icon.png">
-    <link rel="manifest" href="site.webmanifest">
+    <link rel="icon" type="image/png" sizes="192x192" href="./icon-192.png?v=3">
+    <link rel="apple-touch-icon" sizes="180x180" href="./apple-touch-icon.png?v=3">
+    <link rel="apple-touch-icon-precomposed" href="./apple-touch-icon.png?v=3">
+    <link rel="manifest" href="./site.webmanifest?v=3">
     <meta name="apple-mobile-web-app-title" content="CASECLOSED">
     
     <link href="https://fonts.googleapis.com/css2?family=VT323&display=swap" rel="stylesheet">
@@ -779,6 +780,12 @@
             updateMenuButtons();
             syncMusicButton();
         });
+
+        if ('serviceWorker' in navigator && window.isSecureContext) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('./sw.js').catch(() => {});
+            });
+        }
 
         function updateMenuButtons() {
             let allSessions = JSON.parse(localStorage.getItem('uc_all_sessions') || '{}');

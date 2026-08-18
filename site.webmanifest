@@ -1,20 +1,26 @@
 {
   "name": "CASECLOSED - Điệp vụ tối mật",
   "short_name": "CASECLOSED",
-  "start_url": "./",
+  "id": "./",
+  "start_url": "./index.html",
+  "scope": "./",
   "display": "standalone",
+  "display_override": ["standalone"],
   "background_color": "#090910",
   "theme_color": "#090910",
+  "description": "Quản trò offline cho Ai là gián điệp.",
   "icons": [
     {
-      "src": "icons/icon-192.png",
+      "src": "icon-192.png?v=3",
       "sizes": "192x192",
-      "type": "image/png"
+      "type": "image/png",
+      "purpose": "any maskable"
     },
     {
-      "src": "icons/icon-512.png",
+      "src": "icon-512.png?v=3",
       "sizes": "512x512",
-      "type": "image/png"
+      "type": "image/png",
+      "purpose": "any maskable"
     }
   ]
 }
