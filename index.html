@@ -545,6 +545,15 @@
             drawPixelArt('bomb-icon', spriteDynamite, 6);
             
             updateMenuButtons();
+
+            // TẠO FAVICON 8-BIT (LOGO WEB) TỰ ĐỘNG TỪ SPRITE THÁM TỬ
+            const favCanvas = document.createElement('canvas');
+            drawPixelArt(favCanvas, spriteDetective, 4);
+            const favLink = document.createElement('link');
+            favLink.rel = 'icon';
+            favLink.type = 'image/png';
+            favLink.href = favCanvas.toDataURL('image/png');
+            document.head.appendChild(favLink);
         });
 
         function updateMenuButtons() {
@@ -1117,12 +1126,12 @@
 
             if (currentWinner === 'TimeOut' || currentWinner === 'DefusalFail') {
                 SFX.doorclose();
-                title.innerHTML = '<b style="color:#e74c3c" class="text-pop">💣 BÙMMM! BOM ĐÃ NỔ 💣</b>';
+                title.innerHTML = '<b style="color:#e74c3c" class="text-pop"> BOM ĐÃ NỔ </b>';
                 mascotContainer.innerHTML = `<p style="color:#fff; font-size: 24px;" class="text-pop">Tổ chức Áo Đen đã giăng bẫy thành công!</p>`;
             }
             else if (currentWinner === 'DefusalWin') {
                 SFX.victory();
-                title.innerHTML = '<b style="color:#27ae60" class="text-pop">💣 ĐÃ GỠ BOM THÀNH CÔNG</b>';
+                title.innerHTML = '<b style="color:#27ae60" class="text-pop">ĐÃ GỠ BOM THÀNH CÔNG</b>';
                 mascotContainer.innerHTML = `<p style="color:#fff; font-size: 24px;" class="text-pop">Thám tử xuất sắc lật ngược thế cờ!</p>`;
             }
             else if(currentWinner === 'Dan') {
