@@ -10,8 +10,33 @@
     <title>CASECLOSED - Điệp Vụ Tối Mật</title>
     
     <!-- LOGO WEB & "THÊM VÀO MÀN HÌNH CHÍNH" ĐIỆN THOẠI (SVG TĨNH) -->
-    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 10 11'%3E%3Crect x='4' y='0' width='1' height='1' fill='%234a3018'/%3E%3Crect x='3' y='1' width='4' height='1' fill='%234a3018'/%3E%3Crect x='2' y='2' width='6' height='1' fill='%234a3018'/%3E%3Crect x='2' y='3' width='1' height='1' fill='%234a3018'/%3E%3Crect x='3' y='3' width='4' height='1' fill='%23ffcba4'/%3E%3Crect x='7' y='3' width='1' height='1' fill='%234a3018'/%3E%3Crect x='2' y='4' width='1' height='1' fill='%23ecf0f1'/%3E%3Crect x='3' y='4' width='1' height='1' fill='%23000'/%3E%3Crect x='4' y='4' width='2' height='1' fill='%23ffcba4'/%3E%3Crect x='6' y='4' width='1' height='1' fill='%23000'/%3E%3Crect x='7' y='4' width='1' height='1' fill='%23ecf0f1'/%3E%3Crect x='2' y='5' width='6' height='1' fill='%23ffcba4'/%3E%3Crect x='3' y='6' width='1' height='1' fill='%232980b9'/%3E%3Crect x='4' y='6' width='2' height='1' fill='%23e74c3c'/%3E%3Crect x='6' y='6' width='1' height='1' fill='%232980b9'/%3E%3Crect x='2' y='7' width='2' height='1' fill='%232980b9'/%3E%3Crect x='4' y='7' width='2' height='1' fill='%23ecf0f1'/%3E%3Crect x='6' y='7' width='2' height='1' fill='%232980b9'/%3E%3Crect x='1' y='8' width='3' height='1' fill='%232980b9'/%3E%3Crect x='4' y='8' width='2' height='1' fill='%23ecf0f1'/%3E%3Crect x='6' y='8' width='3' height='1' fill='%232980b9'/%3E%3Crect x='1' y='9' width='8' height='1' fill='%232980b9'/%3E%3Crect x='1' y='10' width='2' height='1' fill='%23000'/%3E%3Crect x='7' y='10' width='2' height='1' fill='%23000'/%3E%3C/svg%3E">
-    <link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 10 11'%3E%3Crect x='4' y='0' width='1' height='1' fill='%234a3018'/%3E%3Crect x='3' y='1' width='4' height='1' fill='%234a3018'/%3E%3Crect x='2' y='2' width='6' height='1' fill='%234a3018'/%3E%3Crect x='2' y='3' width='1' height='1' fill='%234a3018'/%3E%3Crect x='3' y='3' width='4' height='1' fill='%23ffcba4'/%3E%3Crect x='7' y='3' width='1' height='1' fill='%234a3018'/%3E%3Crect x='2' y='4' width='1' height='1' fill='%23ecf0f1'/%3E%3Crect x='3' y='4' width='1' height='1' fill='%23000'/%3E%3Crect x='4' y='4' width='2' height='1' fill='%23ffcba4'/%3E%3Crect x='6' y='4' width='1' height='1' fill='%23000'/%3E%3Crect x='7' y='4' width='1' height='1' fill='%23ecf0f1'/%3E%3Crect x='2' y='5' width='6' height='1' fill='%23ffcba4'/%3E%3Crect x='3' y='6' width='1' height='1' fill='%232980b9'/%3E%3Crect x='4' y='6' width='2' height='1' fill='%23e74c3c'/%3E%3Crect x='6' y='6' width='1' height='1' fill='%232980b9'/%3E%3Crect x='2' y='7' width='2' height='1' fill='%232980b9'/%3E%3Crect x='4' y='7' width='2' height='1' fill='%23ecf0f1'/%3E%3Crect x='6' y='7' width='2' height='1' fill='%232980b9'/%3E%3Crect x='1' y='8' width='3' height='1' fill='%232980b9'/%3E%3Crect x='4' y='8' width='2' height='1' fill='%23ecf0f1'/%3E%3Crect x='6' y='8' width='3' height='1' fill='%232980b9'/%3E%3Crect x='1' y='9' width='8' height='1' fill='%232980b9'/%3E%3Crect x='1' y='10' width='2' height='1' fill='%23000'/%3E%3Crect x='7' y='10' width='2' height='1' fill='%23000'/%3E%3C/svg%3E">
+    <script>
+        (function() {
+            var c = {'0':'transparent','1':'#4a3018','2':'#ffcba4','3':'#2980b9','4':'#2b2b2b','5':'#ecf0f1','6':'#000000','8':'#e74c3c'};
+            var s = ["0000100000", "0001111000", "0011111100", "0012222100", "0056226500", "0022222200", "0003883000", "0033553300", "0333553330", "0333333330", "0660000660"];
+            var scale = 20; 
+            var canvas = document.createElement('canvas');
+            canvas.width = s[0].length * scale; canvas.height = s.length * scale;
+            var ctx = canvas.getContext('2d');
+            ctx.fillStyle = '#f7d51d'; 
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            for(var y=0; y<s.length; y++) {
+                for(var x=0; x<s[y].length; x++) {
+                    if(s[y][x] !== '0') {
+                        ctx.fillStyle = c[s[y][x]];
+                        ctx.fillRect(x*scale, y*scale, scale, scale);
+                    }
+                }
+            }
+            var dataUrl = canvas.toDataURL('image/png');
+            var linkIcon = document.createElement('link'); linkIcon.rel = 'icon'; linkIcon.type = 'image/png'; linkIcon.href = dataUrl;
+            document.head.appendChild(linkIcon);
+            var appleIcon = document.createElement('link'); appleIcon.rel = 'apple-touch-icon'; appleIcon.href = dataUrl;
+            document.head.appendChild(appleIcon);
+            var appTitle = document.createElement('meta'); appTitle.name = 'apple-mobile-web-app-title'; appTitle.content = 'CASECLOSED';
+            document.head.appendChild(appTitle);
+        })();
+    </script>
     
     <link href="https://fonts.googleapis.com/css2?family=VT323&display=swap" rel="stylesheet">
     <link href="https://unpkg.com/nes.css@2.3.0/css/nes.min.css" rel="stylesheet" />
@@ -21,6 +46,7 @@
             font-family: 'VT323', monospace; font-size: 24px; padding: 20px; 
             color: #e0e0e0; line-height: 1.5; margin: 0; min-height: 100vh;
             overflow-x: hidden; position: relative; background-color: #090910; 
+            padding-bottom: 150px; /* FIX MOBILE: Tạo đệm để cuộn qua khỏi quả bom */
         }
         
         .retro-bg { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; z-index: -2; }
@@ -102,6 +128,21 @@
         @keyframes waveAnim { 0% { transform: translateY(0); } 100% { transform: translateY(-10px); } }
         .anim-float { animation: float 1.5s infinite alternate steps(4); }
         @keyframes float { 0% { transform: translateY(0px); } 100% { transform: translateY(-15px); } }
+
+        /* --- FIX MOBILE RESPONSIVE --- */
+        @media screen and (max-width: 768px) {
+            #bomb-container {
+                transform: scale(0.65); 
+                transform-origin: bottom right;
+                bottom: 10px;
+                right: 10px;
+            }
+        }
+        @media screen and (max-width: 400px) {
+            #bomb-container {
+                transform: scale(0.55); 
+            }
+        }
     </style>
 </head>
 <body>
@@ -431,29 +472,23 @@
         const themeBgm = new Audio('THEME.mp3'); 
         themeBgm.loop = true; themeBgm.volume = 0.5;
 
-        // --- XỬ LÝ CHẠY NGẦM (BACKGROUND AUDIO FIX) ---
+        // --- XỬ LÝ CHẠY NGẦM ---
         document.addEventListener("visibilitychange", () => {
             if (document.hidden) {
-                // Tạm dừng nhạc nền THEME
                 if (!themeBgm.paused) {
                     themeBgm.dataset.wasPlaying = "true";
                     themeBgm.pause();
                 } else {
                     themeBgm.dataset.wasPlaying = "false";
                 }
-                
-                // Tạm dừng Web Audio API (nhịp tim, SFX)
                 if (audioCtx && audioCtx.state === 'running') {
                     audioCtx.suspend();
                 }
             } else {
-                // Khôi phục nhạc nền THEME nếu trước đó đang phát
-                if (themeBgm.dataset.wasPlaying === "true" && !isMuted) {
+                if (themeBgm.dataset.wasPlaying === "true") {
                     themeBgm.play().catch(e => console.log(e));
                 }
-                
-                // Khôi phục Web Audio API
-                if (audioCtx && audioCtx.state === 'suspended' && !isMuted) {
+                if (audioCtx && audioCtx.state === 'suspended') {
                     audioCtx.resume();
                 }
             }
@@ -1148,9 +1183,16 @@
             document.getElementById('victory-word-civ').innerText = civilianWordToGuess || "???";
             document.getElementById('victory-word-spy').innerText = spyWordToGuess || "???";
 
-            if (currentWinner === 'TimeOut' || currentWinner === 'DefusalFail') {
+            // SỬA LỖI ĐIỂM: TIME OUT
+            if (currentWinner === 'TimeOut') {
                 SFX.doorclose();
-                title.innerHTML = '<b style="color:#e74c3c" class="text-pop"> BOM ĐÃ NỔ </b>';
+                title.innerHTML = '<b style="color:#e74c3c" class="text-pop"> HẾT GIỜ - BOM ĐÃ NỔ </b>';
+                mascotContainer.innerHTML = `<p style="color:#fff; font-size: 24px;" class="text-pop">Nhiệm vụ thất bại! Toàn bộ lực lượng đã tử nạn!</p>`;
+            }
+            // SỬA LỖI ĐIỂM: CẮT SAI DÂY
+            else if (currentWinner === 'DefusalFail') {
+                SFX.doorclose();
+                title.innerHTML = '<b style="color:#e74c3c" class="text-pop"> CẮT SAI DÂY - BOM ĐÃ NỔ </b>';
                 mascotContainer.innerHTML = `<p style="color:#fff; font-size: 24px;" class="text-pop">Tổ chức Áo Đen đã giăng bẫy thành công!</p>`;
             }
             else if (currentWinner === 'DefusalWin') {
@@ -1196,7 +1238,13 @@
             roundPoints = {};
             players.forEach(p => {
                 let pts = 0;
-                if (winnerLabel === 'TimeOut' || winnerLabel === 'DefusalFail') {
+                // SỬA LỖI ĐIỂM: Tách TIME OUT và CẮT SAI DÂY
+                if (winnerLabel === 'TimeOut') {
+                    // Tất cả đều thua, đều bị trừ điểm
+                    pts = currentScoreSettings.timeOutPenalty !== undefined ? currentScoreSettings.timeOutPenalty : -2;
+                }
+                else if (winnerLabel === 'DefusalFail') {
+                    // Áo đen thắng, những người khác thua
                     if (p.role === 'GianDiep') pts = currentScoreSettings.spyWin;
                     else pts = currentScoreSettings.timeOutPenalty !== undefined ? currentScoreSettings.timeOutPenalty : -2;
                 }
