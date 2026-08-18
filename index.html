@@ -429,6 +429,7 @@
 
         const AudioContext = window.AudioContext || window.webkitAudioContext;
         let audioCtx; 
+        const SFX_VOLUME_MULTIPLIER = 1.2;
 
         function initAudio() {
             if (!audioCtx) audioCtx = new AudioContext();
@@ -439,7 +440,7 @@
             initAudio();
             const osc = audioCtx.createOscillator(), gain = audioCtx.createGain();
             osc.type = type; osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
-            gain.gain.setValueAtTime(vol, audioCtx.currentTime);
+            gain.gain.setValueAtTime(Math.min(vol * SFX_VOLUME_MULTIPLIER, 0.75), audioCtx.currentTime);
             gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + duration);
             osc.connect(gain); gain.connect(audioCtx.destination); osc.start(); osc.stop(audioCtx.currentTime + duration);
         }
@@ -451,25 +452,62 @@
             const data = buffer.getChannelData(0);
             for (let i = 0; i < bufferSize; i++) data[i] = Math.random() * 2 - 1;
             const noise = audioCtx.createBufferSource(); noise.buffer = buffer;
-            const gain = audioCtx.createGain(); gain.gain.setValueAtTime(vol, audioCtx.currentTime);
+            const gain = audioCtx.createGain(); gain.gain.setValueAtTime(Math.min(vol * SFX_VOLUME_MULTIPLIER, 0.75), audioCtx.currentTime);
             gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + duration);
             noise.connect(gain); gain.connect(audioCtx.destination); noise.start();
         }
 
         const SFX = {
             click: () => playTone(600, 'square', 0.1, 0.05),
-            swallow: () => { playTone(800, 'sine', 0.1, 0.1); setTimeout(() => playTone(1200, 'sine', 0.15, 0.1), 100); }, 
-            eliminate: () => { playTone(300, 'square', 0.2, 0.1); setTimeout(() => playTone(250, 'square', 0.2, 0.1), 200); setTimeout(() => playTone(200, 'square', 0.4, 0.15), 400); },
-            victory: () => { playTone(400, 'square', 0.1, 0.1); setTimeout(() => playTone(500, 'square', 0.1, 0.1), 100); setTimeout(() => playTone(600, 'square', 0.3, 0.15), 200); },
-            doorclose: () => { playNoise(0.6, 0.5); playTone(80, 'square', 0.5, 0.3); setTimeout(() => playTone(50, 'sawtooth', 0.4, 0.4), 100); },
+            swallow: () => { duckBackgroundMusic('interaction', 0.25); playTone(800, 'sine', 0.1, 0.1); setTimeout(() => playTone(1200, 'sine', 0.15, 0.1), 100); }, 
+            eliminate: () => { duckBackgroundMusic('impact', 0.8); playTone(300, 'square', 0.2, 0.1); setTimeout(() => playTone(250, 'square', 0.2, 0.1), 200); setTimeout(() => playTone(200, 'square', 0.4, 0.15), 400); },
+            defuse: () => { duckBackgroundMusic('impact', 0.45); playTone(740, 'square', 0.1, 0.11); setTimeout(() => playTone(988, 'square', 0.16, 0.13), 110); },
+            victory: () => { duckBackgroundMusic('impact', 0.55); playTone(400, 'square', 0.1, 0.1); setTimeout(() => playTone(500, 'square', 0.1, 0.1), 100); setTimeout(() => playTone(600, 'square', 0.3, 0.15), 200); },
+            doorclose: () => { duckBackgroundMusic('critical', 1); playNoise(0.6, 0.5); playTone(80, 'square', 0.5, 0.3); setTimeout(() => playTone(50, 'sawtooth', 0.4, 0.4), 100); },
             pointUp: () => { playTone(987, 'sine', 0.1, 0.1); setTimeout(() => playTone(1318, 'sine', 0.2, 0.1), 100); },
             tick: () => { playTone(1200, 'square', 0.05, 0.05); },
-            shatter: () => { playNoise(1.5, 0.8); playTone(150, 'sawtooth', 1.0, 0.4); } 
+            shatter: () => { duckBackgroundMusic('critical', 1.6); playNoise(1.5, 0.8); playTone(150, 'sawtooth', 1.0, 0.4); } 
         };
 
+        const BGM_NORMAL_VOLUME = 0.5;
+        const BGM_DUCK_PROFILES = {
+            interaction: { reductionDb: 2.5, attack: 0.10, release: 0.45 },
+            impact: { reductionDb: 5.5, attack: 0.08, release: 0.70 },
+            critical: { reductionDb: 8, attack: 0.05, release: 1.15 }
+        };
         const themeBgm = new Audio('THEME.mp3'); 
-        themeBgm.loop = true; themeBgm.volume = 0.5;
+        themeBgm.loop = true; themeBgm.volume = BGM_NORMAL_VOLUME;
         let musicEnabled = localStorage.getItem('caseclosed_music_enabled') !== 'false';
+        let bgmFadeFrame = null;
+        let bgmDuckTimer = null;
+
+        function fadeBackgroundMusic(targetVolume, durationSeconds) {
+            if (bgmFadeFrame) cancelAnimationFrame(bgmFadeFrame);
+            const startVolume = themeBgm.volume;
+            const startTime = performance.now();
+            const durationMs = Math.max(durationSeconds * 1000, 1);
+            const animate = (now) => {
+                const progress = Math.min((now - startTime) / durationMs, 1);
+                // Ease in/out keeps the transition natural instead of sounding like a volume switch.
+                const eased = progress < 0.5 ? 2 * progress * progress : 1 - Math.pow(-2 * progress + 2, 2) / 2;
+                themeBgm.volume = startVolume + (targetVolume - startVolume) * eased;
+                if (progress < 1) bgmFadeFrame = requestAnimationFrame(animate);
+                else bgmFadeFrame = null;
+            };
+            bgmFadeFrame = requestAnimationFrame(animate);
+        }
+
+        function duckBackgroundMusic(profileName, soundDuration = 0) {
+            if (!musicEnabled || themeBgm.paused) return;
+            const profile = BGM_DUCK_PROFILES[profileName];
+            if (!profile) return;
+            const duckedVolume = BGM_NORMAL_VOLUME * Math.pow(10, -profile.reductionDb / 20);
+            fadeBackgroundMusic(duckedVolume, profile.attack);
+            clearTimeout(bgmDuckTimer);
+            bgmDuckTimer = setTimeout(() => {
+                if (musicEnabled) fadeBackgroundMusic(BGM_NORMAL_VOLUME, profile.release);
+            }, (profile.attack + soundDuration) * 1000);
+        }
 
         function syncMusicButton() {
             const button = document.getElementById('music-toggle-btn');
@@ -480,6 +518,7 @@
 
         function playBackgroundMusic() {
             if (!musicEnabled) return;
+            fadeBackgroundMusic(BGM_NORMAL_VOLUME, 0.2);
             themeBgm.play().catch(() => {});
         }
 
@@ -487,7 +526,11 @@
             musicEnabled = !musicEnabled;
             localStorage.setItem('caseclosed_music_enabled', String(musicEnabled));
             if (musicEnabled) playBackgroundMusic();
-            else themeBgm.pause();
+            else {
+                clearTimeout(bgmDuckTimer);
+                if (bgmFadeFrame) cancelAnimationFrame(bgmFadeFrame);
+                themeBgm.pause();
+            }
             syncMusicButton();
         }
 
@@ -750,7 +793,12 @@
             });
         }
 
-        function exitToMenu() { stopTimer(); switchScreen('init-screen'); updateMenuButtons(); }
+        function exitToMenu() {
+            stopTimer();
+            switchScreen('init-screen');
+            updateMenuButtons();
+            playBackgroundMusic();
+        }
 
         function openScoreSettings() {
             document.getElementById('setting-dan-alive').value = currentScoreSettings.danAlive;
@@ -1516,7 +1564,6 @@
 
         function goToVoteScreen() {
             isReviewMode = false;
-            if(themeBgm.paused && musicEnabled) { themeBgm.currentTime = 0; playBackgroundMusic(); }
             
             switchScreen('vote-screen'); 
             
@@ -1574,7 +1621,7 @@
         function checkDefusePin() {
             let pinInput = document.getElementById('defuse-pin-input').value.trim();
             if (pinInput === defuserPinCode) {
-                SFX.click();
+                SFX.defuse();
                 document.getElementById('defuse-step-1').style.display = 'none';
                 document.getElementById('defuse-step-2').style.display = 'block';
             } else {
@@ -1598,6 +1645,7 @@
             canvas.className = 'pixel-canvas reveal-mascot'; void canvas.offsetWidth; 
             
             if (wordInput === actualSpyWord) {
+                SFX.defuse();
                 drawPixelArt('mascot-display', spriteDetective, 12);
                 msg.innerHTML = `Mật mã nhập vào chính xác!<br><b style='color:#27ae60; font-size: 28px;' class='text-pop'>ĐÃ VÔ HIỆU HÓA BOM</b>`;
                 currentWinner = 'DefusalWin';
