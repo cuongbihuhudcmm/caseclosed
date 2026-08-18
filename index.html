@@ -160,6 +160,7 @@
             <canvas id="bomb-icon" class="pixel-canvas"></canvas>
             <div id="timer-text">00:00</div>
         </div>
+        <div id="c4-status" style="max-width:220px; color:#f7d51d; font-size:12px; text-align:right; line-height:1.45; text-shadow:1px 1px #000;"></div>
         <button id="btn-defuse" class="nes-btn is-error" style="width: 100%; font-size: 16px; padding: 4px;" onclick="openDefuseModal()">GỠ BOM [X]</button>
     </div>
 
@@ -221,13 +222,14 @@
             <p class="title text-pop">Bố Trí Vai Trò</p>
 
             <div style="text-align: center; margin-bottom: 15px; padding: 10px; border: 2px solid #e74c3c; background: #000; box-shadow: 2px 2px 0 #000;">
-                <span style="font-size: 20px; color: #e74c3c;" class="text-pop">Bom hẹn giờ (Phút): </span>
-                <input type="number" id="input-timer" class="nes-input is-dark" value="0" min="0" max="60" style="width: 80px; display: inline-block; text-align: center; font-size: 24px!important; padding: 5px!important;">
-                
-                <label style="color: #fff; font-size: 16px; margin-top: 15px; display: block; border-top: 1px dashed #555; padding-top: 10px;">
-                    <input type="checkbox" id="cb-defuser" class="nes-checkbox is-dark" checked>
-                    <span>Kích hoạt Chuyên Gia Gỡ Bom</span>
+                <label style="color: #fff; font-size: 16px; display: block;">
+                    <input type="checkbox" id="cb-defuser" class="nes-checkbox is-dark" onchange="updateC4Settings()">
+                    <span>Kích hoạt chế độ C4</span>
                 </label>
+                <div id="c4-timer-setting" style="margin-top: 15px; padding-top: 10px; border-top: 1px dashed #555;">
+                    <span style="font-size: 20px; color: #e74c3c;" class="text-pop">Thời gian C4 (phút): </span>
+                    <input type="number" id="input-timer" class="nes-input is-dark" value="5" min="1" max="60" style="width: 80px; display: inline-block; text-align: center; font-size: 24px!important; padding: 5px!important;">
+                </div>
             </div>
 
             <div style="display: flex; gap: 15px; margin-bottom: 15px;">
@@ -430,8 +432,8 @@
             <label style="color:#f7d51d; font-size: 18px;" class="text-pop">Gỡ bom thành công (MVP):</label>
             <input type="number" id="setting-defuse-win" class="nes-input is-dark" value="10" style="margin-bottom: 15px; height: 45px; padding: 5px;">
 
-            <label style="color:#e74c3c; font-size: 18px;" class="text-pop">Hết giờ/Bom nổ (Trừ điểm):</label>
-            <input type="number" id="setting-timeout-penalty" class="nes-input is-dark" value="-2" style="margin-bottom: 30px; height: 45px; padding: 5px;">
+            <label style="color:#e74c3c; font-size: 18px;" class="text-pop">Bom nổ / cắt sai (điểm phe còn lại):</label>
+            <input type="number" id="setting-timeout-penalty" class="nes-input is-dark" value="0" style="margin-bottom: 30px; height: 45px; padding: 5px;">
             
             <div style="display: flex; gap: 15px; justify-content: center;">
                 <button class="nes-btn" style="padding: 10px 20px;" onclick="closeScoreSettings(false)">HỦY</button>
@@ -671,11 +673,11 @@
             `,
             `
             <h3 style="color:#f7d51d; text-align:center; font-size:24px; text-shadow:2px 2px 0 #000; border-bottom: 2px dashed #555; padding-bottom: 10px;">3. CHẾ ĐỘ BOM HẸN GIỜ (C4)</h3>
-            <p style="color:#fff;">Cơ chế sinh tồn tàn khốc nhất dành riêng cho CASECLOSED!</p>
-            <p style="color:#ddd;">- Khi bắt đầu, hệ thống bí mật chọn 1 Thám Tử làm <b>Chuyên Gia Gỡ Bom</b> và cung cấp 1 Mã PIN (4 số).</p>
-            <p style="color:#ddd;">- <b>Hết giờ:</b> Bom Nổ! Tất cả các phe đều thất bại.</p>
-            <p style="color:#ddd;">- <b>Cách gỡ:</b> Chuyên gia phải bấm [GỠ BOM], nhập đúng Mã PIN. Sau đó phải nhập đúng <b>Từ khóa của Áo Đen</b> để cắt dây.</p>
-            <p style="color:#e74c3c; font-size: 18px; text-shadow: none;">Cảnh báo: Nếu cắt sai dây (nhập sai từ khóa), bom nổ ngay lập tức, Áo đen chiến thắng!</p>
+            <p style="color:#fff;">Chế độ tùy chọn: chỉ xuất hiện khi quản trò bật C4 ở phần thiết lập.</p>
+            <p style="color:#ddd;">- Sau khi phát vai, hệ thống bí mật chọn 1 Thám Tử làm <b>Chuyên Gia Gỡ Bom</b> và cấp Mã PIN (4 số). Đồng hồ chỉ bắt đầu khi bước vào vòng điều tra đầu tiên.</p>
+            <p style="color:#ddd;">- C4 bị khóa cho đến sau lần bắt giữ đầu tiên. Khi đó, Chuyên gia có thể nhập PIN rồi nhập <b>từ khóa của Áo Đen</b>.</p>
+            <p style="color:#ddd;">- Chỉ có <b>một lần cắt dây</b>. Nếu Chuyên gia bị loại, không có người thay thế và C4 không thể được gỡ.</p>
+            <p style="color:#e74c3c; font-size: 18px; text-shadow: none;">Hết giờ hoặc cắt sai dây: bom nổ, Áo Đen chiến thắng ngay. Gỡ đúng: Thám Tử chiến thắng ngay.</p>
             `,
             `
             <h3 style="color:#f7d51d; text-align:center; font-size:24px; text-shadow:2px 2px 0 #000; border-bottom: 2px dashed #555; padding-bottom: 10px;">4. HỆ THỐNG ĐIỂM THƯỞNG</h3>
@@ -685,7 +687,7 @@
                 <li><b style="color:#e76e55">Áo đen:</b> Chiến thắng (+5 điểm).</li>
                 <li><b style="color:#209cee">Siêu trộm:</b> Sống sót cuối cùng (+6 điểm), Đoán trúng từ lật kèo (+10 điểm).</li>
                 <li><b style="color:#f7d51d">MVP Gỡ Bom:</b> Cắt dây thành công (+10 điểm).</li>
-                <li><b style="color:#e74c3c">Bom nổ/Hết giờ:</b> Ai thắng thì cộng điểm, ai thua bị trừ (-2 điểm).</li>
+                <li><b style="color:#e74c3c">Bom nổ/cắt sai:</b> Áo Đen nhận điểm thắng; phe còn lại mặc định 0 điểm (quản trò có thể chỉnh thành phạt nhẹ).</li>
             </ul>
             `
         ];
@@ -780,8 +782,11 @@
         
         let isDefuserMode = false;
         let defuserPinCode = "";
+        let c4Unlocked = false;
+        let c4PermanentlyLocked = false;
+        let defuseAttemptUsed = false;
         
-        let currentScoreSettings = { danAlive: 3, danDead: 2, spyWin: 5, kidSurvive: 6, kidHack: 10, defuseWin: 10, timeOutPenalty: -2 };
+        let currentScoreSettings = { danAlive: 3, danDead: 2, spyWin: 5, kidSurvive: 6, kidHack: 10, defuseWin: 10, timeOutPenalty: 0 };
 
         document.addEventListener("DOMContentLoaded", () => {
             drawPixelArt('bee-logo', spriteBee, 10);
@@ -792,6 +797,7 @@
             drawPixelArt('bomb-icon', spriteDynamite, 6);
             
             updateMenuButtons();
+            updateC4Settings();
             syncMusicButton();
         });
 
@@ -834,7 +840,7 @@
             requestFullScreen(); 
             stopTimer();
             currentSessionId = 'CASE_' + Date.now(); playerNamesInput = []; globalScores = {}; playedHistory = [];
-            currentScoreSettings = { danAlive: 3, danDead: 2, spyWin: 5, kidSurvive: 6, kidHack: 10, defuseWin: 10, timeOutPenalty: -2 };
+            currentScoreSettings = { danAlive: 3, danDead: 2, spyWin: 5, kidSurvive: 6, kidHack: 10, defuseWin: 10, timeOutPenalty: 0 };
             updateNameList(); updateRoleCount(); switchScreen('setup-screen'); 
         }
 
@@ -865,7 +871,7 @@
             let allSessions = JSON.parse(localStorage.getItem('uc_all_sessions') || '{}'), s = allSessions[id];
             if(s) {
                 currentSessionId = id; playerNamesInput = s.players || []; globalScores = s.scores || {}; playedHistory = s.history || [];
-                currentScoreSettings = s.scoreSettings || { danAlive: 3, danDead: 2, spyWin: 5, kidSurvive: 6, kidHack: 10, defuseWin: 10, timeOutPenalty: -2 };
+                currentScoreSettings = s.scoreSettings || { danAlive: 3, danDead: 2, spyWin: 5, kidSurvive: 6, kidHack: 10, defuseWin: 10, timeOutPenalty: 0 };
                 updateNameList(); updateRoleCount(); switchScreen('setup-screen');
             }
         }
@@ -891,7 +897,7 @@
             document.getElementById('setting-kid-survive').value = currentScoreSettings.kidSurvive;
             document.getElementById('setting-kid-hack').value = currentScoreSettings.kidHack;
             document.getElementById('setting-defuse-win').value = currentScoreSettings.defuseWin !== undefined ? currentScoreSettings.defuseWin : 10;
-            document.getElementById('setting-timeout-penalty').value = currentScoreSettings.timeOutPenalty !== undefined ? currentScoreSettings.timeOutPenalty : -2;
+            document.getElementById('setting-timeout-penalty').value = currentScoreSettings.timeOutPenalty !== undefined ? currentScoreSettings.timeOutPenalty : 0;
             document.getElementById('score-settings-overlay').style.display = 'flex';
         }
 
@@ -950,6 +956,50 @@
                     </div>
                 </li>`; 
             });
+        }
+
+        // Kho từ được chuẩn hóa: giữ nguyên tên riêng, thương hiệu, game và nhân vật;
+        // chỉ Việt hóa những từ tiếng Anh phổ thông để trải nghiệm chơi thống nhất.
+        const COMMON_ENGLISH_TO_VIETNAMESE = Object.freeze({
+            Cat:'Mèo', Dog:'Chó', Boy:'Con trai', Girl:'Con gái', Man:'Đàn ông', Woman:'Phụ nữ', Water:'Nước', Fire:'Lửa', Ice:'Băng', Snow:'Tuyết', Car:'Ô tô', Bus:'Xe buýt', Phone:'Điện thoại', Laptop:'Máy tính xách tay', Tablet:'Máy tính bảng', Computer:'Máy tính',
+            Red:'Đỏ', Blue:'Xanh dương', Black:'Đen', White:'Trắng', Sun:'Mặt trời', Moon:'Mặt trăng', King:'Vua', Queen:'Nữ hoàng', Gold:'Vàng', Silver:'Bạc', Guitar:'Đàn guitar', Piano:'Đàn piano', Football:'Bóng đá', Basketball:'Bóng rổ',
+            Left:'Trái', Right:'Phải', Up:'Lên', Down:'Xuống', Good:'Tốt', Bad:'Xấu', Happy:'Vui', Sad:'Buồn', Morning:'Buổi sáng', Evening:'Buổi tối', Summer:'Mùa hè', Winter:'Mùa đông', Spring:'Mùa xuân', Autumn:'Mùa thu',
+            Teacher:'Giáo viên', Student:'Học sinh', Doctor:'Bác sĩ', Nurse:'Y tá', Dentist:'Nha sĩ', Farmer:'Nông dân', Builder:'Thợ xây', Actor:'Diễn viên', Singer:'Ca sĩ', Single:'Độc thân', Married:'Đã kết hôn',
+            Hello:'Xin chào', Goodbye:'Tạm biệt', Yes:'Có', No:'Không', True:'Đúng', False:'Sai', Buy:'Mua', Sell:'Bán', Open:'Mở', Close:'Đóng', Start:'Bắt đầu', Stop:'Dừng', Winner:'Người thắng', Loser:'Người thua',
+            Hot:'Nóng', Cold:'Lạnh', Big:'Lớn', Small:'Nhỏ', Fast:'Nhanh', Slow:'Chậm', Hard:'Cứng', Soft:'Mềm', Heavy:'Nặng', Light:'Nhẹ', Clean:'Sạch', Dirty:'Bẩn', Rich:'Giàu', Poor:'Nghèo', Old:'Cũ', New:'Mới', Empty:'Trống', Full:'Đầy', Simple:'Đơn giản', Complex:'Phức tạp', Cheap:'Rẻ', Expensive:'Đắt',
+            Laugh:'Cười', Cry:'Khóc', Love:'Yêu', Hate:'Ghét', Walk:'Đi bộ', Run:'Chạy', Stand:'Đứng', Sit:'Ngồi', Push:'Đẩy', Pull:'Kéo', Win:'Thắng', Lose:'Thua', Play:'Chơi', Work:'Làm việc', Read:'Đọc', Write:'Viết', Speak:'Nói', Listen:'Lắng nghe', Give:'Cho', Take:'Lấy', Teach:'Dạy', Learn:'Học', Arrive:'Đến', Depart:'Rời đi', Ask:'Hỏi', Answer:'Trả lời', Break:'Làm vỡ', Fix:'Sửa', Catch:'Bắt', Throw:'Ném', Find:'Tìm', Grow:'Lớn lên', Shrink:'Co lại', Hide:'Giấu', Seek:'Tìm kiếm', Sing:'Hát', Dance:'Nhảy múa', Smile:'Mỉm cười', Frown:'Nhăn mặt', Accept:'Chấp nhận', Reject:'Từ chối', Agree:'Đồng ý', Disagree:'Không đồng ý', Begin:'Bắt đầu', End:'Kết thúc', Build:'Xây dựng', Destroy:'Phá hủy', Miss:'Trượt', Create:'Tạo ra', Ruin:'Phá hỏng', Enjoy:'Tận hưởng', Suffer:'Chịu đựng', Forget:'Quên', Remember:'Nhớ', Ignore:'Phớt lờ', Notice:'Nhận ra', Join:'Tham gia', Leave:'Rời đi', Keep:'Giữ', Share:'Chia sẻ', Pass:'Đạt', Fail:'Trượt', Save:'Tiết kiệm', Spend:'Chi tiêu', Show:'Hiện ra', Trust:'Tin tưởng', Doubt:'Nghi ngờ', Attack:'Tấn công', Defend:'Phòng thủ', Combine:'Kết hợp', Separate:'Tách rời', Punish:'Trừng phạt', Reward:'Khen thưởng',
+            Apple:'Táo', Orange:'Cam', Banana:'Chuối', Melon:'Dưa', Coffee:'Cà phê', Tea:'Trà', Milk:'Sữa', Bread:'Bánh mì', Rice:'Cơm', Meat:'Thịt', Fish:'Cá', Chicken:'Gà', Beef:'Thịt bò', Pizza:'Bánh pizza', Burger:'Bánh mì kẹp thịt', Salad:'Xa lát', Soup:'Súp', Sweet:'Ngọt', Sour:'Chua', Bitter:'Đắng', Spicy:'Cay', Breakfast:'Bữa sáng', Dinner:'Bữa tối', Lunch:'Bữa trưa', Snack:'Bữa ăn nhẹ',
+            Shirt:'Áo sơ mi', Pants:'Quần dài', Dress:'Váy liền', Skirt:'Chân váy', Hat:'Mũ', Cap:'Mũ lưỡi trai', Shoes:'Giày', Socks:'Tất', House:'Nhà', Home:'Nhà', Room:'Phòng', Door:'Cửa', Window:'Cửa sổ', Wall:'Tường', Bed:'Giường', Sofa:'Ghế sô pha', Chair:'Ghế', Table:'Bàn', Desk:'Bàn làm việc', Lamp:'Đèn', Pen:'Bút', Pencil:'Bút chì', Book:'Sách', Paper:'Giấy', School:'Trường học', Class:'Lớp học',
+            Train:'Tàu hỏa', Plane:'Máy bay', Boat:'Thuyền', Ship:'Tàu thủy', Helicopter:'Trực thăng', Rain:'Mưa', Wind:'Gió', Storm:'Bão', Mountain:'Núi', River:'Sông', Ocean:'Đại dương', Sea:'Biển', Tree:'Cây', Flower:'Hoa', Forest:'Rừng', Jungle:'Rừng rậm', Rabbit:'Thỏ', Hamster:'Chuột hamster', Lion:'Sư tử', Tiger:'Hổ', Bear:'Gấu', Panda:'Gấu trúc', Bird:'Chim', Duck:'Vịt', Eagle:'Đại bàng', Wolf:'Chó sói', Shark:'Cá mập', Snake:'Rắn', Worm:'Giun',
+            Uncle:'Chú', Aunt:'Cô', Brother:'Anh trai', Sister:'Chị gái', Father:'Bố', Mother:'Mẹ', Week:'Tuần', Month:'Tháng', Year:'Năm', Decade:'Thập kỷ', Day:'Ngày', Hour:'Giờ', Minute:'Phút', Second:'Giây', Circle:'Hình tròn', Square:'Hình vuông', Triangle:'Hình tam giác', Rectangle:'Hình chữ nhật',
+            Screen:'Màn hình', Keyboard:'Bàn phím', Mouse:'Chuột máy tính', Pad:'Bàn di chuột', Camera:'Máy ảnh', Speaker:'Loa', Video:'Video', Audio:'Âm thanh', Music:'Âm nhạc', Movie:'Phim', Plate:'Đĩa', Bowl:'Bát', Fork:'Nĩa', Spoon:'Thìa', Printer:'Máy in', Scanner:'Máy quét', Battery:'Pin', Charger:'Bộ sạc', Cable:'Dây cáp', Adapter:'Bộ chuyển đổi', Router:'Bộ định tuyến', Modem:'Bộ phát mạng', Folder:'Thư mục', File:'Tệp', Hall:'Sảnh', Floor:'Sàn nhà', Roof:'Mái nhà', Ceiling:'Trần nhà', Garden:'Vườn', Yard:'Sân', Street:'Đường phố', Avenue:'Đại lộ', Bridge:'Cầu', Tunnel:'Đường hầm', City:'Thành phố', Town:'Thị trấn', Village:'Làng', Countryside:'Nông thôn', Country:'Quốc gia', Continent:'Châu lục', Stream:'Suối', Valley:'Thung lũng', Island:'Đảo', Peninsula:'Bán đảo', Volcano:'Núi lửa', Earthquake:'Động đất', Weather:'Thời tiết', Climate:'Khí hậu', Future:'Tương lai', Past:'Quá khứ',
+            Desktop:'Máy tính để bàn', Master:'Cao thủ', Challenger:'Thách đấu', Like:'Thích', Download:'Tải xuống', Upload:'Tải lên', Online:'Trực tuyến', Offline:'Ngoại tuyến', Enter:'Nhập', Space:'Phím cách', Delete:'Xóa', Backspace:'Xóa lùi', Copy:'Sao chép', Paste:'Dán', Inbox:'Hộp thư', Comment:'Bình luận', Follow:'Theo dõi', Subscribe:'Đăng ký', Mute:'Tắt tiếng', Block:'Chặn', Troll:'Chọc phá', Spam:'Tin rác', Night:'Đêm', Midnight:'Nửa đêm', Watch:'Đồng hồ', Desert:'Sa mạc', Boss:'Trùm', Micro:'Mi cờ rô',
+            'Game offline':'Trò chơi ngoại tuyến', 'Game online':'Trò chơi trực tuyến', Livestream:'Phát trực tiếp'
+        });
+
+        // Các cặp dịch ra tiếng Việt thành đồng nghĩa, bao-hàm hoặc quá gượng;
+        // loại chúng khỏi tất cả chế độ, thay vì để chúng phá cân bằng C4.
+        const REJECTED_WORD_PAIR_IDS = new Set([
+            196, 208, 274, 453, 1089, 1090, 1091, 1092, 1093, 1094,
+            1095, 1096, 1097, 1098, 1099, 1100, 1101, 1102, 1103, 1104,
+            1112, 1113, 1114, 1115, 1116, 1117, 1118, 1119, 1120, 1121,
+            1122, 1123, 1133, 1134, 1140, 1141, 1145, 1146, 1147
+        ]);
+        const EASY_WORD_PAIR_RANGES = [[688, 711], [799, 848], [940, 998]];
+        const C4_WORD_PAIR_IDS = new Set([7, 10, 12, 13, 55, 82, 90, 91, 92, 101, 102, 103, 104, 179, 180, 185, 210, 226, 227, 230, 236, 237, 238, 241, 242, 243, 244, 245, 278, 279, 280, 281, 282, 322, 323, 324, 325, 326, 327, 398, 399, 400, 401, 402, 403, 404, 405, 406, 407, 408, 409, 410, 611, 612, 613, 614, 615, 616, 617, 618, 619, 620, 621, 622, 623, 624, 625, 626, 627, 628, 629, 630, 631, 632, 633, 634, 635, 636, 637, 670, 671, 672, 673, 674, 675, 676, 677, 678, 713, 714, 715, 716, 717, 718, 719, 720, 721, 722, 723, 724, 725, 726, 727, 728, 729, 730, 731, 733, 734, 735, 736, 737, 738, 739, 1149, 1150, 1151, 1152, 1153, 1154, 1155, 1156, 1157, 1158, 1159, 1165, 1167, 1168]);
+
+        const PRESERVED_SPECIAL_PAIR_IDS = new Set([32, 568]);
+
+        function localizeWord(word, id) {
+            if (PRESERVED_SPECIAL_PAIR_IDS.has(id)) return word;
+            return COMMON_ENGLISH_TO_VIETNAMESE[word] || word;
+        }
+
+        function getWordPairTier(id) {
+            if (REJECTED_WORD_PAIR_IDS.has(id)) return 'loai';
+            if (C4_WORD_PAIR_IDS.has(id)) return 'c4';
+            if (EASY_WORD_PAIR_RANGES.some(([start, end]) => id >= start && id <= end)) return 'de';
+            return 'chuan';
         }
 
         const rawWordDatabase = [
@@ -1372,7 +1422,12 @@
             { a: "Mountain", b: "Valley" }, { a: "Forest", b: "Desert" }, { a: "Island", b: "Peninsula" },
             { a: "Volcano", b: "Earthquake" }, { a: "Weather", b: "Climate" }, { a: "Winter", b: "Summer" },
             { a: "Future", b: "Past" }
-        ].map((item, index) => ({...item, id: index})); 
+        ].map((item, index) => ({
+            a: localizeWord(item.a, index),
+            b: localizeWord(item.b, index),
+            id: index,
+            tier: getWordPairTier(index)
+        })).filter((item) => item.tier !== 'loai'); 
 
         const COOLDOWN_LIMIT = Math.min(100, rawWordDatabase.length - 10);
 
@@ -1383,12 +1438,14 @@
             if (playerNamesInput.length < 4) { showModal("<div style='text-align:center'>Cần tối thiểu 4 người để lập chuyên án!</div>", "alert"); return; }
             if (playerNamesInput.length - numSpies - numKids < numSpies + numKids) { showModal("<div style='text-align:center'>Lỗi chiến thuật!<br><span style='color:#e76e55'>Thám tử ít hơn tổng số tội phạm.</span></div>", "alert"); return; }
 
+            const defuserEnabled = document.getElementById('cb-defuser').checked;
+            const configuredMinutes = parseInt(document.getElementById('input-timer').value) || 5;
             pendingGameConfig = {
                 spies: numSpies,
                 kids: numKids,
                 civilians: playerNamesInput.length - numSpies - numKids,
-                timerMinutes: parseInt(document.getElementById('input-timer').value) || 0,
-                defuserEnabled: document.getElementById('cb-defuser').checked
+                timerMinutes: defuserEnabled ? Math.max(1, configuredMinutes) : 0,
+                defuserEnabled
             };
             renderGameSummary();
             switchScreen('game-summary-screen');
@@ -1396,19 +1453,21 @@
 
         function renderGameSummary() {
             const config = pendingGameConfig;
-            const c4Label = config.defuserEnabled ? (config.timerMinutes > 0 ? 'C4: BẬT' : 'C4 TỰ DO') : 'TẮT';
+            const c4Label = config.defuserEnabled ? 'C4: BẬT' : 'C4: TẮT';
             document.getElementById('game-summary-details').innerHTML = `
                 <div style="padding:12px; background:#000; border:2px solid #3498db;"><span style="color:#3498db;">THÁM TỬ</span><br><b style="font-size:30px;">${config.civilians}</b></div>
                 <div style="padding:12px; background:#000; border:2px solid #e76e55;"><span style="color:#e76e55;">ÁO ĐEN</span><br><b style="font-size:30px;">${config.spies}</b></div>
                 <div style="padding:12px; background:#000; border:2px solid #209cee;"><span style="color:#209cee;">SIÊU TRỘM</span><br><b style="font-size:30px;">${config.kids}</b></div>
-                <div style="padding:12px; background:#000; border:2px solid #f7d51d;"><span style="color:#f7d51d;">C4 / THỜI GIAN</span><br><b style="font-size:22px;">${c4Label}<br>${config.timerMinutes > 0 ? config.timerMinutes + ' PHÚT' : 'KHÔNG GIỚI HẠN'}</b></div>
+                <div style="padding:12px; background:#000; border:2px solid #f7d51d;"><span style="color:#f7d51d;">C4 / THỜI GIAN</span><br><b style="font-size:22px;">${c4Label}<br>${config.defuserEnabled ? config.timerMinutes + ' PHÚT' : 'KHÔNG ÁP DỤNG'}</b></div>
             `;
         }
 
         function beginRoleDistribution() {
             const config = pendingGameConfig;
             themeBgm.pause();
+            clearInterval(timerInterval);
             isDefuserMode = config.defuserEnabled;
+            defuserPinCode = "";
             
             generateWordsAndRoles(config.civilians, config.spies, config.kids);
             
@@ -1418,9 +1477,13 @@
             pillPickCounter = 0;
             isReviewMode = false; roundPoints = {}; currentWinner = null; lastElimination = null; roundHistory = [];
             
-            totalSeconds = config.timerMinutes * 60;
+            totalSeconds = isDefuserMode ? config.timerMinutes * 60 : 0;
             isTimerActive = false;
+            c4Unlocked = false;
+            c4PermanentlyLocked = false;
+            defuseAttemptUsed = false;
             document.getElementById('bomb-container').style.display = 'none';
+            document.getElementById('c4-status').innerText = '';
 
             // Reset UI Gỡ bom
             document.getElementById('defuse-step-1').style.display = 'block';
@@ -1430,6 +1493,15 @@
             document.getElementById('defuse-error-1').style.display = 'none';
 
             renderPills(); playCaseIntro();
+        }
+
+        function updateC4Settings() {
+            const enabled = document.getElementById('cb-defuser').checked;
+            const input = document.getElementById('input-timer');
+            const panel = document.getElementById('c4-timer-setting');
+            input.disabled = !enabled;
+            panel.style.opacity = enabled ? '1' : '0.45';
+            if (enabled && (!parseInt(input.value) || parseInt(input.value) < 1)) input.value = 5;
         }
 
         function updateTimerUI() {
@@ -1466,11 +1538,42 @@
             showVictoryScreen();
         }
 
+        function updateC4AccessUI() {
+            const button = document.getElementById('btn-defuse');
+            const status = document.getElementById('c4-status');
+            const timer = document.getElementById('bomb-timer');
+
+            if (!isDefuserMode) return;
+            timer.style.display = 'flex';
+            button.style.display = 'block';
+
+            if (c4PermanentlyLocked) {
+                button.disabled = true;
+                button.innerText = 'C4 VÔ HIỆU';
+                status.innerText = 'CHUYÊN GIA ĐÃ BỊ LOẠI — KHÔNG CÒN AI CÓ THỂ GỠ BOM';
+            } else if (!c4Unlocked) {
+                button.disabled = true;
+                button.innerText = 'GỠ BOM [KHÓA]';
+                status.innerText = 'C4 SẼ MỞ SAU LẦN BẮT GIỮ ĐẦU TIÊN';
+            } else if (defuseAttemptUsed) {
+                button.disabled = true;
+                button.innerText = 'ĐÃ CẮT DÂY';
+                status.innerText = 'CHỈ CÓ MỘT LẦN CẮT DÂY';
+            } else {
+                button.disabled = false;
+                button.innerText = 'GỠ BOM [X]';
+                status.innerText = 'C4 ĐÃ MỞ — CHỈ CHUYÊN GIA CÓ PIN';
+            }
+        }
+
         function generateWordsAndRoles(civs, spies, kids) {
             if (playedHistory.length > COOLDOWN_LIMIT) playedHistory = playedHistory.slice(playedHistory.length - COOLDOWN_LIMIT);
             let availableWords = rawWordDatabase.filter(w => !playedHistory.includes(w.id));
             if (availableWords.length === 0) { availableWords = rawWordDatabase; playedHistory = []; }
-            const randomPair = availableWords[Math.floor(Math.random() * availableWords.length)];
+            // C4 chỉ dùng nhóm cặp từ đã tuyển chọn; ván thường giữ toàn bộ kho từ hợp lệ.
+            const c4Words = isDefuserMode ? availableWords.filter(w => w.tier === 'c4') : [];
+            const wordPool = c4Words.length > 0 ? c4Words : availableWords;
+            const randomPair = wordPool[Math.floor(Math.random() * wordPool.length)];
             playedHistory.push(randomPair.id); saveData();
 
             const isA = Math.random() < 0.5; civilianWordToGuess = isA ? randomPair.a : randomPair.b; spyWordToGuess = isA ? randomPair.b : randomPair.a;
@@ -1677,20 +1780,29 @@
             });
             renderSurvivors(); 
             
-            if (totalSeconds > 0 && !isTimerActive) {
-                isTimerActive = true;
-                updateTimerUI();
+            if (isDefuserMode) {
                 document.getElementById('bomb-container').style.display = 'flex';
-                clearInterval(timerInterval);
-                timerInterval = setInterval(timerTick, 1000);
-            } else if (totalSeconds === 0 && isDefuserMode) {
-                document.getElementById('bomb-container').style.display = 'flex';
-                document.getElementById('bomb-timer').style.display = 'none'; 
+                updateC4AccessUI();
+                if (!isTimerActive) {
+                    isTimerActive = true;
+                    updateTimerUI();
+                    clearInterval(timerInterval);
+                    timerInterval = setInterval(timerTick, 1000);
+                }
             }
         }
 
         // --- CƠ CHẾ GỠ BOM (DEFUSAL) ---
         function openDefuseModal() {
+            if (!isDefuserMode || !c4Unlocked || c4PermanentlyLocked || defuseAttemptUsed) {
+                const reason = c4PermanentlyLocked
+                    ? 'Chuyên gia gỡ bom đã bị loại. C4 không thể vô hiệu hóa.'
+                    : !c4Unlocked
+                        ? 'Chưa có lần bắt giữ nào. C4 vẫn đang khóa.'
+                        : 'Lần cắt dây duy nhất đã được dùng.';
+                showModal(`<div style='text-align:center'>${reason}</div>`, 'alert');
+                return;
+            }
             document.getElementById('defuse-step-1').style.display = 'block';
             document.getElementById('defuse-step-2').style.display = 'none';
             document.getElementById('defuse-pin-input').value = "";
@@ -1715,8 +1827,11 @@
         }
 
         function submitDefuseWord() {
+            if (!isDefuserMode || !c4Unlocked || c4PermanentlyLocked || defuseAttemptUsed) return;
             let wordInput = document.getElementById('defuse-word-input').value.trim().toLowerCase();
             let actualSpyWord = spyWordToGuess.toLowerCase();
+            defuseAttemptUsed = true;
+            updateC4AccessUI();
             closeDefuseModal();
             stopTimer(); // Bấm cắt dây là timer dừng
             switchScreen('result-screen');
@@ -1747,9 +1862,24 @@
         function eliminatePlayer(index) {
             SFX.eliminate();
             const player = players[index];
-            lastElimination = { playerIndex: index, previousSpeakerIndex: currentSpeakerIndex };
+            lastElimination = {
+                playerIndex: index,
+                previousSpeakerIndex: currentSpeakerIndex,
+                c4Unlocked,
+                c4PermanentlyLocked
+            };
             roundHistory.push({ playerId: player.id, role: player.role });
-            player.isAlive = false; switchScreen('result-screen');
+            player.isAlive = false;
+            if (isDefuserMode) {
+                if (player.isDefuser) {
+                    c4PermanentlyLocked = true;
+                    c4Unlocked = false;
+                } else if (!c4Unlocked) {
+                    c4Unlocked = true;
+                }
+                updateC4AccessUI();
+            }
+            switchScreen('result-screen');
             const msg = document.getElementById('result-message'), canvas = document.getElementById('mascot-display'), mwGuess = document.getElementById('mr-white-guess');
             document.getElementById('next-round-btn').style.display = 'none'; document.getElementById('undo-elimination-btn').style.display = 'none'; document.getElementById('btn-to-victory').style.display = 'none';
             mwGuess.style.display = 'none'; document.getElementById('guess-input').value = ""; 
@@ -1768,7 +1898,10 @@
             else if (player.role === 'SieuTrom') { roleName = "SIÊU TRỘM"; color = "#209cee"; drawPixelArt('mascot-display', spriteKid, 12); }
 
             canvas.classList.add('reveal-mascot');
-            msg.innerHTML = `Nghi phạm <b style='color:#fff' class='text-pop'>${player.id}</b> đã bị khống chế!<br>Khám xét ra thân phận:<br><b style='color:${color}; font-size: 28px;' class='text-pop'>${roleName}</b>`;
+            const c4Note = isDefuserMode && player.isDefuser
+                ? `<br><span style='color:#e74c3c' class='text-pop'>CHUYÊN GIA GỠ BOM ĐÃ HY SINH — C4 VÔ HIỆU</span>`
+                : '';
+            msg.innerHTML = `Nghi phạm <b style='color:#fff' class='text-pop'>${player.id}</b> đã bị khống chế!<br>Khám xét ra thân phận:<br><b style='color:${color}; font-size: 28px;' class='text-pop'>${roleName}</b>${c4Note}`;
             if (player.role === 'SieuTrom') mwGuess.style.display = 'block'; else checkGameStatus(); 
         }
 
@@ -1815,9 +1948,11 @@
 
         function undoLastElimination() {
             if (!lastElimination) return;
-            const { playerIndex, previousSpeakerIndex } = lastElimination;
+            const { playerIndex, previousSpeakerIndex, c4Unlocked: previousC4Unlocked, c4PermanentlyLocked: previousC4Lock } = lastElimination;
             players[playerIndex].isAlive = true;
             currentSpeakerIndex = previousSpeakerIndex;
+            c4Unlocked = previousC4Unlocked;
+            c4PermanentlyLocked = previousC4Lock;
             roundHistory.pop();
             lastElimination = null;
             document.getElementById('undo-elimination-btn').style.display = 'none';
@@ -1833,16 +1968,14 @@
             document.getElementById('victory-word-spy').innerText = spyWordToGuess || "???";
             renderVictoryHistory();
 
-            // SỬA LỖI ĐIỂM: TIME OUT -> Tất cả cùng thua
             if (currentWinner === 'TimeOut') {
                 SFX.doorclose();
-                title.innerHTML = '<b style="color:#e74c3c" class="text-pop"> HẾT GIỜ - BOM ĐÃ NỔ </b>';
-                mascotContainer.innerHTML = `<p style="color:#fff; font-size: 24px;" class="text-pop">Nhiệm vụ thất bại! Toàn bộ lực lượng đã tử nạn!</p>`;
+                title.innerHTML = '<b style="color:#e74c3c" class="text-pop"> ÁO ĐEN THẮNG — BOM ĐÃ NỔ </b>';
+                mascotContainer.innerHTML = `<p style="color:#fff; font-size: 24px;" class="text-pop">Áo Đen đã kéo dài thời gian thành công!</p>`;
             }
-            // SỬA LỖI ĐIỂM: CẮT SAI DÂY -> Áo đen thắng
             else if (currentWinner === 'DefusalFail') {
                 SFX.doorclose();
-                title.innerHTML = '<b style="color:#e74c3c" class="text-pop"> CẮT SAI DÂY - BOM ĐÃ NỔ </b>';
+                title.innerHTML = '<b style="color:#e74c3c" class="text-pop"> ÁO ĐEN THẮNG — CẮT SAI DÂY </b>';
                 mascotContainer.innerHTML = `<p style="color:#fff; font-size: 24px;" class="text-pop">Tổ chức Áo Đen đã giăng bẫy thành công!</p>`;
             }
             else if (currentWinner === 'DefusalWin') {
@@ -1906,15 +2039,9 @@
             roundPoints = {};
             players.forEach(p => {
                 let pts = 0;
-                // SỬA LỖI ĐIỂM: Tách TIME OUT (Bom tự nổ) và DEFUSAL FAIL (Cắt sai dây)
-                if (winnerLabel === 'TimeOut') {
-                    // Nếu bom nổ vì hết giờ: TẤT CẢ CÙNG CHẾT (Trừ điểm tất cả)
-                    pts = currentScoreSettings.timeOutPenalty !== undefined ? currentScoreSettings.timeOutPenalty : -2;
-                }
-                else if (winnerLabel === 'DefusalFail') {
-                    // Nếu thám tử cắt sai dây: Áo đen hưởng lợi
+                if (winnerLabel === 'TimeOut' || winnerLabel === 'DefusalFail') {
                     if (p.role === 'GianDiep') pts = currentScoreSettings.spyWin;
-                    else pts = currentScoreSettings.timeOutPenalty !== undefined ? currentScoreSettings.timeOutPenalty : -2;
+                    else pts = currentScoreSettings.timeOutPenalty !== undefined ? currentScoreSettings.timeOutPenalty : 0;
                 }
                 else if (winnerLabel === 'DefusalWin') {
                     if (p.isDefuser) pts = currentScoreSettings.defuseWin !== undefined ? currentScoreSettings.defuseWin : 10;
