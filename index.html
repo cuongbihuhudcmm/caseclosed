@@ -6,42 +6,12 @@
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="mobile-web-app-capable" content="yes">
+    <meta name="theme-color" content="#090910">
     <title>CASECLOSED - Điệp Vụ Tối Mật</title>
     
-    <!-- SCRIPT TẠO LOGO APPLE TOUCH ICON ĐỒNG BỘ (FIX LỖI IPHONE & VERCEL) -->
-    <script>
-        (function() {
-            var c = {'0':'transparent','1':'#4a3018','2':'#ffcba4','3':'#2980b9','4':'#2b2b2b','5':'#ecf0f1','6':'#000000','8':'#e74c3c'};
-            var s = ["0000100000", "0001111000", "0011111100", "0012222100", "0056226500", "0022222200", "0003883000", "0033553300", "0333553330", "0333333330", "0660000660"];
-            var scale = 20; // Scale to ~200x220px (Chuẩn màn hình Retina iPhone)
-            var canvas = document.createElement('canvas');
-            canvas.width = s[0].length * scale; canvas.height = s.length * scale;
-            var ctx = canvas.getContext('2d');
-            
-            // Đổ nền màu Vàng chuẩn Game để iPhone không bị lỗi viền đen
-            ctx.fillStyle = '#f7d51d'; 
-            ctx.fillRect(0, 0, canvas.width, canvas.height);
-            
-            for(var y=0; y<s.length; y++) {
-                for(var x=0; x<s[y].length; x++) {
-                    if(s[y][x] !== '0') {
-                        ctx.fillStyle = c[s[y][x]];
-                        ctx.fillRect(x*scale, y*scale, scale, scale);
-                    }
-                }
-            }
-            var dataUrl = canvas.toDataURL('image/png');
-            
-            var linkIcon = document.createElement('link'); linkIcon.rel = 'icon'; linkIcon.type = 'image/png'; linkIcon.href = dataUrl;
-            document.head.appendChild(linkIcon);
-            
-            var appleIcon = document.createElement('link'); appleIcon.rel = 'apple-touch-icon'; appleIcon.href = dataUrl;
-            document.head.appendChild(appleIcon);
-            
-            var appTitle = document.createElement('meta'); appTitle.name = 'apple-mobile-web-app-title'; appTitle.content = 'CASECLOSED';
-            document.head.appendChild(appTitle);
-        })();
-    </script>
+    <!-- LOGO WEB & "THÊM VÀO MÀN HÌNH CHÍNH" ĐIỆN THOẠI (SVG TĨNH) -->
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 10 11'%3E%3Crect x='4' y='0' width='1' height='1' fill='%234a3018'/%3E%3Crect x='3' y='1' width='4' height='1' fill='%234a3018'/%3E%3Crect x='2' y='2' width='6' height='1' fill='%234a3018'/%3E%3Crect x='2' y='3' width='1' height='1' fill='%234a3018'/%3E%3Crect x='3' y='3' width='4' height='1' fill='%23ffcba4'/%3E%3Crect x='7' y='3' width='1' height='1' fill='%234a3018'/%3E%3Crect x='2' y='4' width='1' height='1' fill='%23ecf0f1'/%3E%3Crect x='3' y='4' width='1' height='1' fill='%23000'/%3E%3Crect x='4' y='4' width='2' height='1' fill='%23ffcba4'/%3E%3Crect x='6' y='4' width='1' height='1' fill='%23000'/%3E%3Crect x='7' y='4' width='1' height='1' fill='%23ecf0f1'/%3E%3Crect x='2' y='5' width='6' height='1' fill='%23ffcba4'/%3E%3Crect x='3' y='6' width='1' height='1' fill='%232980b9'/%3E%3Crect x='4' y='6' width='2' height='1' fill='%23e74c3c'/%3E%3Crect x='6' y='6' width='1' height='1' fill='%232980b9'/%3E%3Crect x='2' y='7' width='2' height='1' fill='%232980b9'/%3E%3Crect x='4' y='7' width='2' height='1' fill='%23ecf0f1'/%3E%3Crect x='6' y='7' width='2' height='1' fill='%232980b9'/%3E%3Crect x='1' y='8' width='3' height='1' fill='%232980b9'/%3E%3Crect x='4' y='8' width='2' height='1' fill='%23ecf0f1'/%3E%3Crect x='6' y='8' width='3' height='1' fill='%232980b9'/%3E%3Crect x='1' y='9' width='8' height='1' fill='%232980b9'/%3E%3Crect x='1' y='10' width='2' height='1' fill='%23000'/%3E%3Crect x='7' y='10' width='2' height='1' fill='%23000'/%3E%3C/svg%3E">
+    <link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 10 11'%3E%3Crect x='4' y='0' width='1' height='1' fill='%234a3018'/%3E%3Crect x='3' y='1' width='4' height='1' fill='%234a3018'/%3E%3Crect x='2' y='2' width='6' height='1' fill='%234a3018'/%3E%3Crect x='2' y='3' width='1' height='1' fill='%234a3018'/%3E%3Crect x='3' y='3' width='4' height='1' fill='%23ffcba4'/%3E%3Crect x='7' y='3' width='1' height='1' fill='%234a3018'/%3E%3Crect x='2' y='4' width='1' height='1' fill='%23ecf0f1'/%3E%3Crect x='3' y='4' width='1' height='1' fill='%23000'/%3E%3Crect x='4' y='4' width='2' height='1' fill='%23ffcba4'/%3E%3Crect x='6' y='4' width='1' height='1' fill='%23000'/%3E%3Crect x='7' y='4' width='1' height='1' fill='%23ecf0f1'/%3E%3Crect x='2' y='5' width='6' height='1' fill='%23ffcba4'/%3E%3Crect x='3' y='6' width='1' height='1' fill='%232980b9'/%3E%3Crect x='4' y='6' width='2' height='1' fill='%23e74c3c'/%3E%3Crect x='6' y='6' width='1' height='1' fill='%232980b9'/%3E%3Crect x='2' y='7' width='2' height='1' fill='%232980b9'/%3E%3Crect x='4' y='7' width='2' height='1' fill='%23ecf0f1'/%3E%3Crect x='6' y='7' width='2' height='1' fill='%232980b9'/%3E%3Crect x='1' y='8' width='3' height='1' fill='%232980b9'/%3E%3Crect x='4' y='8' width='2' height='1' fill='%23ecf0f1'/%3E%3Crect x='6' y='8' width='3' height='1' fill='%232980b9'/%3E%3Crect x='1' y='9' width='8' height='1' fill='%232980b9'/%3E%3Crect x='1' y='10' width='2' height='1' fill='%23000'/%3E%3Crect x='7' y='10' width='2' height='1' fill='%23000'/%3E%3C/svg%3E">
     
     <link href="https://fonts.googleapis.com/css2?family=VT323&display=swap" rel="stylesheet">
     <link href="https://unpkg.com/nes.css@2.3.0/css/nes.min.css" rel="stylesheet" />
@@ -460,6 +430,34 @@
 
         const themeBgm = new Audio('THEME.mp3'); 
         themeBgm.loop = true; themeBgm.volume = 0.5;
+
+        // --- XỬ LÝ CHẠY NGẦM (BACKGROUND AUDIO FIX) ---
+        document.addEventListener("visibilitychange", () => {
+            if (document.hidden) {
+                // Tạm dừng nhạc nền THEME
+                if (!themeBgm.paused) {
+                    themeBgm.dataset.wasPlaying = "true";
+                    themeBgm.pause();
+                } else {
+                    themeBgm.dataset.wasPlaying = "false";
+                }
+                
+                // Tạm dừng Web Audio API (nhịp tim, SFX)
+                if (audioCtx && audioCtx.state === 'running') {
+                    audioCtx.suspend();
+                }
+            } else {
+                // Khôi phục nhạc nền THEME nếu trước đó đang phát
+                if (themeBgm.dataset.wasPlaying === "true" && !isMuted) {
+                    themeBgm.play().catch(e => console.log(e));
+                }
+                
+                // Khôi phục Web Audio API
+                if (audioCtx && audioCtx.state === 'suspended' && !isMuted) {
+                    audioCtx.resume();
+                }
+            }
+        });
 
         document.addEventListener('click', (e) => {
             if (e.target.classList.contains('nes-btn') && !e.target.classList.contains('pill-item') && !e.target.classList.contains('btn-eliminated')) SFX.click();
