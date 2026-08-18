@@ -2,100 +2,99 @@
 <html lang="vi">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="mobile-web-app-capable" content="yes">
     <title>CASECLOSED - Điệp Vụ Tối Mật</title>
     
     <link href="https://fonts.googleapis.com/css2?family=VT323&display=swap" rel="stylesheet">
     <link href="https://unpkg.com/nes.css@2.3.0/css/nes.min.css" rel="stylesheet" />
     <style>
-        /* --- BACKGROUND CHUẨN 8-BIT KHÔNG GRADIENT MƯỢT --- */
+        /* --- BACKGROUND CHUẨN 8-BIT --- */
         body { 
-            font-family: 'VT323', monospace; font-size: 22px; padding: 20px; 
+            font-family: 'VT323', monospace; font-size: 24px; padding: 20px; 
             color: #e0e0e0; line-height: 1.5; margin: 0; min-height: 100vh;
-            overflow-x: hidden; position: relative;
-            background-color: #090910; /* Solid color */
+            overflow-x: hidden; position: relative; background-color: #090910; 
         }
-        .retro-bg {
-            position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; z-index: -1;
-        }
+        
+        .retro-bg { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; z-index: -2; }
         .retro-bg::after {
             content: ''; position: absolute; bottom: 0; left: -50%; width: 200%; height: 50%;
-            background-image: linear-gradient(transparent 65%, rgba(231, 110, 85, 0.6) 68%, transparent 70%), linear-gradient(90deg, transparent 65%, rgba(231, 110, 85, 0.6) 68%, transparent 70%);
-            background-size: 60px 20px, 20px 60px; transform: perspective(300px) rotateX(60deg); 
-            animation: gridMove 2s linear infinite;
-        }
-        .scanlines {
-            position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; z-index: 998; pointer-events: none;
-            background: repeating-linear-gradient(0deg, rgba(0,0,0,0.15), rgba(0,0,0,0.15) 2px, transparent 2px, transparent 4px);
+            background-image: linear-gradient(transparent 65%, rgba(231, 110, 85, 0.4) 68%, transparent 70%), linear-gradient(90deg, transparent 65%, rgba(231, 110, 85, 0.4) 68%, transparent 70%);
+            background-size: 60px 20px, 20px 60px; transform: perspective(300px) rotateX(60deg); animation: gridMove 2s linear infinite;
         }
 
-        .screen { display: none; position: relative; z-index: 10; } 
-        .active { display: block; } 
-        h2 { text-align: center; margin-bottom: 20px; }
+        .cyber-dust-1, .cyber-dust-2, .cyber-dust-3 { position: fixed; top: 0; left: 0; z-index: -1; pointer-events: none; background: transparent; }
+        .cyber-dust-1 { width: 4px; height: 4px; box-shadow: 10vw 10vh #fff, 20vw 30vh #f7d51d, 80vw 20vh #e76e55, 50vw 50vh #3498db, 70vw 80vh #fff, 90vw 90vh #f7d51d, 30vw 70vh #3498db, 40vw 15vh #e76e55, 60vw 60vh #fff, 15vw 85vh #f7d51d, 10vw 110vh #fff, 20vw 130vh #f7d51d, 80vw 120vh #e76e55, 50vw 150vh #3498db, 70vw 180vh #fff, 90vw 190vh #f7d51d, 30vw 170vh #3498db, 40vw 115vh #e76e55, 60vw 160vh #fff, 15vw 185vh #f7d51d; animation: dustAnim 20s linear infinite; }
+        .cyber-dust-2 { width: 6px; height: 6px; box-shadow: 15vw 25vh #3498db, 35vw 45vh #fff, 85vw 75vh #e76e55, 55vw 15vh #f7d51d, 75vw 40vh #fff, 95vw 15vh #3498db, 45vw 85vh #f7d51d, 25vw 65vh #e76e55, 65vw 30vh #fff, 5vw 55vh #3498db, 15vw 125vh #3498db, 35vw 145vh #fff, 85vw 175vh #e76e55, 55vw 115vh #f7d51d, 75vw 140vh #fff, 95vw 115vh #3498db, 45vw 185vh #f7d51d, 25vw 165vh #e76e55, 65vw 130vh #fff, 5vw 155vh #3498db; animation: dustAnim 14s linear infinite; }
+        .cyber-dust-3 { width: 8px; height: 8px; box-shadow: 12vw 40vh #e76e55, 28vw 10vh #f7d51d, 82vw 60vh #fff, 52vw 90vh #3498db, 78vw 20vh #e76e55, 92vw 50vh #f7d51d, 32vw 35vh #fff, 48vw 65vh #3498db, 12vw 140vh #e76e55, 28vw 110vh #f7d51d, 82vw 160vh #fff, 52vw 190vh #3498db, 78vw 120vh #e76e55, 92vw 150vh #f7d51d, 32vw 135vh #fff, 48vw 165vh #3498db; animation: dustAnim 25s linear infinite; }
+        @keyframes dustAnim { 0% { transform: translateY(0); } 100% { transform: translateY(-100vh); } }
 
-        /* Bỏ border-radius, dùng bóng cứng */
+        .scanlines { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; z-index: 998; pointer-events: none; background: repeating-linear-gradient(0deg, rgba(0,0,0,0.15), rgba(0,0,0,0.15) 2px, transparent 2px, transparent 4px); }
+        .screen { display: none; position: relative; z-index: 10; } .active { display: block; } 
+        h2 { text-align: center; margin-bottom: 20px; text-shadow: 4px 4px 0px #000; }
+
+        .arcade-title { position: relative; display: inline-block; padding: 0 40px; }
+        .arcade-title::before, .arcade-title::after { content: '■'; color: #3498db; font-size: 24px; position: absolute; top: 50%; transform: translateY(-50%); text-shadow: 2px 2px 0 #000; }
+        .arcade-title::before { left: 0; } .arcade-title::after { right: 0; }
+        
+        .blinker { animation: blinkerAnim 1s steps(2) infinite; }
+        @keyframes blinkerAnim { 50% { opacity: 0; } }
+
         .nes-container.is-dark { background-color: #121215; border-color: #fff; box-shadow: 4px 4px 0px #000; border-radius: 0 !important; }
-        .nes-input.is-dark { background-color: #000; color: #fff; border-color: #555; border-radius: 0 !important; }
-        .nes-btn { border-radius: 0 !important; }
-        .nes-table.is-dark { background-color: transparent; color: white; width: 100%; }
-        .nes-table.is-dark th { color: #f7d51d; }
+        .nes-input.is-dark { background-color: #000; color: #fff; border-color: #555; border-radius: 0 !important; font-size: 22px !important; padding: 10px !important; }
+        .nes-btn { border-radius: 0 !important; font-size: 18px; } 
+        .nes-table.is-dark { background-color: transparent; color: white; width: 100%; font-size: 20px;}
+        .nes-table.is-dark th { color: #f7d51d; text-shadow: 2px 2px 0px #000; }
 
-        /* --- MŨI TÊN CHỈ NGƯỜI PHÁT BIỂU (PIXEL ARROW) --- */
-        .pixel-arrow {
-            width: 0; height: 0; 
-            border-left: 10px solid transparent;
-            border-right: 10px solid transparent;
-            border-top: 14px solid #f7d51d;
-            animation: bounceArrow 0.6s infinite alternate steps(3); /* Steps tạo hiệu ứng giật khung hình */
-            margin-bottom: 5px;
-        }
-        @keyframes bounceArrow {
-            from { transform: translateY(0); }
-            to { transform: translateY(-8px); }
-        }
+        .text-pop { text-shadow: 2px 2px 0px #000; }
+        .title { font-size: 24px !important; text-shadow: 2px 2px 0px #000; }
 
-        /* --- KHAY THUỐC APTX-4869 (VUÔNG VỨC) --- */
-        .pill-wrapper { 
-            position: relative; margin: 0 auto 20px; 
-            background: #111;
-            border: 4px solid #fff; 
-            box-shadow: inset 4px 4px 0 #000, 6px 6px 0 rgba(0,0,0,0.8); /* Bóng cứng 8-bit */
-            padding: 30px 20px; min-height: 100px;
-            display: flex; justify-content: center; align-items: center; 
-            max-width: 600px; 
+        /* --- BOM HẸN GIỜ C4 & NÚT GỠ BOM --- */
+        #bomb-container {
+            position: fixed; bottom: 20px; right: 20px; z-index: 9990;
+            display: none; flex-direction: column; align-items: flex-end; gap: 5px;
         }
+        #bomb-timer {
+            position: relative; width: 252px; height: 108px; filter: drop-shadow(4px 4px 0 rgba(0,0,0,0.8));
+        }
+        #bomb-icon { position: absolute; top: 0; left: 0; width: 100%; height: 100%; }
+        #timer-text {
+            position: absolute; top: 36px; left: 54px; width: 96px; height: 30px;
+            color: #ff0000; font-family: 'VT323', monospace; font-size: 26px; line-height: 30px;
+            text-align: center; text-shadow: 0 0 5px #ff0000; letter-spacing: 2px; z-index: 1;
+        }
+        @keyframes redAlert { 0% { color: #ff0000; text-shadow: 0 0 5px #ff0000; } 50% { color: #fff; text-shadow: 0 0 15px #ff0000; } 100% { color: #ff0000; text-shadow: 0 0 5px #ff0000; } }
+        .bomb-warning #timer-text { animation: redAlert 0.5s infinite steps(2); }
+
+        .pixel-arrow { width: 0; height: 0; border-left: 12px solid transparent; border-right: 12px solid transparent; border-top: 16px solid #f7d51d; animation: bounceArrow 0.6s infinite alternate steps(3); margin-bottom: 5px; }
+        @keyframes bounceArrow { from { transform: translateY(0); } to { transform: translateY(-8px); } }
+
+        .btn-eliminated { position: relative; background-color: #2b2b2b !important; color: #aaa !important; border-color: #444 !important; box-shadow: inset 4px 4px 0px rgba(0,0,0,0.8) !important; cursor: not-allowed !important; }
+        .btn-eliminated::after { content: 'ELIMINATED'; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%) rotate(-12deg); color: #e74c3c; font-family: 'VT323', monospace; font-size: 14px; font-weight: bold; border: 2px solid #e74c3c; background: transparent; padding: 2px 6px; letter-spacing: 1px; white-space: nowrap; pointer-events: none; text-shadow: 2px 2px 0px #000; box-shadow: 2px 2px 0px #000; }
+
+        .pill-wrapper { position: relative; margin: 0 auto 20px; background: #111; border: 4px solid #fff; box-shadow: inset 4px 4px 0 #000, 6px 6px 0 rgba(0,0,0,0.8); padding: 30px 20px; min-height: 100px; display: flex; justify-content: center; align-items: center; max-width: 600px; }
         .pill-grid { display: flex; flex-wrap: wrap; gap: 30px; justify-content: center; align-items: center; width: 100%; }
         .pill-item { cursor: pointer; transition: transform 0.1s; filter: drop-shadow(4px 4px 0 #000); }
         .pill-item:hover { filter: drop-shadow(4px 4px 0 #e74c3c); transform: scale(1.1); }
         .pill-item:active { transform: scale(0.9); }
         .pill-item.consumed { animation: consumeAnim 0.5s forwards steps(4); pointer-events: none; }
-        
-        @keyframes consumeAnim {
-            0% { transform: scale(1); filter: brightness(1); }
-            50% { transform: scale(1.2) rotate(15deg); filter: brightness(1.5); opacity: 0.9; }
-            100% { transform: scale(0); opacity: 0; filter: grayscale(1); }
-        }
+        @keyframes consumeAnim { 0% { transform: scale(1); filter: brightness(1); } 50% { transform: scale(1.2) rotate(15deg); filter: brightness(1.5); opacity: 0.9; } 100% { transform: scale(0); opacity: 0; filter: grayscale(1); } }
 
-        /* --- PIXEL MASCOTS & HARD GLOW --- */
+        /* --- PIXEL MASCOTS & INTRO --- */
+        #intro-screen { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background-color: #090910; z-index: 10000; display: flex; flex-direction: column; justify-content: center; align-items: center; cursor: pointer; transition: opacity 0.8s ease, visibility 0.8s ease; }
+        #intro-screen.hidden { opacity: 0; visibility: hidden; }
         .pixel-canvas { image-rendering: pixelated; display: inline-block; }
-        /* Drop shadow đổi thành viền khối cứng (solid shadow) */
-        .glow-detective { filter: drop-shadow(4px 4px 0px #1d6b9e); }
-        .glow-spy { filter: drop-shadow(4px 4px 0px #a83d27); }
-        .glow-kid { filter: drop-shadow(4px 4px 0px #126399); }
-        
+        .glow-detective { filter: drop-shadow(4px 4px 0px #1d6b9e); } .glow-spy { filter: drop-shadow(4px 4px 0px #a83d27); } .glow-kid { filter: drop-shadow(4px 4px 0px #126399); } .glow-bee { filter: drop-shadow(4px 4px 0px #f1c40f); }
         .reveal-mascot { animation: dropDown 0.6s forwards steps(4); }
         @keyframes dropDown { 0% { transform: translateY(-50px) scale(0.5); opacity: 0; } 100% { transform: translateY(0) scale(1.5); opacity: 1; } }
-
-        /* Animation chuyển thành giật cục (steps) chuẩn giả lập */
         .anim-bounce { animation: bounce 0.6s infinite alternate steps(3); }
         @keyframes bounce { from { transform: translateY(0); } to { transform: translateY(-10px); } }
-        
         .anim-shake { animation: shake 0.4s infinite steps(2); }
         @keyframes shake { 0% { transform: translateX(2px); } 100% { transform: translateX(-2px); } }
-        
         .anim-wave { animation: waveAnim 0.8s infinite alternate steps(3); }
         @keyframes waveAnim { 0% { transform: translateY(0); } 100% { transform: translateY(-10px); } }
-
         .anim-float { animation: float 1.5s infinite alternate steps(4); }
         @keyframes float { 0% { transform: translateY(0px); } 100% { transform: translateY(-15px); } }
     </style>
@@ -103,218 +102,287 @@
 <body>
 
     <div class="retro-bg"></div>
+    <div class="cyber-dust-1"></div>
+    <div class="cyber-dust-2"></div>
+    <div class="cyber-dust-3"></div>
     <div class="scanlines"></div>
 
+    <!-- UI BOM HẸN GIỜ C4 -->
+    <div id="bomb-container">
+        <div id="bomb-timer">
+            <canvas id="bomb-icon" class="pixel-canvas"></canvas>
+            <div id="timer-text">00:00</div>
+        </div>
+        <button id="btn-defuse" class="nes-btn is-error" style="width: 100%; font-size: 16px; padding: 4px;" onclick="openDefuseModal()">GỠ BOM [X]</button>
+    </div>
+
+    <!-- MÀN HÌNH INTRO: BEESTUDIO -->
+    <div id="intro-screen" onclick="finishIntro()">
+        <canvas id="bee-logo" class="pixel-canvas anim-float glow-bee" style="margin-bottom: 20px;"></canvas>
+        <h1 style="color: #f7d51d; font-size: 64px; text-shadow: 6px 6px 0px #e76e55; letter-spacing: 8px; margin: 0; padding: 0;">BeeStudio</h1>
+        <p style="color: #fff; font-size: 24px; margin-top: 10px; letter-spacing: 2px;" class="text-pop">PRESENTS</p>
+        <div style="position: absolute; bottom: 15%;"><p class="blinker text-pop" style="color: #27ae60; font-size: 28px;">- TAP TO START -</p></div>
+    </div>
+
     <!-- MÀN HÌNH 0: INIT -->
-    <div id="init-screen" class="screen active">
-        <div style="text-align: center; margin-top: 50px; display: flex; justify-content: center; gap: 20px;">
+    <div id="init-screen" class="screen">
+        <div style="text-align: center; margin-top: 20px; height: 30px;"><span class="text-pop blinker" style="color: #27ae60; font-size: 20px;">[ SYSTEM READY ]</span></div>
+        <div style="text-align: center; margin-top: 20px; display: flex; justify-content: center; gap: 20px;">
             <canvas id="main-logo-1" class="pixel-canvas anim-wave glow-detective" style="animation-delay: 0s"></canvas>
             <canvas id="main-logo-2" class="pixel-canvas anim-wave glow-spy" style="animation-delay: 0.15s"></canvas>
             <canvas id="main-logo-3" class="pixel-canvas anim-wave glow-kid" style="animation-delay: 0.3s"></canvas>
         </div>
-        <h2 style="color: #f7d51d; font-size: 40px; text-shadow: 4px 4px #e76e55; margin-top: 10px; letter-spacing: 4px;">CASECLOSED</h2>
+        <div style="text-align: center; margin-top: 10px;"><h2 class="arcade-title" style="color: #f7d51d; font-size: 44px; text-shadow: 4px 4px #e76e55; letter-spacing: 4px; margin: 0;">CASECLOSED</h2></div>
+        
         <div class="nes-container is-dark is-centered" style="margin-top: 30px;">
-            <p>HỆ THỐNG DỮ LIỆU</p>
-            <button class="nes-btn is-primary" style="width: 100%; margin-top: 20px;" onclick="startNewSession()">Mở Hồ Sơ Mới</button>
-            <button id="btn-continue" class="nes-btn is-success" style="width: 100%; margin-top: 15px; display: none;" onclick="showLoadScreen()">Tiếp Tục Điều Tra</button>
-            <button class="nes-btn is-warning" style="width: 100%; margin-top: 15px;" onclick="showRules()">[ LUẬT CHƠI ]</button>
+            <p class="text-pop">HỆ THỐNG DỮ LIỆU</p>
+            <button class="nes-btn is-primary" style="width: 100%; margin-top: 20px; padding: 12px;" onclick="startNewSession()">Mở Hồ Sơ Mới</button>
+            <button id="btn-continue" class="nes-btn is-success" style="width: 100%; margin-top: 15px; padding: 12px; display: none;" onclick="showLoadScreen()">Tiếp Tục Điều Tra</button>
+            <button class="nes-btn is-warning" style="width: 100%; margin-top: 15px; padding: 12px;" onclick="showRules()">[ LUẬT CHƠI ]</button>
         </div>
     </div>
 
     <!-- MÀN HÌNH 0.5: DANH SÁCH HỒ SƠ -->
     <div id="load-screen" class="screen">
-        <h2 style="color: #f7d51d; text-shadow: 2px 2px #e76e55; margin-bottom: 5px;">KHO LƯU TRỮ</h2>
+        <h2 style="color: #f7d51d; text-shadow: 4px 4px #e76e55; margin-bottom: 5px;" class="arcade-title">KHO LƯU TRỮ</h2>
         <div class="nes-container is-dark with-title">
-            <p class="title">Chọn Đội Hình</p>
+            <p class="title text-pop">Chọn Đội Hình</p>
             <div id="session-list" style="margin-top: 20px; max-height: 400px; overflow-y: auto;"></div>
-            <button type="button" class="nes-btn" style="margin-top: 20px; width: 100%;" onclick="switchScreen('init-screen')">Quay Lại</button>
+            <button type="button" class="nes-btn" style="margin-top: 20px; width: 100%; padding: 10px;" onclick="switchScreen('init-screen')">Quay Lại</button>
         </div>
     </div>
 
     <!-- MÀN HÌNH 1: SETUP -->
     <div id="setup-screen" class="screen">
-        <h2 style="color: #f7d51d; text-shadow: 2px 2px #e76e55; margin-bottom: 5px;">THIẾT LẬP LỰC LƯỢNG</h2>
+        <h2 style="color: #f7d51d; text-shadow: 4px 4px #e76e55; margin-bottom: 5px;">THIẾT LẬP LỰC LƯỢNG</h2>
         <div class="nes-container is-dark with-title is-centered">
-            <p class="title">Bố Trí Vai Trò</p>
-            <div style="display: flex; gap: 15px; margin-bottom: 10px;">
+            <p class="title text-pop">Bố Trí Vai Trò</p>
+
+            <div style="text-align: center; margin-bottom: 15px; padding: 10px; border: 2px solid #e74c3c; background: #000; box-shadow: 2px 2px 0 #000;">
+                <span style="font-size: 20px; color: #e74c3c;" class="text-pop">Bom hẹn giờ (Phút): </span>
+                <input type="number" id="input-timer" class="nes-input is-dark" value="0" min="0" max="60" style="width: 80px; display: inline-block; text-align: center; font-size: 24px!important; padding: 5px!important;">
+                
+                <label style="color: #fff; font-size: 16px; margin-top: 15px; display: block; border-top: 1px dashed #555; padding-top: 10px;">
+                    <input type="checkbox" id="cb-defuser" class="nes-checkbox is-dark" checked>
+                    <span>Kích hoạt Chuyên Gia Gỡ Bom</span>
+                </label>
+            </div>
+
+            <div style="display: flex; gap: 15px; margin-bottom: 15px;">
                 <div style="flex: 1; text-align: left;">
-                    <label style="font-size: 14px; color: #e76e55;">Áo đen:</label>
+                    <label style="font-size: 18px; color: #e76e55;" class="text-pop">Áo đen:</label>
                     <input type="number" id="input-spies" class="nes-input is-dark" value="1" min="1" onchange="updateRoleCount()">
                 </div>
                 <div style="flex: 1; text-align: left;">
-                    <label style="font-size: 14px; color: #209cee;">Siêu trộm:</label>
+                    <label style="font-size: 18px; color: #209cee;" class="text-pop">Siêu trộm:</label>
                     <input type="number" id="input-kids" class="nes-input is-dark" value="1" min="0" onchange="updateRoleCount()">
                 </div>
             </div>
-            <div style="text-align: center; margin-bottom: 15px; padding: 10px; border: 2px solid #555; background: #000;">
-                <span style="font-size: 16px;">Đội Thám Tử: </span>
-                <b id="calc-civilians" style="font-size: 24px; color: #3498db;">0</b>
+            <div style="text-align: center; margin-bottom: 15px; padding: 15px; border: 2px solid #555; background: #000; box-shadow: 2px 2px 0 #000;">
+                <span style="font-size: 20px;" class="text-pop">Đội Thám Tử: </span>
+                <b id="calc-civilians" style="font-size: 28px; color: #3498db; text-shadow: 2px 2px 0 #000;">0</b>
             </div>
             <div class="nes-field" style="display: flex; gap: 10px; margin-bottom: 15px;">
                 <input type="text" id="player-name" class="nes-input is-dark" placeholder="Tên thám tử..." onkeypress="handleEnter(event)">
-                <button type="button" class="nes-btn is-primary" onclick="addPlayerName()">Thêm</button>
+                <button type="button" class="nes-btn is-primary" style="padding: 10px 20px;" onclick="addPlayerName()">+</button>
             </div>
             
-            <p style="font-size: 12px; color: #aaa; text-align: left; margin-bottom: 5px;">* Xếp vị trí ngồi theo vòng tròn:</p>
+            <p style="font-size: 16px; color: #ddd; text-align: left; margin-bottom: 5px;" class="text-pop">* Xếp vị trí ngồi theo vòng tròn:</p>
             <div class="nes-container is-dark" style="padding: 10px; text-align: left; min-height: 100px;">
-                <ul id="name-list" class="nes-list is-disc" style="font-size: 18px; margin: 0; color: #fff; padding-left: 0;"></ul>
+                <ul id="name-list" class="nes-list is-disc" style="font-size: 22px; margin: 0; color: #fff; padding-left: 0;"></ul>
             </div>
             
-            <button type="button" class="nes-btn is-warning" style="margin-top: 15px; width: 100%;" onclick="openScoreSettings()">[ CÀI ĐẶT ĐIỂM ]</button>
-            <button type="button" class="nes-btn is-success" style="margin-top: 15px; width: 100%;" onclick="startGame()">PHÁT MẬT LỆNH</button>
-            <button type="button" class="nes-btn" style="margin-top: 10px; width: 100%;" onclick="exitToMenu()">Quay Lại Menu</button>
+            <button type="button" class="nes-btn is-warning" style="margin-top: 20px; width: 100%; padding: 10px;" onclick="openScoreSettings()">[ CÀI ĐẶT ĐIỂM ]</button>
+            <button type="button" class="nes-btn is-success" style="margin-top: 15px; width: 100%; padding: 12px;" onclick="startGame()">PHÁT MẬT LỆNH</button>
+            <button type="button" class="nes-btn" style="margin-top: 15px; width: 100%; padding: 10px;" onclick="exitToMenu()">Quay Lại Menu</button>
         </div>
     </div>
 
     <!-- MÀN HÌNH 2: CHỌN THUỐC -->
     <div id="reveal-screen" class="screen">
-        <div style="text-align: right; margin-bottom: 15px;">
-            <button id="reroll-btn" class="nes-btn is-error" style="font-size: 12px; padding: 4px 8px;" onclick="rerollWords()">[ XÓA / ĐỔI MÃ ]</button>
+        <div style="text-align: right; margin-bottom: 20px;">
+            <button id="reroll-btn" class="nes-btn is-error" style="font-size: 16px; padding: 6px 12px;" onclick="rerollWords()">[ XÓA / ĐỔI MÃ ]</button>
         </div>
-        <p id="instruction-text" style="text-align: center; font-size: 14px; color: #aaa;">Uống 1 viên APTX-4869 để nhận hồ sơ mật!</p>
+        <p id="instruction-text" style="text-align: center; font-size: 18px; color: #ddd;" class="text-pop">Uống 1 viên APTX-4869 để nhận hồ sơ mật!</p>
         
-        <div class="pill-wrapper" id="pill-wrapper">
-            <div id="pill-board" class="pill-grid"></div>
-        </div>
+        <div class="pill-wrapper" id="pill-wrapper"><div id="pill-board" class="pill-grid"></div></div>
         
-        <div id="turn-indicator" style="text-align: center; margin: 25px 0;">
-            <h3 id="player-turn-text" style="color: #f7d51d; margin: 0; font-size: 28px; text-transform: uppercase;">LƯỢT BỐC: ???</h3>
+        <div id="turn-indicator" style="text-align: center; margin: 30px 0;">
+            <h3 id="player-turn-text" style="color: #f7d51d; margin: 0; font-size: 32px; text-transform: uppercase;" class="text-pop arcade-title">LƯỢT BỐC: ???</h3>
         </div>
 
         <div id="review-btn-container" style="text-align: center; display: none; margin-bottom: 20px;">
-            <button class="nes-btn is-primary" onclick="showRevealedWordForReview()">MỞ HỒ SƠ CỦA BẠN</button>
+            <button class="nes-btn is-primary" style="padding: 12px 20px; font-size: 20px;" onclick="showRevealedWordForReview()">MỞ HỒ SƠ CỦA BẠN</button>
         </div>
 
-        <div id="word-reveal-box" class="nes-container is-dark" style="display: none; margin-top: 10px; text-align: center; padding: 15px 10px; border: 4px solid #fff;">
-            <p id="secret-word" style="font-size: 32px; margin: 0; font-weight: bold; color: #f7d51d;">???</p>
-            <p id="role-hint" style="font-size: 14px; margin-top: 5px; color: #aaa;"></p>
+        <div id="word-reveal-box" class="nes-container is-dark" style="display: none; margin-top: 10px; text-align: center; padding: 20px 10px; border: 4px solid #fff;">
+            <p id="secret-word" style="font-size: 40px; margin: 0; font-weight: bold; color: #f7d51d;" class="text-pop">???</p>
+            <p id="role-hint" style="font-size: 18px; margin-top: 10px; color: #ddd;" class="text-pop"></p>
         </div>
         
         <div style="text-align: center;">
-            <button id="next-player-btn" type="button" class="nes-btn is-warning" style="display: none; margin-top: 15px;" onclick="handleNextAction()">Đã Ghi Nhớ</button>
+            <button id="next-player-btn" type="button" class="nes-btn is-warning" style="display: none; margin-top: 20px; padding: 12px 30px; font-size: 20px;" onclick="handleNextAction()">Đã Ghi Nhớ</button>
         </div>
     </div>
 
     <!-- MÀN HÌNH 2.5: CHỌN NGƯỜI ĐỂ XEM LẠI -->
     <div id="select-review-screen" class="screen">
-        <h2 style="color: #209cee;">BÍ MẬT QUỐC GIA</h2>
+        <h2 style="color: #209cee;" class="text-pop arcade-title">BÍ MẬT QUỐC GIA</h2>
         <div class="nes-container is-dark with-title">
-            <p class="title">Kiểm Tra Hồ Sơ</p>
-            <p style="font-size: 14px; text-align: center;">Chỉ ấn vào tên CỦA BẠN để xem lại thẻ.</p>
-            <div id="review-player-list" style="display: flex; flex-wrap: wrap; gap: 10px; justify-content: center; margin-top: 15px; min-height: 80px;"></div>
-            <button type="button" class="nes-btn" style="margin-top: 20px; width: 100%;" onclick="goToVoteScreen()">Hủy bỏ (Quay lại)</button>
+            <p class="title text-pop">Kiểm Tra Hồ Sơ</p>
+            <p style="font-size: 18px; text-align: center; color: #ddd;" class="text-pop">Chỉ ấn vào tên CỦA BẠN để xem lại thẻ.</p>
+            <div id="review-player-list" style="display: flex; flex-wrap: wrap; gap: 15px; justify-content: center; margin-top: 20px; min-height: 80px;"></div>
+            <button type="button" class="nes-btn" style="margin-top: 30px; width: 100%; padding: 12px;" onclick="goToVoteScreen()">Hủy bỏ (Quay lại)</button>
         </div>
     </div>
 
     <!-- MÀN HÌNH 3: BỎ PHIẾU -->
     <div id="vote-screen" class="screen">
         <div class="nes-container is-dark with-title">
-            <p class="title">Quyết định bắt giữ</p>
+            <p class="title text-pop">Quyết định bắt giữ</p>
             <div style="text-align: right; margin-bottom: 25px;">
-                <button type="button" class="nes-btn is-warning" style="font-size: 12px; padding: 2px 8px;" onclick="openReviewMode()">[ XEM LẠI THẺ ]</button>
+                <button type="button" class="nes-btn is-warning" style="font-size: 16px; padding: 6px 12px;" onclick="openReviewMode()">[ XEM LẠI THẺ ]</button>
             </div>
-            <!-- KHU VỰC RENDER DANH SÁCH & MŨI TÊN CHỈ ĐIỂM SẼ NẰM Ở ĐÂY -->
             <div id="player-list" style="display: flex; flex-wrap: wrap; gap: 15px; justify-content: center; min-height: 80px; align-items: flex-end;"></div>
         </div>
-
         <div style="margin-top: 40px; text-align: center;">
-            <p style="color: #f7d51d; font-size: 16px; margin-bottom: 15px; border-bottom: 2px solid #555; display: inline-block; padding-bottom: 5px;">[ TÌNH TRẠNG SINH TỒN ]</p>
+            <p style="color: #f7d51d; font-size: 20px; margin-bottom: 15px; border-bottom: 4px solid #555; display: inline-block; padding-bottom: 5px;" class="text-pop">[ TÌNH TRẠNG SINH TỒN ]</p>
             <div id="survivor-mascots" style="display: flex; flex-wrap: wrap; gap: 15px; justify-content: center; align-items: flex-end; min-height: 60px;"></div>
         </div>
     </div>
 
-    <!-- MÀN HÌNH 4: PHÁN QUYẾT LOẠI NGƯỜI -->
+    <!-- MÀN HÌNH 4: PHÁN QUYẾT -->
     <div id="result-screen" class="screen">
-        <h2 id="result-title" style="color: #f7d51d;">BẮT GIỮ NGHI PHẠM</h2>
+        <h2 id="result-title" style="color: #f7d51d;" class="text-pop">BẮT GIỮ NGHI PHẠM</h2>
         <div class="nes-container is-dark" style="text-align: center;">
             <canvas id="mascot-display" class="pixel-canvas" style="margin: 20px 0;"></canvas>
-            <p id="result-message" style="font-size: 18px; text-align: center; margin-top: 10px; line-height: 1.8;"></p>
+            <p id="result-message" style="font-size: 22px; text-align: center; margin-top: 10px; line-height: 1.8;" class="text-pop"></p>
             
-            <div id="mr-white-guess" style="display: none; margin-top: 20px; padding: 15px; border: 2px solid #e76e55; background: #111;">
-                <p style="color: #e76e55; font-size: 16px;">SIÊU TRỘM ĐANG GIẢI MÃ BẢO VẬT!</p>
-                <input type="text" id="guess-input" class="nes-input is-dark" placeholder="Nhập từ khóa của Thám Tử...">
-                <button class="nes-btn is-error" style="margin-top: 15px;" onclick="checkSieuTromGuess()">Chốt Đáp Án!</button>
+            <div id="mr-white-guess" style="display: none; margin-top: 25px; padding: 20px; border: 4px solid #e76e55; background: #111;">
+                <p style="color: #e76e55; font-size: 20px;" class="text-pop blinker">SIÊU TRỘM GIẢI MÃ BẢO VẬT!</p>
+                <input type="text" id="guess-input" class="nes-input is-dark" placeholder="Nhập từ khóa của Thám Tử..." style="margin-top: 10px;">
+                <button class="nes-btn is-error" style="margin-top: 20px; width: 100%; padding: 10px;" onclick="checkSieuTromGuess()">Chốt Đáp Án!</button>
             </div>
             
-            <div style="text-align: center; margin-top: 20px;">
-                <button id="next-round-btn" class="nes-btn is-warning" style="display: none;" onclick="startNextRound()">Tiếp Tục Điều Tra</button>
-                <button id="btn-to-victory" class="nes-btn is-success" style="display: none;" onclick="showVictoryScreen()">Xem Kết Quả Cuối Cùng</button>
+            <div style="text-align: center; margin-top: 25px;">
+                <button id="next-round-btn" class="nes-btn is-warning" style="display: none; width: 100%; padding: 12px;" onclick="startNextRound()">Tiếp Tục Điều Tra</button>
+                <button id="btn-to-victory" class="nes-btn is-success" style="display: none; width: 100%; padding: 12px;" onclick="showVictoryScreen()">Xem Kết Quả Cuối Cùng</button>
             </div>
         </div>
     </div>
 
     <!-- MÀN HÌNH 4.5: TỔNG KẾT CHIẾN THẮNG -->
     <div id="victory-screen" class="screen">
-        <h2 style="color: #f7d51d;">TỔNG KẾT CHUYÊN ÁN</h2>
+        <h2 style="color: #f7d51d;" class="text-pop arcade-title">TỔNG KẾT CHUYÊN ÁN</h2>
         <div class="nes-container is-dark" style="text-align: center;">
-            <h3 id="victory-faction-name" style="margin-top: 10px; font-size: 26px;"></h3>
+            <h3 id="victory-faction-name" style="margin-top: 10px; font-size: 30px;" class="text-pop"></h3>
             <div id="victory-mascots" style="display: flex; justify-content: center; gap: 20px; margin: 30px 0; min-height: 80px;"></div>
             
-            <div class="nes-container is-dark" style="margin-top: 20px; padding: 15px; font-size: 18px; border-color: #f7d51d;">
-                <p style="color: #3498db; margin-bottom: 15px;">Mật lệnh Thám Tử:<br><b id="victory-word-civ" style="font-size: 26px; color:#fff;"></b></p>
-                <p style="color: #e76e55; margin-bottom: 0;">Mật lệnh Áo Đen:<br><b id="victory-word-spy" style="font-size: 26px; color:#fff;"></b></p>
+            <div class="nes-container is-dark" style="margin-top: 20px; padding: 20px; font-size: 20px; border-color: #f7d51d;">
+                <p style="color: #3498db; margin-bottom: 15px;" class="text-pop">Mật lệnh Thám Tử:<br><b id="victory-word-civ" style="font-size: 32px; color:#fff;"></b></p>
+                <p style="color: #e76e55; margin-bottom: 0;" class="text-pop">Mật lệnh Áo Đen:<br><b id="victory-word-spy" style="font-size: 32px; color:#fff;"></b></p>
             </div>
             
-            <button class="nes-btn is-success" style="margin-top: 25px; width: 100%;" onclick="showLeaderboard()">Xem Bảng Xếp Hạng</button>
+            <button class="nes-btn is-success" style="margin-top: 30px; width: 100%; padding: 12px;" onclick="showLeaderboard()">Xem Bảng Xếp Hạng</button>
         </div>
     </div>
 
     <!-- MÀN HÌNH 5: BẢNG XẾP HẠNG -->
     <div id="leaderboard-screen" class="screen">
-        <h2 style="color: #f7d51d;">BẢNG XẾP HẠNG</h2>
+        <h2 style="color: #f7d51d;" class="text-pop arcade-title">BẢNG XẾP HẠNG</h2>
         <div class="nes-container is-dark with-title">
-            <p class="title">Thành Tích Điểm Số</p>
+            <p class="title text-pop">Thành Tích Điểm Số</p>
             <div class="nes-table-responsive" style="min-height: 250px;">
-                <table class="nes-table is-dark is-bordered">
-                    <thead><tr><th>Tên Đặc Vụ</th><th>Điểm Thưởng</th></tr></thead>
+                <table class="nes-table is-dark is-bordered" style="font-size: 22px;">
+                    <thead><tr><th class="text-pop">Tên Đặc Vụ</th><th class="text-pop">Điểm</th></tr></thead>
                     <tbody id="leaderboard-body"></tbody>
                 </table>
             </div>
-            <button id="btn-next-case" type="button" class="nes-btn is-primary" style="margin-top: 20px; width: 100%; display:none;" onclick="switchScreen('setup-screen')">Tiếp Tục Vụ Án Mới</button>
-            <button id="btn-menu" type="button" class="nes-btn" style="margin-top: 10px; width: 100%; display:none;" onclick="exitToMenu()">Trở Về Menu</button>
+            <button id="btn-next-case" type="button" class="nes-btn is-primary" style="margin-top: 25px; width: 100%; padding: 12px; display:none;" onclick="switchScreen('setup-screen')">Vụ Án Mới</button>
+            <button id="btn-menu" type="button" class="nes-btn" style="margin-top: 15px; width: 100%; padding: 12px; display:none;" onclick="exitToMenu()">Trở Về Menu</button>
         </div>
     </div>
 
-    <!-- OVERLAY CÀI ĐẶT & THÔNG BÁO -->
+    <!-- OVERLAY CÀI ĐẶT ĐIỂM SỐ -->
     <div id="score-settings-overlay" style="display: none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0,0,0,0.9); z-index: 9998; justify-content: center; align-items: center; flex-direction: column;">
-        <div class="nes-container is-dark" style="width: 90%; max-width: 500px; text-align: left; border: 4px solid #f7d51d; background-color: #000; padding: 15px; overflow-y: auto; max-height: 90vh;">
-            <h3 style="color:#f7d51d; text-align:center; font-size: 20px; margin-bottom: 20px;">TÙY CHỈNH ĐIỂM THƯỞNG</h3>
+        <div class="nes-container is-dark" style="width: 90%; max-width: 500px; text-align: left; border: 4px solid #f7d51d; background-color: #000; padding: 20px; overflow-y: auto; max-height: 90vh;">
+            <h3 style="color:#f7d51d; text-align:center; font-size: 24px; margin-bottom: 25px;" class="text-pop">TÙY CHỈNH ĐIỂM THƯỞNG</h3>
             
-            <label style="color:#3498db; font-size: 16px;">Thám tử (CÒN SỐNG):</label>
-            <input type="number" id="setting-dan-alive" class="nes-input is-dark" value="3" style="margin-bottom: 10px; height: 35px; padding: 5px;">
+            <label style="color:#3498db; font-size: 18px;" class="text-pop">Thám tử (CÒN SỐNG):</label>
+            <input type="number" id="setting-dan-alive" class="nes-input is-dark" value="3" style="margin-bottom: 15px; height: 45px; padding: 5px;">
             
-            <label style="color:#3498db; font-size: 16px;">Thám tử (HI SINH):</label>
-            <input type="number" id="setting-dan-dead" class="nes-input is-dark" value="2" style="margin-bottom: 10px; height: 35px; padding: 5px;">
+            <label style="color:#3498db; font-size: 18px;" class="text-pop">Thám tử (HI SINH):</label>
+            <input type="number" id="setting-dan-dead" class="nes-input is-dark" value="2" style="margin-bottom: 15px; height: 45px; padding: 5px;">
             
-            <label style="color:#e76e55; font-size: 16px;">Áo đen (THẮNG):</label>
-            <input type="number" id="setting-spy-win" class="nes-input is-dark" value="5" style="margin-bottom: 10px; height: 35px; padding: 5px;">
+            <label style="color:#e76e55; font-size: 18px;" class="text-pop">Áo đen (THẮNG):</label>
+            <input type="number" id="setting-spy-win" class="nes-input is-dark" value="5" style="margin-bottom: 15px; height: 45px; padding: 5px;">
             
-            <label style="color:#209cee; font-size: 16px;">Siêu trộm (SỐNG SÓT):</label>
-            <input type="number" id="setting-kid-survive" class="nes-input is-dark" value="6" style="margin-bottom: 10px; height: 35px; padding: 5px;">
+            <label style="color:#209cee; font-size: 18px;" class="text-pop">Siêu trộm (SỐNG SÓT):</label>
+            <input type="number" id="setting-kid-survive" class="nes-input is-dark" value="6" style="margin-bottom: 15px; height: 45px; padding: 5px;">
             
-            <label style="color:#209cee; font-size: 16px;">Siêu trộm (LẬT KÈO):</label>
-            <input type="number" id="setting-kid-hack" class="nes-input is-dark" value="10" style="margin-bottom: 20px; height: 35px; padding: 5px;">
+            <label style="color:#209cee; font-size: 18px;" class="text-pop">Siêu trộm (LẬT KÈO):</label>
+            <input type="number" id="setting-kid-hack" class="nes-input is-dark" value="10" style="margin-bottom: 15px; height: 45px; padding: 5px;">
+
+            <label style="color:#f7d51d; font-size: 18px;" class="text-pop">Gỡ bom thành công (MVP):</label>
+            <input type="number" id="setting-defuse-win" class="nes-input is-dark" value="10" style="margin-bottom: 15px; height: 45px; padding: 5px;">
+
+            <label style="color:#e74c3c; font-size: 18px;" class="text-pop">Hết giờ/Bom nổ (Trừ điểm):</label>
+            <input type="number" id="setting-timeout-penalty" class="nes-input is-dark" value="-2" style="margin-bottom: 30px; height: 45px; padding: 5px;">
             
-            <div style="display: flex; gap: 10px; justify-content: center;">
-                <button class="nes-btn" onclick="closeScoreSettings(false)">HỦY</button>
-                <button class="nes-btn is-success" onclick="closeScoreSettings(true)">LƯU LẠI</button>
+            <div style="display: flex; gap: 15px; justify-content: center;">
+                <button class="nes-btn" style="padding: 10px 20px;" onclick="closeScoreSettings(false)">HỦY</button>
+                <button class="nes-btn is-success" style="padding: 10px 20px;" onclick="closeScoreSettings(true)">LƯU LẠI</button>
             </div>
         </div>
     </div>
 
+    <!-- OVERLAY GỠ BOM (HACKING TERMINAL) -->
+    <div id="defuse-modal-overlay" style="display:none; position:fixed; top:0; left:0; width:100vw; height:100vh; background:rgba(0,0,0,0.95); z-index:10000; justify-content:center; align-items:center; flex-direction:column;">
+        <div class="nes-container is-dark" style="width:90%; max-width:450px; border: 4px solid #e74c3c; text-align: center;">
+            <h3 style="color:#e74c3c; text-shadow: 2px 2px 0 #000;">[ HỆ THỐNG GỠ BOM ]</h3>
+            
+            <div id="defuse-step-1">
+                <p style="color:#f7d51d; font-size: 18px;">MÃ BẢO MẬT (4 SỐ):</p>
+                <input type="number" id="defuse-pin-input" class="nes-input is-dark" style="text-align:center; font-size:40px !important; letter-spacing: 15px; margin-bottom: 15px;" placeholder="****">
+                <p id="defuse-error-1" style="color:#e74c3c; display:none; font-size: 16px;" class="blinker">MÃ SAI! TỪ CHỐI TRUY CẬP!</p>
+                <div style="display: flex; gap: 10px; justify-content: center; margin-top: 15px;">
+                    <button class="nes-btn" onclick="closeDefuseModal()">HỦY BỎ</button>
+                    <button class="nes-btn is-error" onclick="checkDefusePin()">XÁC NHẬN</button>
+                </div>
+            </div>
+
+            <div id="defuse-step-2" style="display:none;">
+                <p style="color:#27ae60; font-size: 18px;">TRUY CẬP THÀNH CÔNG.</p>
+                <p style="color:#fff; font-size: 16px;">Hãy nhập TỪ KHÓA CỦA ÁO ĐEN để vô hiệu hóa ngòi nổ:</p>
+                <input type="text" id="defuse-word-input" class="nes-input is-dark" style="text-align:center; font-size:24px !important; margin-bottom: 15px;">
+                <div style="display: flex; gap: 10px; justify-content: center; margin-top: 15px;">
+                    <button class="nes-btn" onclick="closeDefuseModal()">HỦY BỎ</button>
+                    <button class="nes-btn is-warning" onclick="submitDefuseWord()">✂ CẮT DÂY</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- OVERLAY THÔNG BÁO CHUNG -->
     <div id="custom-modal-overlay" style="display: none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0,0,0,0.9); z-index: 9999; justify-content: center; align-items: center; flex-direction: column;">
-        <div class="nes-container is-dark" style="width: 85%; max-width: 450px; text-align: left; border: 4px solid #f7d51d; background-color: #000;">
-            <p id="custom-modal-text" style="font-size: 18px; color: #fff; margin-bottom: 25px; line-height: 1.6;"></p>
+        <div class="nes-container is-dark" style="width: 85%; max-width: 450px; text-align: left; border: 4px solid #f7d51d; background-color: #000; padding: 20px;">
+            <p id="custom-modal-text" style="font-size: 22px; color: #fff; margin-bottom: 30px; line-height: 1.8;" class="text-pop"></p>
             <div style="display: flex; justify-content: center; gap: 15px;">
-                <button id="custom-modal-btn-cancel" class="nes-btn" style="display: none; font-size: 16px;" onclick="closeModal()">HỦY BỎ</button>
-                <button id="custom-modal-btn-ok" class="nes-btn is-primary" style="font-size: 16px;">ĐÃ HIỂU</button>
+                <button id="custom-modal-btn-cancel" class="nes-btn" style="display: none; padding: 10px 20px; font-size: 18px;" onclick="closeModal()">HỦY BỎ</button>
+                <button id="custom-modal-btn-ok" class="nes-btn is-primary" style="padding: 10px 20px; font-size: 18px;">ĐÃ HIỂU</button>
             </div>
         </div>
     </div>
 
     <!-- ================= JAVASCRIPT ================= -->
     <script>
-        /* --- 1. WEB AUDIO API & SFX --- */
+        function requestFullScreen() {
+            const elem = document.documentElement;
+            if (elem.requestFullscreen) { elem.requestFullscreen().catch((e) => console.log(e)); } 
+            else if (elem.webkitRequestFullscreen) { elem.webkitRequestFullscreen(); } 
+            else if (elem.msRequestFullscreen) { elem.msRequestFullscreen(); }
+        }
+
         const AudioContext = window.AudioContext || window.webkitAudioContext;
         let audioCtx; 
 
@@ -350,17 +418,34 @@
             eliminate: () => { playTone(300, 'square', 0.2, 0.1); setTimeout(() => playTone(250, 'square', 0.2, 0.1), 200); setTimeout(() => playTone(200, 'square', 0.4, 0.15), 400); },
             victory: () => { playTone(400, 'square', 0.1, 0.1); setTimeout(() => playTone(500, 'square', 0.1, 0.1), 100); setTimeout(() => playTone(600, 'square', 0.3, 0.15), 200); },
             doorclose: () => { playNoise(0.6, 0.5); playTone(80, 'square', 0.5, 0.3); setTimeout(() => playTone(50, 'sawtooth', 0.4, 0.4), 100); },
-            pointUp: () => { playTone(987, 'sine', 0.1, 0.1); setTimeout(() => playTone(1318, 'sine', 0.2, 0.1), 100); } 
+            pointUp: () => { playTone(987, 'sine', 0.1, 0.1); setTimeout(() => playTone(1318, 'sine', 0.2, 0.1), 100); },
+            tick: () => { playTone(1200, 'square', 0.05, 0.05); },
+            shatter: () => { playNoise(1.5, 0.8); playTone(150, 'sawtooth', 1.0, 0.4); } 
         };
 
         const themeBgm = new Audio('THEME.mp3'); 
         themeBgm.loop = true; themeBgm.volume = 0.5;
 
         document.addEventListener('click', (e) => {
-            if (e.target.classList.contains('nes-btn') && !e.target.classList.contains('pill-item')) SFX.click();
+            if (e.target.classList.contains('nes-btn') && !e.target.classList.contains('pill-item') && !e.target.classList.contains('btn-eliminated')) SFX.click();
         });
 
-        /* --- 2. CUSTOM MODAL THÔNG BÁO --- */
+        let introDone = false;
+        function finishIntro() {
+            if(introDone) return;
+            introDone = true;
+            requestFullScreen();
+            playTone(523.25, 'square', 0.1, 0.1); setTimeout(() => playTone(659.25, 'square', 0.1, 0.1), 100); 
+            setTimeout(() => playTone(783.99, 'square', 0.2, 0.1), 200); setTimeout(() => playTone(1046.50, 'square', 0.4, 0.15), 300);
+
+            const introScreen = document.getElementById('intro-screen');
+            introScreen.classList.add('hidden'); 
+            setTimeout(() => {
+                introScreen.style.display = 'none'; document.getElementById('init-screen').classList.add('active'); 
+                themeBgm.play().catch(e => console.log(e));
+            }, 800); 
+        }
+
         let modalConfirmCallback = null;
         function showModal(message, type = 'alert', callback = null) {
             document.getElementById('custom-modal-text').innerHTML = message;
@@ -369,8 +454,7 @@
             if (type === 'confirm') { 
                 btnCancel.style.display = 'inline-block'; btnOk.className = 'nes-btn is-error'; btnOk.innerText = 'XÁC NHẬN'; 
                 document.getElementById('custom-modal-text').style.textAlign = "center";
-            } 
-            else { 
+            } else { 
                 btnCancel.style.display = 'none'; btnOk.className = 'nes-btn is-primary'; btnOk.innerText = 'ĐÃ HIỂU'; 
                 document.getElementById('custom-modal-text').style.textAlign = "left";
             }
@@ -381,41 +465,47 @@
 
         function showRules() {
             showModal(
-                `<b style='color:#f7d51d; font-size: 22px; display:block; text-align:center;'>QUY TẮC NGHIỆP VỤ</b><br>
+                `<b style='color:#f7d51d; font-size: 24px; display:block; text-align:center; text-shadow: 2px 2px 0 #000;'>QUY TẮC NGHIỆP VỤ</b><br>
                 - <b style='color:#3498db'>Thám Tử:</b> Thắng khi loại bỏ toàn bộ tội phạm ngầm.<br>
                 - <b style='color:#e76e55'>Áo đen:</b> Kẻ thù độc lập. Thắng khi Quân số >= Thám tử.<br>
                 - <b style='color:#209cee'>Siêu Trộm:</b> Kẻ thù độc lập. Thắng khi Hack đúng mật mã lúc bị loại, HOẶC sống sót đến khi Quân số >= Thám tử.<br><br>
-                <i style='color:#aaa; font-size:16px'>Lưu ý: Game vẫn tiếp tục ở thế 2vs2. Áo đen và Siêu trộm KHÔNG CÙNG PHE. Nhưng nếu Thám tử chỉ còn <= 1 người, mà trên sàn CÒN CẢ 2 phe ngầm này, 2 phe cùng Thắng!</i>`, 
+                <i style='color:#ccc; font-size:18px'>Lưu ý: Game vẫn tiếp tục ở thế 2vs2. Áo đen và Siêu trộm KHÔNG CÙNG PHE. Nhưng nếu Thám tử chỉ còn <= 1 người, mà trên sàn CÒN CẢ 2 phe ngầm này, 2 phe cùng Thắng!</i>`, 
                 'alert'
             );
         }
 
-        /* --- 3. PIXEL ENGINE --- */
         const COLORS = { 
             '0':'transparent', '1':'#4a3018', '2':'#ffcba4', '3':'#2980b9', 
             '4':'#2b2b2b', '5':'#ecf0f1', '6':'#000000', 
-            '8':'#e74c3c', '9':'#95a5a6', 'A':'#f1c40f' 
+            '8':'#e74c3c', '9':'#95a5a6', 'A':'#f1c40f',
+            'B':'#e3a857', 'C':'#c07b32'
         };
         
-        const spriteDetective = [
-            "0000100000", "0001111000", "0011111100", "0012222100", "0056226500",
-            "0022222200", "0003883000", "0033553300", "0333553330", "0333333330", "0660000660"
-        ];
-        const spriteSpy = [
-            "0004444000", "0004444000", "0009999000", "0444444440", "0022626200",
-            "0022222200", "0000220000", "0004444000", "0044444400", "0444444440", "0440000440"
-        ];
-        const spriteKid = [
-            "0005555000", "0055555500", "0033333300", "0555555550", "0022623200",
-            "0022222200", "0005555000", "0055855500", "0555555550", "0555555550", "0550000550"
-        ];
-        const spritePill = [
-            "0000000000",
-            "0066666600",
-            "0688855560",
-            "0688855560",
-            "0066666600",
-            "0000000000"
+        const spriteDetective = ["0000100000", "0001111000", "0011111100", "0012222100", "0056226500", "0022222200", "0003883000", "0033553300", "0333553330", "0333333330", "0660000660"];
+        const spriteSpy = ["0004444000", "0004444000", "0009999000", "0444444440", "0022626200", "0022222200", "0000220000", "0004444000", "0044444400", "0444444440", "0440000440"];
+        const spriteKid = ["0005555000", "0055555500", "0033333300", "0555555550", "0022623200", "0022222200", "0005555000", "0055855500", "0555555550", "0555555550", "0550000550"];
+        const spriteBee = ["0005550055500","0055555055555","0005550005550","0000AAAAAAA00","000AA6666AA00","000AAAAAAAA00","000AA6666AA00","0000AAAAAAA00","000000AA00000","0000006600000","0000000600000"];
+        const spritePill = ["0000000000", "0066666600", "0688855560", "0688855560", "0066666600", "0000000000"];
+        
+        const spriteDynamite = [
+            "000000070000000077000700000000000000000000",
+            "000000007700000700007000000000000000000000",
+            "00BBBB6BBBBBBBBBBBBBBBBBBBBBBBBBB6BBBB0000",
+            "00BBBB6BBBBBBBBBBBBBBBBBBBBBBBBBB6BBBB0000",
+            "00CCCC6CCCCCCCCCCCCCCCCCCCCCCCCCC6CCCC0000",
+            "00BBBB6444444444444444444444444446BBBB0000",
+            "00BBBB6446666666666666666444444446BBBB0000",
+            "00CCCC6446666666666666666444955946CCCC0000",
+            "00BBBB64A6666666666666666444555546BBBB0000",
+            "00BBBB64A6666666666666666444555546BBBB0000",
+            "00CCCC64A6666666666666666444955946CCCC0000",
+            "00BBBB6444444444444444444444444446BBBB0000",
+            "00BBBB64444A44A4444449944444444446BBBB0000",
+            "00CCCC6CCCCCCCCCCCCCCCCCCCCCCCCCC6CCCC0000",
+            "00BBBB6BBBBBBBBBBBBBBBBBBBBBBBBBB6BBBB0000",
+            "00BBBB6BBBBBBBBBBBBBBBBBBBBBBBBBB6BBBB0000",
+            "00CCCC6CCCCCCCCCCCCCCCCCCCCCCCCCC6CCCC0000",
+            "000000000000000000000000000000000000000000"
         ];
 
         function drawPixelArt(canvasOrId, matrix, scale) {
@@ -430,27 +520,31 @@
             }
         }
 
-        /* --- 4. MULTI-SESSION ARCHITECTURE & LOGIC --- */
+        /* --- GLOBAL VARIABLES --- */
         let currentSessionId = null;
         let globalScores = {}; let playerNamesInput = []; let players = []; let unassignedRoles = []; 
         let currentPlayerIndex = 0; let currentSpeakerIndex = 0; let pillPickCounter = 0;
         let civilianWordToGuess = ""; let spyWordToGuess = ""; let hasShotCurrentTurn = false; let playedHistory = [];
         let isReviewMode = false; let currentWinner = null; let roundPoints = {}; 
 
-        let currentScoreSettings = { danAlive: 3, danDead: 2, spyWin: 5, kidSurvive: 6, kidHack: 10 };
+        let timerInterval = null;
+        let totalSeconds = 0;
+        let isTimerActive = false;
+        
+        let isDefuserMode = false;
+        let defuserPinCode = "";
+        
+        let currentScoreSettings = { danAlive: 3, danDead: 2, spyWin: 5, kidSurvive: 6, kidHack: 10, defuseWin: 10, timeOutPenalty: -2 };
 
         document.addEventListener("DOMContentLoaded", () => {
+            drawPixelArt('bee-logo', spriteBee, 10);
             drawPixelArt('main-logo-1', spriteDetective, 8);
             drawPixelArt('main-logo-2', spriteSpy, 8);
             drawPixelArt('main-logo-3', spriteKid, 8);
-            updateMenuButtons();
             
-            document.body.addEventListener('click', () => {
-                const revealScreen = document.getElementById('reveal-screen');
-                if(themeBgm.paused && !revealScreen.classList.contains('active')) {
-                    themeBgm.play().catch(e => console.log(e));
-                }
-            }, { once: true });
+            drawPixelArt('bomb-icon', spriteDynamite, 6);
+            
+            updateMenuButtons();
         });
 
         function updateMenuButtons() {
@@ -471,30 +565,42 @@
             updateMenuButtons();
         }
 
-        function switchScreen(screenId) { document.querySelectorAll('.screen').forEach(s => s.classList.remove('active')); document.getElementById(screenId).classList.add('active'); }
+        function stopTimer() {
+            clearInterval(timerInterval);
+            isTimerActive = false;
+            document.getElementById('bomb-container').style.display = 'none';
+        }
+
+        function switchScreen(screenId) { 
+            document.querySelectorAll('.screen').forEach(s => s.classList.remove('active')); 
+            document.getElementById(screenId).classList.add('active'); 
+        }
         
         function startNewSession() { 
+            requestFullScreen(); 
+            stopTimer();
             currentSessionId = 'CASE_' + Date.now(); playerNamesInput = []; globalScores = {}; playedHistory = [];
-            currentScoreSettings = { danAlive: 3, danDead: 2, spyWin: 5, kidSurvive: 6, kidHack: 10 };
+            currentScoreSettings = { danAlive: 3, danDead: 2, spyWin: 5, kidSurvive: 6, kidHack: 10, defuseWin: 10, timeOutPenalty: -2 };
             updateNameList(); updateRoleCount(); switchScreen('setup-screen'); 
         }
 
         function showLoadScreen() {
+            requestFullScreen(); stopTimer();
             let allSessions = JSON.parse(localStorage.getItem('uc_all_sessions') || '{}');
             let listDiv = document.getElementById('session-list'); listDiv.innerHTML = '';
             let keys = Object.keys(allSessions).sort((a,b) => b.localeCompare(a));
             
-            if(keys.length === 0) listDiv.innerHTML = '<p style="color:#aaa; text-align:center;">Kho lưu trữ trống rỗng!</p>';
+            if(keys.length === 0) listDiv.innerHTML = '<p style="color:#ddd; text-align:center; font-size: 20px;" class="text-pop">Kho lưu trữ trống rỗng!</p>';
             else {
                 keys.forEach(k => {
                     let s = allSessions[k];
                     listDiv.innerHTML += `
                     <div style="display: flex; align-items: stretch; margin-bottom: 15px; width: 100%; gap: 10px;">
-                        <button type="button" class="nes-btn is-primary" style="flex: 1; text-align: left; padding: 10px 15px;" onclick="loadSession('${k}')">
-                            <b style="color:#f7d51d; font-size: 14px; display: block; margin-bottom: 4px;">${s.date}</b>
-                            <span style="font-size: 18px; color: #fff;">${s.name} (${s.players.length} Đặc Vụ)</span>
+                        <button type="button" class="nes-btn is-primary" style="flex: 1; text-align: left; padding: 12px 15px;" onclick="loadSession('${k}')">
+                            <b style="color:#f7d51d; font-size: 16px; display: block; margin-bottom: 4px; text-shadow: 2px 2px 0 #000;">${s.date}</b>
+                            <span style="font-size: 20px; color: #fff; text-shadow: 2px 2px 0 #000;">${s.name} (${s.players.length} Đặc Vụ)</span>
                         </button>
-                        <button type="button" class="nes-btn is-error" style="display: flex; align-items: center; padding: 10px 15px; font-size: 14px;" onclick="deleteSession('${k}')">XÓA</button>
+                        <button type="button" class="nes-btn is-error" style="display: flex; align-items: center; padding: 10px 15px; font-size: 16px;" onclick="deleteSession('${k}')">XÓA</button>
                     </div>`;
                 });
             }
@@ -505,7 +611,7 @@
             let allSessions = JSON.parse(localStorage.getItem('uc_all_sessions') || '{}'), s = allSessions[id];
             if(s) {
                 currentSessionId = id; playerNamesInput = s.players || []; globalScores = s.scores || {}; playedHistory = s.history || [];
-                currentScoreSettings = s.scoreSettings || { danAlive: 3, danDead: 2, spyWin: 5, kidSurvive: 6, kidHack: 10 };
+                currentScoreSettings = s.scoreSettings || { danAlive: 3, danDead: 2, spyWin: 5, kidSurvive: 6, kidHack: 10, defuseWin: 10, timeOutPenalty: -2 };
                 updateNameList(); updateRoleCount(); switchScreen('setup-screen');
             }
         }
@@ -517,7 +623,7 @@
             });
         }
 
-        function exitToMenu() { switchScreen('init-screen'); updateMenuButtons(); }
+        function exitToMenu() { stopTimer(); switchScreen('init-screen'); updateMenuButtons(); }
 
         function openScoreSettings() {
             document.getElementById('setting-dan-alive').value = currentScoreSettings.danAlive;
@@ -525,6 +631,8 @@
             document.getElementById('setting-spy-win').value = currentScoreSettings.spyWin;
             document.getElementById('setting-kid-survive').value = currentScoreSettings.kidSurvive;
             document.getElementById('setting-kid-hack').value = currentScoreSettings.kidHack;
+            document.getElementById('setting-defuse-win').value = currentScoreSettings.defuseWin !== undefined ? currentScoreSettings.defuseWin : 10;
+            document.getElementById('setting-timeout-penalty').value = currentScoreSettings.timeOutPenalty !== undefined ? currentScoreSettings.timeOutPenalty : -2;
             document.getElementById('score-settings-overlay').style.display = 'flex';
         }
 
@@ -535,6 +643,8 @@
                 currentScoreSettings.spyWin = parseInt(document.getElementById('setting-spy-win').value) || 0;
                 currentScoreSettings.kidSurvive = parseInt(document.getElementById('setting-kid-survive').value) || 0;
                 currentScoreSettings.kidHack = parseInt(document.getElementById('setting-kid-hack').value) || 0;
+                currentScoreSettings.defuseWin = parseInt(document.getElementById('setting-defuse-win').value) || 0;
+                currentScoreSettings.timeOutPenalty = parseInt(document.getElementById('setting-timeout-penalty').value) || 0;
                 saveData(); 
             }
             document.getElementById('score-settings-overlay').style.display = 'none';
@@ -558,17 +668,13 @@
         
         function movePlayerUp(index) {
             if(index > 0) {
-                let temp = playerNamesInput[index];
-                playerNamesInput[index] = playerNamesInput[index-1];
-                playerNamesInput[index-1] = temp;
+                let temp = playerNamesInput[index]; playerNamesInput[index] = playerNamesInput[index-1]; playerNamesInput[index-1] = temp;
                 updateNameList(); saveData();
             }
         }
         function movePlayerDown(index) {
             if(index < playerNamesInput.length - 1) {
-                let temp = playerNamesInput[index];
-                playerNamesInput[index] = playerNamesInput[index+1];
-                playerNamesInput[index+1] = temp;
+                let temp = playerNamesInput[index]; playerNamesInput[index] = playerNamesInput[index+1]; playerNamesInput[index+1] = temp;
                 updateNameList(); saveData();
             }
         }
@@ -577,17 +683,16 @@
             const list = document.getElementById('name-list'); list.innerHTML = "";
             playerNamesInput.forEach((name, i) => { 
                 list.innerHTML += `<li style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 8px; background: rgba(0,0,0,0.5); padding: 5px 10px;">
-                    <span style="color: #fff; flex:1;">${name}</span>
+                    <span style="color: #fff; flex:1;" class="text-pop">${name}</span>
                     <div style="display:flex; gap:5px;">
-                        <button class="nes-btn" style="padding: 2px 6px; font-size: 14px;" onclick="movePlayerUp(${i})">▲</button>
-                        <button class="nes-btn" style="padding: 2px 6px; font-size: 14px;" onclick="movePlayerDown(${i})">▼</button>
-                        <button class="nes-btn is-error" style="padding: 2px 8px; font-size: 14px;" onclick="removePlayer(${i})">X</button>
+                        <button class="nes-btn" style="padding: 4px 8px; font-size: 16px;" onclick="movePlayerUp(${i})">▲</button>
+                        <button class="nes-btn" style="padding: 4px 8px; font-size: 16px;" onclick="movePlayerDown(${i})">▼</button>
+                        <button class="nes-btn is-error" style="padding: 4px 12px; font-size: 16px;" onclick="removePlayer(${i})">X</button>
                     </div>
                 </li>`; 
             });
         }
 
-        /* --- 6. CSDL TỪ VỰNG --- */
         const rawWordDatabase = [
             { a: "Con chó", b: "Con mèo" }, { a: "Gà trống", b: "Con vịt" }, { a: "Trâu", b: "Bò" }, { a: "Sư tử", b: "Con hổ" },
             { a: "Sông", b: "Suối" }, { a: "Biển", b: "Hồ" }, { a: "Núi", b: "Đồi" }, { a: "Hoa hồng", b: "Hoa cúc" }, { a: "Cây đa", b: "Cây tre" },
@@ -602,37 +707,96 @@
 
         /* --- 7. START GAME --- */
         function startGame() {
+            requestFullScreen(); 
             let numSpies = parseInt(document.getElementById('input-spies').value) || 0, numKids = parseInt(document.getElementById('input-kids').value) || 0;
             if (playerNamesInput.length < 4) { showModal("<div style='text-align:center'>Cần tối thiểu 4 người để lập chuyên án!</div>", "alert"); return; }
             if (playerNamesInput.length - numSpies - numKids < numSpies + numKids) { showModal("<div style='text-align:center'>Lỗi chiến thuật!<br><span style='color:#e76e55'>Thám tử ít hơn tổng số tội phạm.</span></div>", "alert"); return; }
             
             themeBgm.pause(); SFX.doorclose(); 
+            
+            isDefuserMode = document.getElementById('cb-defuser').checked;
+            
             generateWordsAndRoles(playerNamesInput.length - numSpies - numKids, numSpies, numKids);
             
-            players = playerNamesInput.map(n => { return {id: n, isAlive: true, role: null, word: null}; });
+            players = playerNamesInput.map(n => { return {id: n, isAlive: true, role: null, word: null, isDefuser: false}; });
             
             currentPlayerIndex = Math.floor(Math.random() * players.length);
             pillPickCounter = 0;
-            
             isReviewMode = false; roundPoints = {}; currentWinner = null;
+            
+            let timerMinutes = parseInt(document.getElementById('input-timer').value) || 0;
+            totalSeconds = timerMinutes * 60;
+            isTimerActive = false;
+            document.getElementById('bomb-container').style.display = 'none';
+
+            // Reset UI Gỡ bom
+            document.getElementById('defuse-step-1').style.display = 'block';
+            document.getElementById('defuse-step-2').style.display = 'none';
+            document.getElementById('defuse-pin-input').value = "";
+            document.getElementById('defuse-word-input').value = "";
+            document.getElementById('defuse-error-1').style.display = 'none';
+
             switchScreen('reveal-screen'); renderPills(); prepareNextShooter();
+        }
+
+        function updateTimerUI() {
+            let m = Math.floor(totalSeconds / 60).toString().padStart(2, '0');
+            let s = (totalSeconds % 60).toString().padStart(2, '0');
+            document.getElementById('timer-text').innerText = `${m}:${s}`;
+            
+            const timerDiv = document.getElementById('bomb-timer');
+            if(totalSeconds <= 10 && totalSeconds > 0) {
+                timerDiv.classList.add('bomb-warning');
+            } else {
+                timerDiv.classList.remove('bomb-warning');
+            }
+        }
+
+        function timerTick() {
+            if (!isTimerActive) return;
+            totalSeconds--;
+            updateTimerUI();
+            
+            if(totalSeconds <= 10 && totalSeconds > 0) {
+                SFX.tick(); 
+            }
+            if (totalSeconds <= 0) {
+                triggerTimeOut();
+            }
+        }
+
+        function triggerTimeOut() {
+            stopTimer();
+            closeDefuseModal(); // Đóng modal gỡ bom nếu đang mở
+            SFX.shatter(); 
+            currentWinner = 'TimeOut';
+            showVictoryScreen();
         }
 
         function generateWordsAndRoles(civs, spies, kids) {
             if (playedHistory.length > COOLDOWN_LIMIT) playedHistory = playedHistory.slice(playedHistory.length - COOLDOWN_LIMIT);
-            
             let availableWords = rawWordDatabase.filter(w => !playedHistory.includes(w.id));
             if (availableWords.length === 0) { availableWords = rawWordDatabase; playedHistory = []; }
-            
             const randomPair = availableWords[Math.floor(Math.random() * availableWords.length)];
             playedHistory.push(randomPair.id); saveData();
 
             const isA = Math.random() < 0.5; civilianWordToGuess = isA ? randomPair.a : randomPair.b; spyWordToGuess = isA ? randomPair.b : randomPair.a;
             
             unassignedRoles = [];
-            for(let i=0;i<civs;i++) unassignedRoles.push({role:'Dan',word:civilianWordToGuess});
-            for(let i=0;i<spies;i++) unassignedRoles.push({role:'GianDiep',word:spyWordToGuess});
-            for(let i=0;i<kids;i++) unassignedRoles.push({role:'SieuTrom',word:'Thư Cảnh Cáo'});
+            for(let i=0;i<civs;i++) unassignedRoles.push({role:'Dan', word:civilianWordToGuess, isDefuser:false});
+            for(let i=0;i<spies;i++) unassignedRoles.push({role:'GianDiep', word:spyWordToGuess, isDefuser:false});
+            for(let i=0;i<kids;i++) unassignedRoles.push({role:'SieuTrom', word:'Thư Cảnh Cáo', isDefuser:false});
+            
+            if (isDefuserMode && civs > 0) {
+                defuserPinCode = Math.floor(1000 + Math.random() * 9000).toString();
+                let danIndices = [];
+                unassignedRoles.forEach((r, i) => { if(r.role === 'Dan') danIndices.push(i); });
+                if (danIndices.length > 0) {
+                    let chosen = danIndices[Math.floor(Math.random() * danIndices.length)];
+                    unassignedRoles[chosen].isDefuser = true;
+                }
+            }
+            
             unassignedRoles.sort(() => Math.random() - 0.5);
         }
 
@@ -640,14 +804,13 @@
             showModal("<div style='text-align:center'>Hủy bỏ tài liệu cũ và lấy từ mới?</div>", "confirm", () => {
                 let s = parseInt(document.getElementById('input-spies').value)||0, k = parseInt(document.getElementById('input-kids').value)||0;
                 generateWordsAndRoles(playerNamesInput.length - s - k, s, k);
-                players.forEach(p => { p.role = null; p.word = null; });
+                players.forEach(p => { p.role = null; p.word = null; p.isDefuser = false; });
                 
                 pillPickCounter = 0;
                 renderPills(); prepareNextShooter();
             });
         }
 
-        /* --- 8. UỐNG THUỐC APTX-4869 & XEM LẠI BÀI --- */
         function renderPills() {
             const board = document.getElementById('pill-board'); board.innerHTML = '';
             unassignedRoles.forEach((r, i) => {
@@ -682,7 +845,9 @@
 
             setTimeout(() => {
                 const pulledRole = unassignedRoles[roleIndex];
-                players[currentPlayerIndex].role = pulledRole.role; players[currentPlayerIndex].word = pulledRole.word;
+                players[currentPlayerIndex].role = pulledRole.role; 
+                players[currentPlayerIndex].word = pulledRole.word;
+                players[currentPlayerIndex].isDefuser = pulledRole.isDefuser;
 
                 const box = document.getElementById('word-reveal-box'), hint = document.getElementById('role-hint');
                 document.getElementById('secret-word').innerText = pulledRole.word;
@@ -691,7 +856,11 @@
                 if (pulledRole.role === 'SieuTrom') {
                     box.style.borderColor = '#209cee'; document.getElementById('secret-word').innerText = "???";
                     hint.style.display = 'block'; hint.innerHTML = "(Bạn là <b style='color:#209cee'>SIÊU TRỘM</b>! Hãy khéo léo ngụy trang!)";
+                } else if (pulledRole.isDefuser) {
+                    hint.style.display = 'block'; 
+                    hint.innerHTML = `(Bạn là <b style='color:#f7d51d'>CHUYÊN GIA GỠ BOM</b>! Mã bảo mật: <b style='color:#e74c3c'>[${defuserPinCode}]</b>)`;
                 }
+                
                 box.style.display = 'block'; document.getElementById('next-player-btn').style.display = 'inline-block';
             }, 300); 
         }
@@ -706,12 +875,11 @@
                 }
                 else {
                     let validSpeakers = [];
-                    players.forEach((p, index) => {
-                        if (p.role !== 'SieuTrom') validSpeakers.push(index);
-                    });
+                    players.forEach((p, index) => { if (p.role !== 'SieuTrom') validSpeakers.push(index); });
                     currentSpeakerIndex = validSpeakers[Math.floor(Math.random() * validSpeakers.length)];
-
-                    showModal("<div style='text-align:center'>Đã phát xong hồ sơ mật!<br><b style='color:#3498db'>Bắt đầu vòng điều tra.</b></div>", "alert", goToVoteScreen);
+                    showModal("<div style='text-align:center'>Đã phát xong hồ sơ mật!<br><b style='color:#3498db'>Bắt đầu vòng điều tra.</b></div>", "alert", () => {
+                        goToVoteScreen();
+                    });
                 }
             }
         }
@@ -722,6 +890,7 @@
             players.forEach((p, index) => {
                 if(p.isAlive) {
                     const btn = document.createElement('button'); btn.className = 'nes-btn is-dark'; btn.innerText = p.id;
+                    btn.style.fontSize = "20px"; btn.style.padding = "8px 16px";
                     btn.onclick = () => { isReviewMode = true; currentPlayerIndex = index; prepareReviewScreen(); };
                     listDiv.appendChild(btn);
                 }
@@ -733,9 +902,7 @@
             document.getElementById('instruction-text').style.display = 'none';
             document.getElementById('player-turn-text').innerText = `TÁI XÁC NHẬN: ${players[currentPlayerIndex].id}`;
             document.getElementById('reroll-btn').style.display = 'none';
-            
             document.getElementById('pill-wrapper').style.display = 'none';
-            
             document.getElementById('word-reveal-box').style.display = 'none';
             document.getElementById('next-player-btn').style.display = 'none';
             document.getElementById('review-btn-container').style.display = 'block';
@@ -747,14 +914,18 @@
             const box = document.getElementById('word-reveal-box'), hint = document.getElementById('role-hint');
             document.getElementById('secret-word').innerText = player.word;
             hint.style.display = 'none'; box.style.borderColor = '#fff';
+            
             if (player.role === 'SieuTrom') {
                 box.style.borderColor = '#209cee'; document.getElementById('secret-word').innerText = "???";
                 hint.style.display = 'block'; hint.innerHTML = "(Bạn là <b style='color:#209cee'>SIÊU TRỘM</b>! Hãy khéo léo ngụy trang!)";
+            } else if (player.isDefuser) {
+                hint.style.display = 'block'; 
+                hint.innerHTML = `(Bạn là <b style='color:#f7d51d'>CHUYÊN GIA GỠ BOM</b>! Mã bảo mật: <b style='color:#e74c3c'>[${defuserPinCode}]</b>)`;
             }
+            
             box.style.display = 'block'; document.getElementById('next-player-btn').style.display = 'inline-block';
         }
 
-        /* --- 9. BỎ PHIẾU --- */
         function renderSurvivors() {
             const container = document.getElementById('survivor-mascots'); container.innerHTML = ''; 
             let aliveCiv = players.filter(p => p.isAlive && p.role === 'Dan').length;
@@ -762,15 +933,9 @@
             let aliveKid = players.filter(p => p.isAlive && p.role === 'SieuTrom').length;
 
             let canvasHTML = ''; let counter = 0;
-            for(let i=0; i<aliveCiv; i++) {
-                canvasHTML += `<canvas id="surv-dan-${counter}" class="pixel-canvas anim-wave glow-detective" style="animation-delay: ${counter * 0.15}s"></canvas>`; counter++;
-            }
-            for(let i=0; i<aliveSpy; i++) {
-                canvasHTML += `<canvas id="surv-spy-${counter}" class="pixel-canvas anim-wave glow-spy" style="animation-delay: ${counter * 0.15}s"></canvas>`; counter++;
-            }
-            for(let i=0; i<aliveKid; i++) {
-                canvasHTML += `<canvas id="surv-kid-${counter}" class="pixel-canvas anim-wave glow-kid" style="animation-delay: ${counter * 0.15}s"></canvas>`; counter++;
-            }
+            for(let i=0; i<aliveCiv; i++) { canvasHTML += `<canvas id="surv-dan-${counter}" class="pixel-canvas anim-wave glow-detective" style="animation-delay: ${counter * 0.15}s"></canvas>`; counter++; }
+            for(let i=0; i<aliveSpy; i++) { canvasHTML += `<canvas id="surv-spy-${counter}" class="pixel-canvas anim-wave glow-spy" style="animation-delay: ${counter * 0.15}s"></canvas>`; counter++; }
+            for(let i=0; i<aliveKid; i++) { canvasHTML += `<canvas id="surv-kid-${counter}" class="pixel-canvas anim-wave glow-kid" style="animation-delay: ${counter * 0.15}s"></canvas>`; counter++; }
             
             container.innerHTML = canvasHTML; counter = 0;
             for(let i=0; i<aliveCiv; i++) drawPixelArt(`surv-dan-${counter++}`, spriteDetective, 4);
@@ -786,34 +951,97 @@
             
             const list = document.getElementById('player-list'); list.innerHTML = '';
             players.forEach((p, i) => {
-                if(p.isAlive) {
-                    const isSpeaker = (i === currentSpeakerIndex);
-                    
-                    const wrapper = document.createElement('div');
-                    wrapper.style.display = 'flex';
-                    wrapper.style.flexDirection = 'column';
-                    wrapper.style.alignItems = 'center';
-                    wrapper.style.gap = '5px';
-                    wrapper.style.minWidth = '80px';
-                    
-                    const arrow = document.createElement('div');
-                    arrow.className = 'pixel-arrow';
-                    arrow.style.visibility = isSpeaker ? 'visible' : 'hidden';
-                    
-                    const btn = document.createElement('button'); 
+                const isSpeaker = (i === currentSpeakerIndex && p.isAlive);
+                
+                const wrapper = document.createElement('div');
+                wrapper.style.display = 'flex'; wrapper.style.flexDirection = 'column'; wrapper.style.alignItems = 'center';
+                wrapper.style.gap = '5px'; wrapper.style.minWidth = '80px';
+                
+                const arrow = document.createElement('div');
+                arrow.className = 'pixel-arrow';
+                arrow.style.visibility = isSpeaker ? 'visible' : 'hidden';
+                
+                const btn = document.createElement('button'); 
+                btn.innerText = p.id; btn.style.fontSize = "22px"; btn.style.padding = "8px 16px";
+                
+                if (p.isAlive) {
                     btn.className = isSpeaker ? 'nes-btn is-primary' : 'nes-btn is-error'; 
-                    btn.innerText = p.id;
                     btn.onclick = () => { showModal(`<div style='text-align:center'>Phát lệnh bắt giữ <b style='color:#f7d51d'>[${p.id}]</b>?</div>`, "confirm", () => eliminatePlayer(i)); };
-                    
-                    wrapper.appendChild(arrow);
-                    wrapper.appendChild(btn);
-                    list.appendChild(wrapper);
+                } else {
+                    btn.className = 'nes-btn btn-eliminated'; 
                 }
+                
+                wrapper.appendChild(arrow); wrapper.appendChild(btn); list.appendChild(wrapper);
             });
             renderSurvivors(); 
+            
+            if (totalSeconds > 0 && !isTimerActive) {
+                isTimerActive = true;
+                updateTimerUI();
+                document.getElementById('bomb-container').style.display = 'flex';
+                clearInterval(timerInterval);
+                timerInterval = setInterval(timerTick, 1000);
+            } else if (totalSeconds === 0 && isDefuserMode) {
+                // Nếu chế độ gỡ bom bật mà không hẹn giờ, nút gỡ bom vẫn hiện nhưng không có đếm ngược
+                document.getElementById('bomb-container').style.display = 'flex';
+                document.getElementById('bomb-timer').style.display = 'none'; // Giấu phần đồng hồ LED đi
+            }
         }
 
-        /* --- 10. PHÁN QUYẾT --- */
+        // --- CƠ CHẾ GỠ BOM (DEFUSAL) ---
+        function openDefuseModal() {
+            document.getElementById('defuse-step-1').style.display = 'block';
+            document.getElementById('defuse-step-2').style.display = 'none';
+            document.getElementById('defuse-pin-input').value = "";
+            document.getElementById('defuse-error-1').style.display = 'none';
+            document.getElementById('defuse-modal-overlay').style.display = 'flex';
+        }
+
+        function closeDefuseModal() {
+            document.getElementById('defuse-modal-overlay').style.display = 'none';
+        }
+
+        function checkDefusePin() {
+            let pinInput = document.getElementById('defuse-pin-input').value.trim();
+            if (pinInput === defuserPinCode) {
+                SFX.click();
+                document.getElementById('defuse-step-1').style.display = 'none';
+                document.getElementById('defuse-step-2').style.display = 'block';
+            } else {
+                SFX.eliminate();
+                document.getElementById('defuse-error-1').style.display = 'block';
+            }
+        }
+
+        function submitDefuseWord() {
+            let wordInput = document.getElementById('defuse-word-input').value.trim().toLowerCase();
+            let actualSpyWord = spyWordToGuess.toLowerCase();
+            closeDefuseModal();
+            stopTimer(); // Bấm cắt dây là timer dừng
+            switchScreen('result-screen');
+
+            const msg = document.getElementById('result-message'), canvas = document.getElementById('mascot-display'), mwGuess = document.getElementById('mr-white-guess');
+            document.getElementById('next-round-btn').style.display = 'none'; 
+            document.getElementById('btn-to-victory').style.display = 'none';
+            mwGuess.style.display = 'none'; 
+            
+            canvas.className = 'pixel-canvas reveal-mascot'; void canvas.offsetWidth; 
+            
+            if (wordInput === actualSpyWord) {
+                drawPixelArt('mascot-display', spriteDetective, 12);
+                msg.innerHTML = `Mật mã nhập vào chính xác!<br><b style='color:#27ae60; font-size: 28px;' class='text-pop'>ĐÃ VÔ HIỆU HÓA BOM</b>`;
+                currentWinner = 'DefusalWin';
+                setTimeout(() => { document.getElementById('btn-to-victory').style.display = 'inline-block'; }, 1000);
+            } else {
+                SFX.shatter();
+                drawPixelArt('mascot-display', spriteSpy, 12);
+                msg.innerHTML = `Mật mã SAI!<br><b style='color:#e74c3c; font-size: 28px;' class='text-pop'>ĐÃ CẮT NHẦM DÂY... BÙM!</b>`;
+                currentWinner = 'DefusalFail';
+                setTimeout(() => { document.getElementById('btn-to-victory').style.display = 'inline-block'; }, 1000);
+            }
+        }
+
+        /* --- PHÁN QUYẾT TRUYỀN THỐNG --- */
         function eliminatePlayer(index) {
             SFX.eliminate();
             const player = players[index]; player.isAlive = false; switchScreen('result-screen');
@@ -821,12 +1049,10 @@
             document.getElementById('next-round-btn').style.display = 'none'; document.getElementById('btn-to-victory').style.display = 'none';
             mwGuess.style.display = 'none'; document.getElementById('guess-input').value = ""; 
 
-            // Cập nhật người phát biểu kế tiếp (người sống liền kề phía sau)
             let nextIndex = (index + 1) % players.length;
             let loopGuard = 0; 
             while(players[nextIndex] && !players[nextIndex].isAlive && loopGuard < players.length) {
-                nextIndex = (nextIndex + 1) % players.length;
-                loopGuard++;
+                nextIndex = (nextIndex + 1) % players.length; loopGuard++;
             }
             currentSpeakerIndex = nextIndex;
 
@@ -837,7 +1063,7 @@
             else if (player.role === 'SieuTrom') { roleName = "SIÊU TRỘM"; color = "#209cee"; drawPixelArt('mascot-display', spriteKid, 12); }
 
             canvas.classList.add('reveal-mascot');
-            msg.innerHTML = `Nghi phạm <b style='color:#fff'>${player.id}</b> đã bị khống chế!<br>Khám xét ra thân phận:<br><b style='color:${color}; font-size: 24px;'>${roleName}</b>`;
+            msg.innerHTML = `Nghi phạm <b style='color:#fff' class='text-pop'>${player.id}</b> đã bị khống chế!<br>Khám xét ra thân phận:<br><b style='color:${color}; font-size: 28px;' class='text-pop'>${roleName}</b>`;
             if (player.role === 'SieuTrom') mwGuess.style.display = 'block'; else checkGameStatus(); 
         }
 
@@ -846,11 +1072,11 @@
             const msg = document.getElementById('result-message'); document.getElementById('mr-white-guess').style.display = 'none';
             
             if (guess === actual) {
-                msg.innerHTML += `<br><br><span style="color:#209cee">Siêu Trộm đã giải mã được bảo vật!</span>`;
+                msg.innerHTML += `<br><br><span style="color:#209cee" class="text-pop">Siêu Trộm đã giải mã được bảo vật!</span>`;
                 currentWinner = 'SieuTromLatKeo';
                 document.getElementById('btn-to-victory').style.display = 'inline-block';
             } else {
-                msg.innerHTML += `<br><br><span style="color:#e76e55">Siêu Trộm giải mã SAI!</span>`;
+                msg.innerHTML += `<br><br><span style="color:#e76e55" class="text-pop">Siêu Trộm giải mã SAI!</span>`;
                 checkGameStatus(); 
             }
         }
@@ -873,6 +1099,7 @@
             else if (aliveKid >= aliveCiv + aliveSpy) { isGameOver = true; currentWinner = 'SieuTromSurvive'; }
 
             if (isGameOver) {
+                stopTimer(); 
                 document.getElementById('btn-to-victory').style.display = 'inline-block'; 
                 themeBgm.pause();
             } else {
@@ -880,37 +1107,46 @@
             }
         }
 
-        // MÀN HÌNH TỔNG KẾT
         function showVictoryScreen() {
             switchScreen('victory-screen');
             const title = document.getElementById('victory-faction-name');
             const mascotContainer = document.getElementById('victory-mascots');
             
-            document.getElementById('victory-word-civ').innerText = civilianWordToGuess;
-            document.getElementById('victory-word-spy').innerText = spyWordToGuess;
+            document.getElementById('victory-word-civ').innerText = civilianWordToGuess || "???";
+            document.getElementById('victory-word-spy').innerText = spyWordToGuess || "???";
 
-            if(currentWinner === 'Dan') {
+            if (currentWinner === 'TimeOut' || currentWinner === 'DefusalFail') {
+                SFX.doorclose();
+                title.innerHTML = '<b style="color:#e74c3c" class="text-pop">💣 BÙMMM! BOM ĐÃ NỔ 💣</b>';
+                mascotContainer.innerHTML = `<p style="color:#fff; font-size: 24px;" class="text-pop">Tổ chức Áo Đen đã giăng bẫy thành công!</p>`;
+            }
+            else if (currentWinner === 'DefusalWin') {
                 SFX.victory();
-                title.innerHTML = '<b style="color:#3498db">THÁM TỬ CHIẾN THẮNG</b>';
+                title.innerHTML = '<b style="color:#27ae60" class="text-pop">💣 ĐÃ GỠ BOM THÀNH CÔNG</b>';
+                mascotContainer.innerHTML = `<p style="color:#fff; font-size: 24px;" class="text-pop">Thám tử xuất sắc lật ngược thế cờ!</p>`;
+            }
+            else if(currentWinner === 'Dan') {
+                SFX.victory();
+                title.innerHTML = '<b style="color:#3498db" class="text-pop">THÁM TỬ CHIẾN THẮNG</b>';
                 mascotContainer.innerHTML = `<canvas id="vic-dan" class="pixel-canvas anim-wave glow-detective"></canvas>`;
                 drawPixelArt('vic-dan', spriteDetective, 8);
             }
             else if(currentWinner === 'GianDiep') {
                 SFX.doorclose();
-                title.innerHTML = '<b style="color:#e76e55">TỔ CHỨC ÁO ĐEN CHIẾN THẮNG</b>';
+                title.innerHTML = '<b style="color:#e76e55" class="text-pop">TỔ CHỨC ÁO ĐEN CHIẾN THẮNG</b>';
                 mascotContainer.innerHTML = `<canvas id="vic-spy" class="pixel-canvas anim-wave glow-spy"></canvas>`;
                 drawPixelArt('vic-spy', spriteSpy, 8);
             }
             else if(currentWinner === 'SieuTromSurvive' || currentWinner === 'SieuTromLatKeo') {
                 SFX.doorclose();
-                title.innerHTML = '<b style="color:#209cee">SIÊU TRỘM CHIẾN THẮNG</b>';
-                if(currentWinner === 'SieuTromLatKeo') title.innerHTML += '<br><span style="font-size:16px;">(Đã giải mã thành công bảo vật)</span>';
+                title.innerHTML = '<b style="color:#209cee" class="text-pop">SIÊU TRỘM CHIẾN THẮNG</b>';
+                if(currentWinner === 'SieuTromLatKeo') title.innerHTML += '<br><span style="font-size:20px;" class="text-pop">(Đã giải mã thành công bảo vật)</span>';
                 mascotContainer.innerHTML = `<canvas id="vic-kid" class="pixel-canvas anim-wave glow-kid"></canvas>`;
                 drawPixelArt('vic-kid', spriteKid, 8);
             }
             else if(currentWinner === 'CoWin') {
                 SFX.doorclose();
-                title.innerHTML = '<b style="color:#e76e55">THẾ LỰC NGẦM CÙNG CHIẾN THẮNG</b>';
+                title.innerHTML = '<b style="color:#e76e55" class="text-pop">THẾ LỰC NGẦM CÙNG CHIẾN THẮNG</b>';
                 mascotContainer.innerHTML = `
                     <canvas id="vic-spy" class="pixel-canvas anim-wave glow-spy" style="animation-delay: 0s"></canvas>
                     <canvas id="vic-kid" class="pixel-canvas anim-wave glow-kid" style="animation-delay: 0.15s"></canvas>
@@ -927,7 +1163,15 @@
             roundPoints = {};
             players.forEach(p => {
                 let pts = 0;
-                if (winnerLabel === 'Dan' && p.role === 'Dan') pts = p.isAlive ? currentScoreSettings.danAlive : currentScoreSettings.danDead; 
+                if (winnerLabel === 'TimeOut' || winnerLabel === 'DefusalFail') {
+                    if (p.role === 'GianDiep') pts = currentScoreSettings.spyWin;
+                    else pts = currentScoreSettings.timeOutPenalty !== undefined ? currentScoreSettings.timeOutPenalty : -2;
+                }
+                else if (winnerLabel === 'DefusalWin') {
+                    if (p.isDefuser) pts = currentScoreSettings.defuseWin !== undefined ? currentScoreSettings.defuseWin : 10;
+                    else if (p.role === 'Dan') pts = p.isAlive ? currentScoreSettings.danAlive : currentScoreSettings.danDead;
+                }
+                else if (winnerLabel === 'Dan' && p.role === 'Dan') pts = p.isAlive ? currentScoreSettings.danAlive : currentScoreSettings.danDead; 
                 else if (winnerLabel === 'GianDiep' && p.role === 'GianDiep') pts = currentScoreSettings.spyWin; 
                 else if (winnerLabel === 'SieuTromSurvive' && p.role === 'SieuTrom') pts = currentScoreSettings.kidSurvive; 
                 else if (winnerLabel === 'CoWin') {
@@ -936,7 +1180,7 @@
                 }
                 else if (winnerLabel === 'SieuTromLatKeo' && p.role === 'SieuTrom') pts = currentScoreSettings.kidHack; 
                 
-                if (pts > 0) {
+                if (pts !== 0) {
                     roundPoints[p.id] = pts;
                     globalScores[p.id] += pts;
                 }
@@ -946,7 +1190,6 @@
 
         function startNextRound() { goToVoteScreen(); }
 
-        /* --- 11. BẢNG XẾP HẠNG --- */
         function showLeaderboard() {
             if(themeBgm.paused) { themeBgm.currentTime = 0; themeBgm.play().catch(e => console.log(e)); }
             switchScreen('leaderboard-screen'); 
@@ -959,29 +1202,31 @@
             });
             
             oldScoreArray.sort((a, b) => b.old - a.old);
-            let hasAddedPoints = oldScoreArray.some(p => p.added > 0);
+            let hasAddedPoints = oldScoreArray.some(p => p.added !== 0);
 
             if(hasAddedPoints) {
                 document.getElementById('btn-next-case').style.display = 'none';
                 document.getElementById('btn-menu').style.display = 'none';
 
                 oldScoreArray.forEach((p, index) => {
-                    let addedHtml = p.added > 0 ? `<span class="added-score" style="color:#f7d51d; margin-left:10px; font-size:18px;">+${p.added}</span>` : '';
+                    let sign = p.added > 0 ? '+' : '';
+                    let color = p.added > 0 ? '#f7d51d' : '#e74c3c';
+                    let addedHtml = p.added !== 0 ? `<span class="added-score" style="color:${color}; margin-left:10px; font-size:22px;">${sign}${p.added}</span>` : '';
                     tbody.innerHTML += `<tr id="row-${index}">
-                        <td>${p.name}</td>
-                        <td><span id="score-${index}" style="color:#3498db">${p.old}</span>${addedHtml}</td>
+                        <td class="text-pop">${p.name}</td>
+                        <td class="text-pop"><span id="score-${index}" style="color:#3498db">${p.old}</span>${addedHtml}</td>
                     </tr>`;
                 });
 
                 setTimeout(() => {
                     oldScoreArray.forEach((p, index) => {
-                        if(p.added > 0) {
+                        if(p.added !== 0) {
                             let scoreEl = document.getElementById(`score-${index}`);
                             let rowEl = document.getElementById(`row-${index}`);
                             let addedEl = rowEl.querySelector('.added-score');
                             
                             scoreEl.innerText = p.new;
-                            scoreEl.style.color = '#27ae60';
+                            scoreEl.style.color = p.added > 0 ? '#27ae60' : '#e74c3c';
                             if(addedEl) addedEl.style.display = 'none';
                         }
                     });
@@ -992,8 +1237,8 @@
                         tbody.innerHTML = '';
                         oldScoreArray.forEach(p => {
                             tbody.innerHTML += `<tr>
-                                <td>${p.name}</td>
-                                <td style="color:#3498db">${p.new}</td>
+                                <td class="text-pop">${p.name}</td>
+                                <td style="color:#3498db" class="text-pop">${p.new}</td>
                             </tr>`;
                         });
                         
@@ -1009,7 +1254,7 @@
                 document.getElementById('btn-menu').style.display = 'block';
                 oldScoreArray.sort((a, b) => b.new - a.new);
                 oldScoreArray.forEach(p => {
-                    tbody.innerHTML += `<tr><td>${p.name}</td><td style="color:#3498db">${p.new}</td></tr>`;
+                    tbody.innerHTML += `<tr><td class="text-pop">${p.name}</td><td style="color:#3498db" class="text-pop">${p.new}</td></tr>`;
                 });
             }
         }
