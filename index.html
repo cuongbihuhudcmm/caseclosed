@@ -546,14 +546,24 @@
             
             updateMenuButtons();
 
-            // TẠO FAVICON 8-BIT (LOGO WEB) TỰ ĐỘNG TỪ SPRITE THÁM TỬ
+            // TẠO FAVICON & ICON "THÊM VÀO MÀN HÌNH CHÍNH" ĐIỆN THOẠI
             const favCanvas = document.createElement('canvas');
-            drawPixelArt(favCanvas, spriteDetective, 4);
+            // Tăng scale lên 18 để ảnh to rõ nét trên điện thoại (đạt chuẩn ~180x180 px)
+            drawPixelArt(favCanvas, spriteDetective, 18); 
+            const favUrl = favCanvas.toDataURL('image/png');
+
+            // Icon cho tab trình duyệt máy tính
             const favLink = document.createElement('link');
             favLink.rel = 'icon';
             favLink.type = 'image/png';
-            favLink.href = favCanvas.toDataURL('image/png');
+            favLink.href = favUrl;
             document.head.appendChild(favLink);
+
+            // Icon chuyên dụng cho tính năng "Add to Home Screen" trên iOS / Android
+            const appleTouchIcon = document.createElement('link');
+            appleTouchIcon.rel = 'apple-touch-icon';
+            appleTouchIcon.href = favUrl;
+            document.head.appendChild(appleTouchIcon);
         });
 
         function updateMenuButtons() {
