@@ -886,16 +886,21 @@
         let pendingGameConfig = null; let lastElimination = null; let roundHistory = [];
         let currentCaseMeta = { number: 'CASE #---', title: 'HỒ SƠ ĐANG KHỞI TẠO' };
         const CASE_TITLES = [
-            'BÓNG ĐEN TRONG PHÒNG KHÓA KÍN', 'MẬT LỆNH BÊN CẠNH HIỆN TRƯỜNG',
-            'DẤU VẾT TRÊN CHUYẾN TÀU ĐÊM', 'CHIẾC ĐỒNG HỒ KHÔNG QUAY LẠI',
-            'BỨC ẢNH BỊ XÉ Ở HỒ SƠ CŨ', 'LỜI KHAI CUỐI CÙNG TRƯỚC NỬA ĐÊM',
-            'VỤ ÁN DƯỚI ÁNH ĐÈN VÀNG', 'BÍ MẬT SAU CÁNH CỬA ĐÓNG KÍN'
-        ];
+            'Vụ án Sát nhân quấn băng trắng', 'Vụ án Bản Sonata Ánh Trăng',
+            'Chuyến tàu tốc hành bí ẩn', 'Vụ án Sát nhân thư viện',
+            'Vụ án Dinh thự nhện Tottori', 'Vụ án ma nữ Kuchisake', 'Dinh thự ma cà rồng'
+        ]; // Đã rút vụ án C4 ra khỏi danh sách random thường
 
         function createCaseMeta() {
+            // Kiểm tra trực tiếp xem chế độ C4 có đang bật không
+            const isC4Enabled = document.getElementById('cb-defuser').checked;
+            
             currentCaseMeta = {
                 number: `CASE #${String(Math.floor(1 + Math.random() * 999)).padStart(3, '0')}`,
-                title: CASE_TITLES[Math.floor(Math.random() * CASE_TITLES.length)]
+                // Nếu có C4 -> Chốt cứng tên vụ án 12 triệu con tin. Nếu không -> Random như cũ.
+                title: isC4Enabled 
+                    ? 'TRỤ SỞ CẢNH SÁT RUNG CHUYỂN: 12 TRIỆU CON TIN' 
+                    : CASE_TITLES[Math.floor(Math.random() * CASE_TITLES.length)]
             };
         }
 
