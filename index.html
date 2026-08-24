@@ -386,6 +386,98 @@
             .rule-header h3 { font-size: 19px; }
             .rule-file-no { display: none; }
         }
+
+        /* --- INTRO RUOT DUOI 3 PHE --- */
+        #chase-screen { position: fixed; inset: 0; z-index: 10002; background: #07070d; display: none; overflow: hidden; cursor: pointer; }
+        #chase-screen.active { display: block; }
+        .chase-speedlines {
+            position: absolute; inset: 0;
+            background: repeating-linear-gradient(180deg, transparent 0 34px, rgba(255, 255, 255, .05) 34px 38px);
+            animation: chaseLines .25s linear infinite;
+        }
+        @keyframes chaseLines { to { transform: translateY(-38px); } }
+        .chase-alert {
+            position: absolute; top: 15%; width: 100%; text-align: center;
+            color: #e74c3c; font-size: clamp(48px, 10vw, 84px); letter-spacing: 14px;
+            text-shadow: 4px 4px 0 #000; opacity: 0;
+            animation: chaseAlertBlink .3s steps(2) 8 forwards;
+        }
+        @keyframes chaseAlertBlink { 0% { opacity: 1; } 49% { opacity: 1; } 50% { opacity: 0; } 100% { opacity: 0; } }
+        .chase-runner { position: absolute; image-rendering: pixelated; }
+        .chase-spy { top: 54%; left: -100px; animation: chaseRunRight 2.4s steps(24) .7s forwards, runBounce .16s steps(2) infinite alternate; }
+        .chase-dan { top: 54%; left: -190px; animation: chaseRunRight 2.4s steps(24) .85s forwards, runBounce .16s steps(2) infinite alternate .1s; }
+        .chase-kid { top: 24%; right: -100px; animation: chaseRunLeft 2s steps(20) 2.7s forwards, runBounce .16s steps(2) infinite alternate; }
+        @keyframes chaseRunRight { to { left: 112%; } }
+        @keyframes chaseRunLeft { to { right: 112%; } }
+        @keyframes runBounce { from { transform: translateY(0); } to { transform: translateY(-9px); } }
+        .chase-flash { position: absolute; inset: 0; background: #fff; opacity: 0; pointer-events: none; animation: chaseFlash .4s steps(3) 4.9s forwards; }
+        @keyframes chaseFlash { 0% { opacity: 0; } 40% { opacity: 1; } 100% { opacity: 0; } }
+        .chase-title {
+            position: absolute; inset: 0; display: flex; flex-direction: column;
+            align-items: center; justify-content: center; gap: 22px; opacity: 0;
+            animation: chaseTitleIn .5s steps(5) 5.2s forwards;
+        }
+        @keyframes chaseTitleIn { from { opacity: 0; transform: scale(2.4); } to { opacity: 1; transform: scale(1); } }
+        .chase-title h1 {
+            color: #f7d51d; font-size: clamp(44px, 10vw, 88px); margin: 0; letter-spacing: 8px;
+            text-shadow: 6px 6px 0 #e76e55, 3px 3px 0 #000;
+        }
+        .chase-stamp {
+            color: #d94b3d; border: 5px solid currentColor; padding: 6px 16px;
+            font-size: clamp(18px, 4vw, 30px); letter-spacing: 6px;
+            transform: rotate(-6deg); background: rgba(30, 14, 10, .72);
+        }
+        .chase-tap { position: absolute; bottom: 12%; width: 100%; text-align: center; color: #27ae60; font-size: 26px; opacity: 0; animation: chaseTapIn .2s steps(2) 6.2s forwards; }
+        @keyframes chaseTapIn { to { opacity: 1; } }
+        #chase-screen.shake { animation: chaseShake .4s steps(6) 1; }
+        @keyframes chaseShake { 0% { transform: translate(5px, 3px); } 25% { transform: translate(-5px, -3px); } 50% { transform: translate(4px, -4px); } 75% { transform: translate(-4px, 3px); } 100% { transform: none; } }
+
+        /* --- CHON CHE DO --- */
+        .mode-cards { display: flex; gap: 20px; justify-content: center; flex-wrap: wrap; max-width: 760px; margin: 36px auto 0; padding: 0 10px; }
+        .mode-card {
+            flex: 1; min-width: 240px; background: #121215; border: 4px solid #fff;
+            box-shadow: 6px 6px 0 #000; padding: 24px 16px; cursor: pointer;
+            display: flex; flex-direction: column; align-items: center; gap: 12px;
+            color: #fff; font-family: 'VT323', monospace; font-size: 20px;
+            transition: transform .12s steps(2), border-color .12s steps(2);
+        }
+        .mode-card:hover { transform: translateY(-5px); border-color: #f7d51d; }
+        .mode-card:active { transform: translateY(1px); }
+        .mode-card b { color: #f7d51d; letter-spacing: 2px; font-size: 26px; text-shadow: 2px 2px 0 #000; }
+        .mode-card span { color: #bbb; font-size: 17px; line-height: 1.4; }
+
+        /* --- MAN HINH ONLINE --- */
+        .online-status { text-align: center; color: #95a5a6; font-size: 16px; min-height: 22px; margin: 10px 0 0; }
+        .room-code-box {
+            display: flex; align-items: center; justify-content: center; gap: 12px; flex-wrap: wrap;
+            margin: 14px auto; padding: 10px 14px; background: #000;
+            border: 3px dashed #f7d51d; max-width: 540px;
+        }
+        .room-code-box b { color: #f7d51d; font-size: 32px; letter-spacing: 8px; }
+        #lobby-players { list-style: none; padding: 0; margin: 0; }
+        #lobby-players li { display: flex; justify-content: space-between; padding: 7px 10px; border-bottom: 1px dashed #444; color: #fff; font-size: 21px; }
+        #lobby-players li b { color: #f7d51d; font-size: 15px; letter-spacing: 1px; }
+        .og-timer-wrap { height: 14px; background: #111; border: 2px solid #555; margin: 10px auto 6px; max-width: 780px; }
+        #og-timer-fill { height: 100%; width: 100%; background: #27ae60; }
+        #og-timer-fill.warn { background: #e74c3c; }
+        #og-turn-banner { text-align: center; color: #f7d51d; font-size: clamp(18px, 4vw, 26px); min-height: 32px; text-shadow: 2px 2px 0 #000; padding: 0 8px; }
+        #og-chat-box {
+            max-width: 780px; margin: 10px auto; height: 38vh; min-height: 200px;
+            overflow-y: auto; background: rgba(0, 0, 0, .6); border: 4px solid #333;
+            padding: 10px; display: flex; flex-direction: column; gap: 8px;
+        }
+        .og-msg { background: rgba(255, 255, 255, .05); padding: 7px 10px; border-left: 4px solid #555; font-size: 19px; line-height: 1.4; overflow-wrap: anywhere; }
+        .og-msg b { color: #3498db; }
+        .og-msg.kind-desc { border-left-color: #f7d51d; background: rgba(247, 213, 29, .09); }
+        .og-msg.kind-desc b { color: #f7d51d; }
+        .og-msg.kind-sys { border-left-color: #e74c3c; color: #e0b7ae; font-style: italic; }
+        #og-input-row { display: flex; gap: 10px; max-width: 780px; margin: 10px auto 0; padding: 0 8px; }
+        #og-input { flex: 1; }
+        #og-vote-area { max-width: 780px; margin: 0 auto 12px; padding: 0 8px; }
+        #og-vote-area .suspect-grid { min-height: 100px; }
+        #og-host-controls { max-width: 780px; margin: 12px auto 0; padding: 0 8px; justify-content: center; }
+        #og-host-controls:empty { display: none !important; }
+        .online-victory-list { max-width: 560px; margin: 10px auto; text-align: left; }
     </style>
 </head>
 <body>
@@ -673,6 +765,135 @@
         </div>
     </div>
 
+    <!-- CẢNH MỞ MÀN: 3 PHE RƯỢT ĐUỔI + TITLE -->
+    <div id="chase-screen">
+        <div class="chase-speedlines"></div>
+        <div class="chase-alert">!!!</div>
+        <canvas id="chase-kid" class="pixel-canvas chase-runner chase-kid"></canvas>
+        <canvas id="chase-spy" class="pixel-canvas chase-runner chase-spy"></canvas>
+        <canvas id="chase-dan" class="pixel-canvas chase-runner chase-dan"></canvas>
+        <div class="chase-flash"></div>
+        <div class="chase-title">
+            <h1>CASECLOSED</h1>
+            <p class="chase-stamp">ĐIỆP VỤ TỐI MẬT</p>
+        </div>
+        <p class="chase-tap blinker">- CHẠM ĐỂ TIẾP TỤC -</p>
+    </div>
+
+    <!-- CHỌN CHẾ ĐỘ -->
+    <div id="mode-screen" class="screen">
+        <div style="text-align:center; margin-top:7vh;">
+            <h2 class="arcade-title" style="color:#f7d51d; font-size:42px; text-shadow:4px 4px 0 #e76e55, 2px 2px 0 #000; margin:0;">CHỌN CHẾ ĐỘ</h2>
+            <p class="subtitle-text">HỒ SƠ NÀY DIỄN RA Ở ĐÂU?</p>
+        </div>
+        <div class="mode-cards">
+            <button type="button" class="mode-card" onclick="enterOffline()">
+                <canvas id="mode-dan" class="pixel-canvas glow-detective"></canvas>
+                <b>CHƠI OFFLINE</b>
+                <span>Cả nhóm tụ quanh 1 điện thoại. Không cần mạng.</span>
+            </button>
+            <button type="button" class="mode-card" onclick="enterOnline()">
+                <canvas id="mode-spy" class="pixel-canvas glow-spy"></canvas>
+                <b>CHƠI ONLINE</b>
+                <span>Mỗi người 1 thiết bị, chơi từ xa qua phòng riêng.</span>
+            </button>
+        </div>
+    </div>
+
+    <!-- ONLINE: MENU -->
+    <div id="online-menu-screen" class="screen">
+        <h2 class="arcade-title" style="color:#f7d51d; text-shadow:4px 4px #e76e55;">CHƠI ONLINE</h2>
+        <div class="nes-container is-dark with-title" style="max-width:460px; margin:30px auto;">
+            <p class="title text-pop">ĐĂNG NHẬP ĐẶC VỤ</p>
+            <input type="text" id="online-name" class="nes-input is-dark" style="width:100%; margin-bottom:16px;" placeholder="Tên đặc vụ (tối đa 16 ký tự)" maxlength="16">
+            <button type="button" class="nes-btn is-primary main-action-btn" style="width:100%; padding:12px;" onclick="hostCreateRoom()">TẠO PHÒNG MỚI</button>
+            <div style="display:flex; gap:10px; margin-top:16px;">
+                <input type="text" id="online-code" class="nes-input is-dark" style="width:130px; text-align:center; text-transform:uppercase; letter-spacing:4px;" placeholder="MÃ" maxlength="5">
+                <button type="button" class="nes-btn is-success" style="flex:1;" onclick="clientJoinRoom()">VÀO PHÒNG</button>
+            </div>
+            <p id="online-status" class="online-status"></p>
+            <button type="button" class="nes-btn" style="width:100%; margin-top:8px;" onclick="switchScreen('mode-screen')">Quay Lại</button>
+        </div>
+    </div>
+
+    <!-- ONLINE: LOBBY -->
+    <div id="online-lobby-screen" class="screen">
+        <h2 class="arcade-title" style="color:#f7d51d;">PHÒNG CHỜ</h2>
+        <div class="room-code-box">
+            <span style="color:#ddd;">MÃ PHÒNG:</span><b id="lobby-code">-----</b>
+            <button type="button" class="nes-btn is-warning" style="font-size:14px; padding:6px 10px;" onclick="copyOnlineInvite()">SAO CHÉP LINK MỜI</button>
+        </div>
+        <div class="nes-container is-dark with-title" style="max-width:520px; margin:0 auto 16px;">
+            <p class="title text-pop">Đặc Vụ (<span id="lobby-count">1</span>/12)</p>
+            <ul id="lobby-players"></ul>
+        </div>
+        <div class="nes-container is-dark" id="lobby-host-config" style="max-width:520px; margin:0 auto 16px; display:none;">
+            <div style="display:flex; gap:12px; margin-bottom:12px;">
+                <label style="flex:1; color:#e76e55;">Áo đen:<input type="number" id="lobby-spies" class="nes-input is-dark" value="1" min="1" style="width:100%;"></label>
+                <label style="flex:1; color:#209cee;">Siêu trộm:<input type="number" id="lobby-kids" class="nes-input is-dark" value="1" min="0" style="width:100%;"></label>
+            </div>
+            <label style="color:#ddd;">Thời lượng thảo luận:
+                <select id="lobby-discuss" class="nes-input is-dark" style="width:100%;">
+                    <option value="60">60 giây</option>
+                    <option value="120" selected>120 giây</option>
+                    <option value="180">180 giây</option>
+                </select>
+            </label>
+        </div>
+        <div style="max-width:520px; margin:0 auto;">
+            <button type="button" id="lobby-start" class="nes-btn is-success main-action-btn" style="width:100%; padding:14px; display:none;" onclick="hostStartGame()">PHÁT MẬT LỆNH</button>
+            <p id="lobby-waiting" class="blinker" style="text-align:center; color:#27ae60; display:none;">Chờ chủ phòng phát mật lệnh...</p>
+            <button type="button" class="nes-btn" style="width:100%; margin-top:12px;" onclick="onlineExit()">Rời Phòng</button>
+        </div>
+    </div>
+
+    <!-- ONLINE: NHẬN VAI -->
+    <div id="online-reveal-screen" class="screen">
+        <div class="case-file-bar"><span class="case-file-bar__number case-number">CASE #---</span><span class="case-file-bar__title case-title">HỒ SƠ MẬT</span><span class="case-classified-stamp">TUYỆT MẬT</span></div>
+        <h2 style="color:#f7d51d;" class="text-pop arcade-title">HỒ SƠ CỦA BẠN</h2>
+        <div class="nes-container is-dark" style="max-width:460px; margin:20px auto; text-align:center; border:4px solid #fff;">
+            <p id="oreveal-word" style="font-size:40px; color:#f7d51d; font-weight:bold; margin:0;" class="text-pop">???</p>
+            <p id="oreveal-hint" style="color:#ddd; font-size:18px;"></p>
+        </div>
+        <div style="max-width:460px; margin:0 auto;">
+            <button type="button" id="oreveal-ready-btn" class="nes-btn is-primary" style="width:100%; padding:12px;" onclick="onlineReady()">TÔI ĐÃ GHI NHỚ — SẴN SÀNG</button>
+        </div>
+    </div>
+
+    <!-- ONLINE: MÀN CHÍNH (MIÊU TẢ / CHAT / BỎ PHIẾU) -->
+    <div id="online-game-screen" class="screen">
+        <div class="case-file-bar"><span class="case-file-bar__number case-number">CASE #---</span><span class="case-file-bar__title case-title">HỒ SƠ MẬT</span><span class="case-file-bar__state" id="og-phase-label">CHỜ</span></div>
+        <div class="og-timer-wrap"><div id="og-timer-fill"></div></div>
+        <div id="og-turn-banner" class="text-pop"></div>
+        <div id="og-vote-area" style="display:none;">
+            <p style="text-align:center; color:#f7d51d;" class="text-pop">BỎ PHIẾU BÍ MẬT — chạm nghi phạm</p>
+            <div id="og-vote-grid" class="suspect-grid" style="margin-bottom:12px;"></div>
+            <div style="text-align:center; margin-bottom:12px;"><button type="button" class="nes-btn" onclick="sendOnlineVote('skip')">VỢNG (không bỏ phiếu)</button></div>
+        </div>
+        <div id="og-chat-box"></div>
+        <div id="og-input-row">
+            <input type="text" id="og-input" class="nes-input is-dark" style="flex:1;" placeholder="..." maxlength="200" onkeypress="if(event.key==='Enter') sendOnlineInput()">
+            <button type="button" id="og-send" class="nes-btn is-error" onclick="sendOnlineInput()">GỬI</button>
+        </div>
+        <div id="og-host-controls" style="display:flex; gap:10px; margin-top:12px;"></div>
+    </div>
+
+    <!-- ONLINE: TỔNG KẾT -->
+    <div id="online-victory-screen" class="screen">
+        <div class="case-file-bar"><span class="case-file-bar__number case-number">CASE #---</span><span class="case-file-bar__title case-title">HỒ SƠ MẬT</span><span class="case-classified-stamp">ĐÃ KHÉP LẠI</span></div>
+        <div class="truth-banner">SỰ THẬT CHỈ CÓ MỘT</div>
+        <div class="nes-container is-dark" style="max-width:640px; margin:0 auto; text-align:center;">
+            <h3 id="ov-faction" class="text-pop" style="font-size:30px; margin:10px 0;"></h3>
+            <p id="ov-words" style="color:#ddd; font-size:18px;"></p>
+            <div class="online-victory-list" id="ov-roles"></div>
+            <div class="online-victory-list" id="ov-points"></div>
+            <div style="display:flex; gap:12px; margin-top:20px;">
+                <button type="button" id="ov-again" class="nes-btn is-success" style="flex:1; display:none;" onclick="hostRematch()">VÁN MỚI (CÙNG PHÒNG)</button>
+                <button type="button" class="nes-btn" style="flex:1;" onclick="onlineExit()">RỜI PHÒNG</button>
+            </div>
+        </div>
+    </div>
+
     <!-- OVERLAY SỬA ĐIỂM TỔNG -->
     <div id="score-editor-overlay" style="display:none; position:fixed; inset:0; z-index:9999; background:rgba(0,0,0,0.92); justify-content:center; align-items:center; padding:20px;">
         <div class="nes-container is-dark" style="width:100%; max-width:500px; max-height:90vh; overflow-y:auto; padding:20px; border-color:#f7d51d;">
@@ -760,6 +981,7 @@
     </div>
 
     <!-- ================= JAVASCRIPT ================= -->
+    <script src="https://unpkg.com/peerjs@1.5.4/dist/peerjs.min.js" defer></script>
     <script>
         function requestFullScreen() {
             const elem = document.documentElement;
@@ -929,9 +1151,45 @@
             const introScreen = document.getElementById('intro-screen');
             introScreen.classList.add('hidden'); 
             setTimeout(() => {
-                introScreen.style.display = 'none'; document.getElementById('init-screen').classList.add('active'); 
+                introScreen.style.display = 'none'; 
+                showChaseIntro();
                 playBackgroundMusic();
             }, 800); 
+        }
+
+        let chaseDone = false;
+        let chaseTimers = [];
+        function showChaseIntro() {
+            const s = document.getElementById('chase-screen');
+            drawPixelArt('chase-spy', spriteSpy, 5);
+            drawPixelArt('chase-dan', spriteDetective, 5);
+            drawPixelArt('chase-kid', spriteKid, 5);
+            s.classList.remove('shake');
+            s.classList.add('active');
+            playNoise(0.35, 0.18);
+            chaseTimers.push(setTimeout(() => {
+                if (chaseDone) return;
+                SFX.doorclose();
+                s.classList.add('shake');
+            }, 5250));
+        }
+        function finishChase() {
+            if (chaseDone) return;
+            chaseDone = true;
+            chaseTimers.forEach(clearTimeout);
+            const s = document.getElementById('chase-screen');
+            s.classList.remove('active', 'shake');
+            switchScreen('mode-screen');
+        }
+        document.getElementById('chase-screen').addEventListener('click', finishChase);
+
+        function enterOffline() { switchScreen('init-screen'); }
+        function enterOnline() {
+            if (typeof Peer === 'undefined') {
+                showModal('Chế độ Online cần kết nối mạng. Vui lòng kiểm tra internet rồi thử lại.', 'alert');
+                return;
+            }
+            switchScreen('online-menu-screen');
         }
 
         let modalConfirmCallback = null;
@@ -1221,6 +1479,10 @@
             updateMenuButtons();
             updateC4Settings();
             syncMusicButton();
+            drawPixelArt('mode-dan', spriteDetective, 5);
+            drawPixelArt('mode-spy', spriteSpy, 5);
+            const inviteCode = new URLSearchParams(location.search).get('p');
+            if (inviteCode) document.getElementById('online-code').value = inviteCode.toUpperCase();
         });
 
         if ('serviceWorker' in navigator && window.isSecureContext) {
@@ -1282,7 +1544,7 @@
         function switchScreen(screenId) { 
             document.querySelectorAll('.screen').forEach(s => s.classList.remove('active')); 
             document.getElementById(screenId).classList.add('active'); 
-            document.body.classList.toggle('victory-party', screenId === 'victory-screen');
+            document.body.classList.toggle('victory-party', screenId === 'victory-screen' || screenId === 'online-victory-screen');
             if (screenId === 'setup-screen') updateRecentPlayers();
         }
         
@@ -3452,6 +3714,640 @@
                     tbody.innerHTML += `<tr><td class="text-pop">${esc(p.name)}</td><td style="color:#3498db" class="text-pop">${p.new}</td></tr>`;
                 });
             }
+        }
+
+        /* ==================== CHE DO ONLINE (P2P) ==================== */
+        const ONLINE = {
+            peer: null, conns: new Map(), hostConn: null, isHost: false, code: null,
+            players: [], phase: 'lobby', round: 1, turnIdx: 0, descCount: 0,
+            myId: null, myName: '', myRole: null, myWord: null,
+            votes: new Map(), turnMs: 60000, voteMs: 30000, discussMs: 120000,
+            civilianWord: '', spyWord: '', guesserId: null, voted: false,
+            timerInt: null, hostTimeouts: [], inputMode: 'off'
+        };
+
+        function onlineStatus(msg) { const el = document.getElementById('online-status'); if (el) el.innerText = msg || ''; }
+        function onlineCodeGen() { const c = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789'; let s = ''; for (let i = 0; i < 5; i++) s += c[Math.floor(Math.random() * c.length)]; return s; }
+        function onlineGetPlayer(id) { return ONLINE.players.find((p) => p.id === id) || null; }
+        function onlinePublic() { return ONLINE.players.map((p) => ({ id: p.id, name: p.name, isAlive: p.isAlive })); }
+        function onlineGetName() {
+            const n = document.getElementById('online-name').value.trim().slice(0, 16);
+            if (!n) { showModal('Nhập tên đặc vụ trước đã!', 'alert'); return null; }
+            return n;
+        }
+
+        function hostCreateRoom() {
+            const name = onlineGetName(); if (!name) return;
+            onlineStatus('Đang mở phòng...');
+            ONLINE.isHost = true; ONLINE.myName = name; ONLINE.phase = 'lobby';
+            ONLINE.code = onlineCodeGen();
+            const peer = new Peer('caseclosed-' + ONLINE.code, { debug: 0 });
+            ONLINE.peer = peer;
+            peer.on('open', (id) => {
+                ONLINE.myId = id;
+                ONLINE.players = [{ id, name, isAlive: true, ready: false }];
+                onlineStatus('');
+                switchScreen('online-lobby-screen');
+                renderLobby();
+            });
+            peer.on('connection', (conn) => {
+                conn.on('data', (d) => hostOnData(conn, d));
+                conn.on('close', () => hostOnLeave(conn));
+            });
+            peer.on('error', (e) => {
+                if (e.type === 'unavailable-id') { try { peer.destroy(); } catch (err) {} hostCreateRoom(); }
+                else onlineStatus('Lỗi kết nối: ' + e.type);
+            });
+        }
+
+        function clientJoinRoom() {
+            const name = onlineGetName(); if (!name) return;
+            const code = document.getElementById('online-code').value.trim().toUpperCase();
+            if (code.length !== 5) { showModal('Mã phòng gồm đúng 5 ký tự.', 'alert'); return; }
+            onlineStatus('Đang kết nối phòng ' + code + '...');
+            ONLINE.isHost = false; ONLINE.myName = name; ONLINE.code = code;
+            const peer = new Peer({ debug: 0 });
+            ONLINE.peer = peer;
+            peer.on('open', (id) => {
+                ONLINE.myId = id;
+                const conn = peer.connect('caseclosed-' + code, { reliable: true });
+                ONLINE.hostConn = conn;
+                conn.on('open', () => conn.send({ t: 'join', name }));
+                conn.on('data', clientOnData);
+                conn.on('close', () => { showModal('Mất kết nối với chủ phòng!', 'alert', () => onlineExit()); });
+            });
+            peer.on('error', (e) => {
+                if (e.type === 'peer-unavailable') { onlineStatus(''); showModal('Không tìm thấy phòng "' + code + '". Kiểm tra lại mã phòng!', 'alert'); }
+                else onlineStatus('Lỗi kết nối: ' + e.type);
+            });
+        }
+
+        function onlineExit() {
+            if (ONLINE.isHost && ONLINE.peer && ONLINE.phase !== 'lobby') { try { hostBroadcast({ t: 'close' }); } catch (e) {} }
+            try { if (ONLINE.peer) ONLINE.peer.destroy(); } catch (e) {}
+            ONLINE.peer = null; ONLINE.conns.clear(); ONLINE.hostConn = null;
+            ONLINE.players = []; ONLINE.phase = 'lobby'; ONLINE.myRole = null; ONLINE.myWord = null; ONLINE.voted = false;
+            switchScreen('mode-screen');
+        }
+
+        function copyOnlineInvite() {
+            const link = location.origin + location.pathname + '?p=' + ONLINE.code;
+            const showIt = () => showModal('Gửi link này cho bạn bè qua Zalo/Messenger:<br><b style="color:#f7d51d; font-size:16px; overflow-wrap:anywhere;">' + esc(link) + '</b><br>Hoặc đưa họ mã phòng: <b style="color:#f7d51d">' + ONLINE.code + '</b>', 'alert');
+            if (navigator.clipboard) navigator.clipboard.writeText(link).then(() => { showModal('Đã sao chép link mời!<br><b style="color:#f7d51d; overflow-wrap:anywhere;">' + esc(link) + '</b>', 'alert'); }).catch(showIt);
+            else showIt();
+        }
+
+        function renderLobby() {
+            document.getElementById('lobby-code').innerText = ONLINE.code;
+            document.getElementById('lobby-count').innerText = ONLINE.players.length;
+            const ul = document.getElementById('lobby-players'); ul.innerHTML = '';
+            ONLINE.players.forEach((p) => {
+                const li = document.createElement('li');
+                const nm = document.createElement('span');
+                nm.textContent = p.name + (p.id === ONLINE.myId ? ' (bạn)' : '');
+                const tag = document.createElement('b');
+                if (p.id === 'caseclosed-' + ONLINE.code) tag.textContent = '★ CHỦ PHÒNG';
+                li.append(nm, tag);
+                ul.appendChild(li);
+            });
+            document.getElementById('lobby-host-config').style.display = ONLINE.isHost ? 'block' : 'none';
+            document.getElementById('lobby-start').style.display = ONLINE.isHost ? 'inline-block' : 'none';
+            document.getElementById('lobby-waiting').style.display = ONLINE.isHost ? 'none' : 'block';
+        }
+
+        function hostBroadcast(msg) { ONLINE.conns.forEach((c) => { if (c.open) c.send(msg); }); }
+        function hostSendTo(id, msg) { const c = ONLINE.conns.get(id); if (c && c.open) c.send(msg); }
+        function hostEmit(msg) { hostBroadcast(msg); clientOnData(msg); }
+        function hostLater(ms, fn) { ONLINE.hostTimeouts.push(setTimeout(fn, ms)); }
+        function hostClearTimers() { ONLINE.hostTimeouts.forEach(clearTimeout); ONLINE.hostTimeouts = []; }
+
+        function hostOnData(conn, d) {
+            if (!d || typeof d !== 'object') return;
+            if (d.t === 'join') {
+                if (ONLINE.phase !== 'lobby') { conn.send({ t: 'busy' }); return; }
+                if (ONLINE.players.length >= 12) { conn.send({ t: 'full' }); return; }
+                let name = String(d.name || 'Đặc vụ').slice(0, 16);
+                const used = new Set(ONLINE.players.map((p) => p.name));
+                let n = 2;
+                while (used.has(name)) { name = String(d.name).slice(0, 16) + ' ' + n; n++; }
+                ONLINE.conns.set(conn.peer, conn);
+                ONLINE.players.push({ id: conn.peer, name, isAlive: true, ready: false });
+                conn.send({ t: 'welcome', you: conn.peer, code: ONLINE.code, players: onlinePublic() });
+                hostEmit({ t: 'lobby', players: onlinePublic() });
+                SFX.click();
+                return;
+            }
+            const p = onlineGetPlayer(conn.peer);
+            if (!p) return;
+            if (d.t === 'ready') { p.ready = true; hostCheckReady(); }
+            else if (d.t === 'desc' && ONLINE.phase === 'describe') {
+                const sp = ONLINE.players[ONLINE.turnIdx];
+                if (sp && sp.id === conn.peer) hostAcceptDescribe(sp, String(d.text).slice(0, 160));
+            }
+            else if (d.t === 'chat' && ONLINE.phase === 'discuss' && p.isAlive) {
+                hostEmit({ t: 'chat', from: p.name, text: String(d.text).slice(0, 200) });
+            }
+            else if (d.t === 'vote' && ONLINE.phase === 'vote' && p.isAlive && !ONLINE.votes.has(conn.peer)) {
+                ONLINE.votes.set(conn.peer, String(d.target));
+                hostMaybeCloseVote();
+            }
+            else if (d.t === 'guess' && ONLINE.guesserId === conn.peer) {
+                hostResolveGuess(String(d.word).slice(0, 60));
+            }
+        }
+
+        function hostOnLeave(conn) {
+            const p = onlineGetPlayer(conn.peer);
+            ONLINE.conns.delete(conn.peer);
+            if (!p) return;
+            if (ONLINE.phase === 'lobby') {
+                ONLINE.players = ONLINE.players.filter((x) => x.id !== conn.peer);
+                hostEmit({ t: 'lobby', players: onlinePublic() });
+            } else {
+                p.gone = true;
+                hostEmit({ t: 'chat', from: 'HỆ THỐNG', text: p.name + ' đã mất kết nối!', kind: 'sys' });
+                if (ONLINE.phase === 'describe' && ONLINE.players[ONLINE.turnIdx] && ONLINE.players[ONLINE.turnIdx].id === conn.peer) hostSkipTurn();
+                if (ONLINE.phase === 'reveal') hostCheckReady();
+            }
+        }
+
+        function hostStartGame() {
+            if (ONLINE.players.length < 4) { showModal('Cần tối thiểu 4 đặc vụ để lập chuyên án!', 'alert'); return; }
+            const spies = Math.max(1, parseInt(document.getElementById('lobby-spies').value) || 1);
+            const kids = Math.max(0, parseInt(document.getElementById('lobby-kids').value) || 0);
+            const civs = ONLINE.players.length - spies - kids;
+            if (civs < spies + kids) { showModal('Lỗi chiến thuật! Thám tử ít hơn tổng số tội phạm.', 'alert'); return; }
+            ONLINE.discussMs = (parseInt(document.getElementById('lobby-discuss').value) || 120) * 1000;
+            const roles = [];
+            for (let i = 0; i < civs; i++) roles.push('Dan');
+            for (let i = 0; i < spies; i++) roles.push('GianDiep');
+            for (let i = 0; i < kids; i++) roles.push('SieuTrom');
+            shuffleArray(roles);
+            const pair = rawWordDatabase[Math.floor(Math.random() * rawWordDatabase.length)];
+            const isA = Math.random() < 0.5;
+            ONLINE.civilianWord = isA ? pair.a : pair.b;
+            ONLINE.spyWord = isA ? pair.b : pair.a;
+            ONLINE.players.forEach((p, i) => {
+                p.role = roles[i];
+                p.word = p.role === 'SieuTrom' ? 'Thư Cảnh Cáo' : (p.role === 'Dan' ? ONLINE.civilianWord : ONLINE.spyWord);
+                p.isAlive = true; p.ready = false; p.gone = false;
+            });
+            ONLINE.round = 1; ONLINE.turnIdx = 0; ONLINE.descCount = 0;
+            ONLINE.votes.clear(); ONLINE.voted = false; ONLINE.guesserId = null;
+            currentCaseMeta = { number: 'CASE #' + String(Math.floor(1 + Math.random() * 999)).padStart(3, '0'), title: CASE_TITLES[Math.floor(Math.random() * CASE_TITLES.length)] };
+            ONLINE.phase = 'reveal';
+            hostEmit({ t: 'start', meta: currentCaseMeta });
+            ONLINE.players.forEach((p) => {
+                const msg = { t: 'role', role: p.role, word: p.word };
+                if (p.id === ONLINE.myId) clientOnData(msg); else hostSendTo(p.id, msg);
+            });
+        }
+
+        function showOnlineReveal() {
+            switchScreen('online-reveal-screen');
+            renderCaseIdentity();
+            const w = document.getElementById('oreveal-word'), h = document.getElementById('oreveal-hint');
+            const btn = document.getElementById('oreveal-ready-btn');
+            btn.disabled = false;
+            if (ONLINE.myRole === 'SieuTrom') {
+                w.innerText = '???'; w.style.color = '#209cee';
+                h.innerHTML = "Bạn là <b style='color:#209cee'>SIÊU TRỘM</b>! Không có mật lệnh — hãy bịa câu miêu tả cho khéo!";
+            } else {
+                w.innerText = ONLINE.myWord; w.style.color = '#f7d51d';
+                h.innerHTML = ONLINE.myRole === 'Dan'
+                    ? "Bạn là <b style='color:#3498db'>THÁM TỬ</b>. Tìm ra Áo Đen đang ẩn mình!"
+                    : "Bạn là <b style='color:#e76e55'>ÁO ĐEN</b>! Mật lệnh của Thám tử RẤT GIỐNG của bạn — diễn cho giống để trà trộn!";
+            }
+        }
+
+        function onlineReady() {
+            SFX.click();
+            document.getElementById('oreveal-ready-btn').disabled = true;
+            if (ONLINE.isHost) {
+                const me = onlineGetPlayer(ONLINE.myId);
+                if (me) me.ready = true;
+                hostCheckReady();
+            } else if (ONLINE.hostConn) ONLINE.hostConn.send({ t: 'ready' });
+        }
+
+        function hostCheckReady() {
+            if (ONLINE.phase !== 'reveal') return;
+            const pending = ONLINE.players.filter((p) => !p.gone && !p.ready);
+            if (pending.length === 0) hostBeginDescribe();
+        }
+
+        function hostBeginDescribe() {
+            ONLINE.phase = 'describe';
+            ONLINE.descCount = 0;
+            ONLINE.turnIdx = ONLINE.players.findIndex((p) => p.isAlive);
+            hostStartTurn();
+        }
+
+        function hostStartTurn() {
+            const sp = ONLINE.players[ONLINE.turnIdx];
+            if (!sp) { hostBeginDiscuss(); return; }
+            hostClearTimers();
+            hostEmit({ t: 'phase', phase: 'describe', round: ONLINE.round, speaker: { id: sp.id, name: sp.name }, deadline: Date.now() + ONLINE.turnMs });
+            hostLater(ONLINE.turnMs, () => hostSkipTurn());
+        }
+
+        function hostAcceptDescribe(sp, text) {
+            hostClearTimers();
+            hostEmit({ t: 'desc', from: sp.name, text });
+            hostAdvanceTurn();
+        }
+
+        function hostSkipTurn() {
+            const sp = ONLINE.players[ONLINE.turnIdx];
+            if (!sp || ONLINE.phase !== 'describe') return;
+            hostClearTimers();
+            hostEmit({ t: 'desc', from: sp.name, text: '(hết thời gian — bỏ lượt)' });
+            hostAdvanceTurn();
+        }
+
+        function hostAdvanceTurn() {
+            ONLINE.descCount++;
+            const aliveCount = ONLINE.players.filter((p) => p.isAlive).length;
+            if (ONLINE.descCount >= aliveCount) { hostBeginDiscuss(); return; }
+            do { ONLINE.turnIdx = (ONLINE.turnIdx + 1) % ONLINE.players.length; } while (!ONLINE.players[ONLINE.turnIdx].isAlive);
+            hostStartTurn();
+        }
+
+        function hostBeginDiscuss() {
+            ONLINE.phase = 'discuss';
+            hostEmit({ t: 'phase', phase: 'discuss', deadline: Date.now() + ONLINE.discussMs });
+            hostLater(ONLINE.discussMs, hostOpenVote);
+        }
+
+        function hostVoteNow() { if (ONLINE.phase === 'discuss') hostOpenVote(); }
+
+        function hostOpenVote() {
+            if (ONLINE.phase !== 'discuss') return;
+            hostClearTimers();
+            ONLINE.phase = 'vote';
+            ONLINE.votes.clear();
+            hostEmit({ t: 'phase', phase: 'vote', deadline: Date.now() + ONLINE.voteMs });
+            hostLater(ONLINE.voteMs, hostTallyVotes);
+        }
+
+        function hostMaybeCloseVote() {
+            const aliveIds = ONLINE.players.filter((p) => p.isAlive && !p.gone).map((p) => p.id);
+            if (aliveIds.length > 0 && aliveIds.every((id) => ONLINE.votes.has(id))) hostTallyVotes();
+        }
+
+        function hostTallyVotes() {
+            if (ONLINE.phase !== 'vote') return;
+            hostClearTimers();
+            const counts = {};
+            ONLINE.votes.forEach((target) => { if (target !== 'skip') counts[target] = (counts[target] || 0) + 1; });
+            let elimId = null, max = 0, tie = false;
+            Object.entries(counts).forEach(([id, c]) => {
+                if (c > max) { max = c; elimId = id; tie = false; }
+                else if (c === max) tie = true;
+            });
+            if (!elimId || tie) elimId = null;
+            let elimRole = null, elimName = null;
+            if (elimId) {
+                const p = onlineGetPlayer(elimId);
+                p.isAlive = false;
+                elimRole = p.role; elimName = p.name;
+            }
+            ONLINE.phase = 'reveal-result';
+            hostEmit({ t: 'voteResult', tally: counts, eliminatedId: elimId, eliminatedRole: elimRole, eliminatedName: elimName });
+            if (elimId && elimRole === 'SieuTrom') {
+                ONLINE.guesserId = elimId;
+                const msg = { t: 'guessAsk' };
+                if (elimId === ONLINE.myId) clientOnData(msg); else hostSendTo(elimId, msg);
+            } else {
+                hostAfterElimination();
+            }
+        }
+
+        function hostResolveGuess(word) {
+            const ok = word.trim().toLowerCase() === ONLINE.civilianWord.toLowerCase();
+            hostEmit({ t: 'guessResult', ok });
+            if (ok) { hostVictory('SieuTromLatKeo'); return; }
+            hostAfterElimination();
+        }
+
+        function hostContinueAfterResult() {
+            const w = onlineCheckVictory();
+            if (w) hostVictory(w);
+            else { ONLINE.round++; hostBeginDescribe(); }
+        }
+
+        function hostAfterElimination() {
+            ONLINE.guesserId = null;
+            const w = onlineCheckVictory();
+            if (w) hostVictory(w);
+        }
+
+        function onlineCheckVictory() {
+            const civ = ONLINE.players.filter((p) => p.isAlive && p.role === 'Dan').length;
+            const spy = ONLINE.players.filter((p) => p.isAlive && p.role === 'GianDiep').length;
+            const kid = ONLINE.players.filter((p) => p.isAlive && p.role === 'SieuTrom').length;
+            if (spy === 0 && kid === 0) return 'Dan';
+            if (civ <= 1) {
+                if (spy >= 1 && kid >= 1) return 'CoWin';
+                if (spy >= 1) return 'GianDiep';
+                if (kid >= 1) return 'SieuTromSurvive';
+            }
+            if (spy >= civ + kid) return 'GianDiep';
+            if (kid >= civ + spy) return 'SieuTromSurvive';
+            return null;
+        }
+
+        function hostVictory(winner) {
+            hostClearTimers();
+            ONLINE.phase = 'victory';
+            const S = DEFAULT_SCORE_SETTINGS;
+            const points = {};
+            ONLINE.players.forEach((p) => {
+                let v = 0;
+                if (winner === 'Dan' && p.role === 'Dan') v = p.isAlive ? S.danAlive : S.danDead;
+                else if (winner === 'GianDiep' && p.role === 'GianDiep') v = S.spyWin;
+                else if (winner === 'SieuTromSurvive' && p.role === 'SieuTrom') v = S.kidSurvive;
+                else if (winner === 'SieuTromLatKeo' && p.role === 'SieuTrom') v = S.kidHack;
+                else if (winner === 'CoWin') {
+                    if (p.role === 'GianDiep') v = S.spyWin;
+                    if (p.role === 'SieuTrom' && p.isAlive) v = S.kidSurvive;
+                }
+                if (v) points[p.id] = v;
+            });
+            hostEmit({ t: 'victory', winner, roles: ONLINE.players.map((p) => ({ name: p.name, role: p.role, isAlive: p.isAlive })), points, words: { civ: ONLINE.civilianWord, spy: ONLINE.spyWord } });
+        }
+
+        function hostRematch() {
+            ONLINE.players.forEach((p) => { p.isAlive = true; p.ready = false; p.gone = false; p.role = null; p.word = null; });
+            hostClearTimers();
+            clearInterval(ONLINE.timerInt);
+            ONLINE.phase = 'lobby';
+            hostEmit({ t: 'reset', players: onlinePublic() });
+        }
+
+        function clientOnData(d) {
+            if (!d || typeof d !== 'object') return;
+            if (d.t === 'welcome') {
+                ONLINE.myId = d.you;
+                ONLINE.players = d.players.map((x) => ({ ...x }));
+                onlineStatus('');
+                switchScreen('online-lobby-screen');
+                renderLobby();
+            }
+            else if (d.t === 'lobby') { ONLINE.players = d.players.map((x) => ({ ...x })); if (ONLINE.phase === 'lobby') renderLobby(); }
+            else if (d.t === 'full') { onlineStatus(''); showModal('Phòng đã đầy (tối đa 12 người).', 'alert'); }
+            else if (d.t === 'busy') { onlineStatus(''); showModal('Ván đang diễn ra — không thể vào giữa chừng.', 'alert'); }
+            else if (d.t === 'close') { showModal('Chủ phòng đã giải tán phòng.', 'alert', () => onlineExit()); }
+            else if (d.t === 'start') {
+                ONLINE.phase = 'reveal';
+                currentCaseMeta = d.meta;
+                addOnlineChatClear();
+                addOnlineChat(null, 'Hồ sơ mật đã được phát! Đọc kỹ rồi xác nhận sẵn sàng.', 'sys');
+            }
+            else if (d.t === 'role') { ONLINE.myRole = d.role; ONLINE.myWord = d.word; showOnlineReveal(); }
+            else if (d.t === 'phase') applyOnlinePhase(d);
+            else if (d.t === 'chat') addOnlineChat(d.from, d.text, d.kind || 'chat');
+            else if (d.t === 'desc') addOnlineChat(d.from, d.text, 'desc');
+            else if (d.t === 'voteResult') applyVoteResult(d);
+            else if (d.t === 'guessAsk') {
+                ONLINE.inputMode = 'guess';
+                setInputRow('Nhập MẬT LỆNH của Thám tử để LẬT KÈO...', 'LẬT KÈO!');
+                document.getElementById('og-turn-banner').innerHTML = "<b style='color:#209cee'>BẠN LÀ SIÊU TRỘM BỊ BẮT — ĐOÁN TRÚNG ĐỂ THẮNG NGAY!</b>";
+            }
+            else if (d.t === 'guessResult') {
+                ONLINE.inputMode = 'off'; setInputRow('Chờ chủ phòng...', '', true);
+                addOnlineChat(null, d.ok ? 'Siêu trộm đoán TRÚNG mật lệnh!' : 'Siêu trộm đoán SAI!', 'sys');
+                if (ONLINE.isHost) renderHostControls([{ label: 'TIẾP TỤC ĐIỀU TRA', fn: 'hostContinueAfterResult' }]);
+            }
+            else if (d.t === 'victory') applyOnlineVictory(d);
+            else if (d.t === 'reset') {
+                ONLINE.players = d.players.map((x) => ({ ...x }));
+                ONLINE.phase = 'lobby'; ONLINE.myRole = null; ONLINE.myWord = null;
+                addOnlineChatClear();
+                switchScreen('online-lobby-screen');
+                renderLobby();
+            }
+        }
+
+        function applyOnlinePhase(d) {
+            ONLINE.phase = d.phase;
+            if (!document.getElementById('online-game-screen').classList.contains('active')) switchScreen('online-game-screen');
+            renderCaseIdentity();
+            const label = document.getElementById('og-phase-label');
+            const banner = document.getElementById('og-turn-banner');
+            const voteArea = document.getElementById('og-vote-area');
+            renderHostControls(null);
+            if (d.phase === 'describe') {
+                label.innerText = 'MIÊU TẢ';
+                banner.innerText = 'VÒNG ' + d.round + ' — LƯỢT MIÊU TẢ: ' + d.speaker.name.toUpperCase();
+                const isMe = d.speaker.id === ONLINE.myId;
+                setInputRow(isMe ? 'Nhập 1 câu miêu tả Mật lệnh của bạn...' : 'Đang chờ ' + d.speaker.name + ' miêu tả...', isMe ? 'GỬI' : '');
+                ONLINE.inputMode = isMe ? 'describe' : 'off';
+                voteArea.style.display = 'none';
+                SFX.tick();
+            } else if (d.phase === 'discuss') {
+                label.innerText = 'THẢO LUẬN';
+                banner.innerText = 'THẢO LUẬN! AI ĐANG DIỄN SÂU?';
+                setInputRow('Nhập tin nhắn thảo luận...', 'GỬI');
+                ONLINE.inputMode = 'chat';
+                voteArea.style.display = 'none';
+                if (ONLINE.isHost) renderHostControls([{ label: 'BỎ PHIẾU NGAY', fn: 'hostVoteNow' }]);
+                SFX.click();
+            } else if (d.phase === 'vote') {
+                label.innerText = 'BỎ PHIẾU';
+                banner.innerText = 'BỎ PHIẾU BÍ MẬT!';
+                ONLINE.inputMode = 'off';
+                setInputRow('Chat tạm khóa khi bỏ phiếu.', '', true);
+                buildOnlineVoteGrid();
+                voteArea.style.display = 'block';
+                ONLINE.voted = false;
+                SFX.eliminate();
+            }
+            startOnlineTimer(d.deadline);
+        }
+
+        function setInputRow(placeholder, btnLabel, disabled) {
+            const inp = document.getElementById('og-input'), btn = document.getElementById('og-send');
+            inp.value = '';
+            inp.placeholder = placeholder;
+            inp.disabled = !!disabled || !btnLabel;
+            btn.disabled = !btnLabel;
+            btn.innerText = btnLabel || '...';
+        }
+
+        function sendOnlineInput() {
+            const inp = document.getElementById('og-input');
+            const text = inp.value.trim();
+            if (!text) return;
+            inp.value = '';
+            if (ONLINE.inputMode === 'describe') {
+                if (ONLINE.isHost) {
+                    const sp = ONLINE.players[ONLINE.turnIdx];
+                    if (sp && sp.id === ONLINE.myId) hostAcceptDescribe(sp, text.slice(0, 160));
+                } else if (ONLINE.hostConn) ONLINE.hostConn.send({ t: 'desc', text: text.slice(0, 160) });
+            } else if (ONLINE.inputMode === 'chat') {
+                if (ONLINE.isHost) hostEmit({ t: 'chat', from: ONLINE.myName, text: text.slice(0, 200) });
+                else if (ONLINE.hostConn) ONLINE.hostConn.send({ t: 'chat', text: text.slice(0, 200) });
+            } else if (ONLINE.inputMode === 'guess') {
+                ONLINE.inputMode = 'off';
+                setInputRow('Đã gửi đáp án. Kết quả sắp có...', '', true);
+                if (ONLINE.isHost) hostResolveGuess(text.slice(0, 60));
+                else if (ONLINE.hostConn) ONLINE.hostConn.send({ t: 'guess', text: text.slice(0, 60) });
+            }
+        }
+
+        function sendOnlineVote(target) {
+            if (ONLINE.phase !== 'vote' || ONLINE.voted) return;
+            ONLINE.voted = true;
+            SFX.click();
+            document.getElementById('og-vote-area').style.display = 'none';
+            addOnlineChat(null, 'Bạn đã bỏ phiếu (bí mật).', 'sys');
+            if (ONLINE.isHost) { ONLINE.votes.set(ONLINE.myId, target); hostMaybeCloseVote(); }
+            else if (ONLINE.hostConn) ONLINE.hostConn.send({ t: 'vote', target });
+        }
+
+        function buildOnlineVoteGrid() {
+            const grid = document.getElementById('og-vote-grid');
+            grid.innerHTML = '';
+            ONLINE.players.filter((p) => p.isAlive).forEach((p) => {
+                const card = document.createElement('button');
+                card.type = 'button';
+                card.className = 'suspect-card';
+                const pin = document.createElement('span'); pin.className = 'suspect-card__pin';
+                const portrait = document.createElement('canvas'); portrait.className = 'pixel-canvas suspect-card__portrait';
+                const name = document.createElement('span'); name.className = 'suspect-card__name';
+                name.innerText = p.id === ONLINE.myId ? p.name + ' (bạn)' : p.name;
+                const status = document.createElement('span'); status.className = 'suspect-card__status'; status.innerText = 'CHỌN ĐỂ BỎ PHIẾU';
+                card.append(pin, portrait, name, status);
+                card.onclick = () => sendOnlineVote(p.id);
+                grid.appendChild(card);
+                drawPixelArt(portrait, spriteSuspect, 4);
+            });
+        }
+
+        function applyVoteResult(d) {
+            ONLINE.phase = 'reveal-result';
+            document.getElementById('og-vote-area').style.display = 'none';
+            ONLINE.inputMode = 'off';
+            setInputRow('Chờ chủ phòng...', '', true);
+            const tallyText = Object.entries(d.tally).map(([id, c]) => {
+                const p = onlineGetPlayer(id);
+                return (p ? p.name : '???') + ': ' + c;
+            }).join(' • ') || 'Tất cả VỢNG';
+            if (d.eliminatedId) {
+                SFX.eliminate();
+                buzz([70, 40, 70]);
+                const rp = getRolePresentation(d.eliminatedRole);
+                addOnlineChat(null, 'Kết quả phiếu: ' + tallyText, 'sys');
+                addOnlineChat(null, d.eliminatedName + ' bị bắt giữ! Thân phận: ' + rp.label, 'sys');
+                document.getElementById('og-turn-banner').innerHTML = d.eliminatedName + ' BỊ BẮT GIỮ — <b style="color:' + rp.color + '">' + rp.label + '</b>';
+            } else {
+                addOnlineChat(null, 'Kết quả phiếu: ' + tallyText + ' — Không ai bị bắt!', 'sys');
+                document.getElementById('og-turn-banner').innerText = 'KHÔNG AI BỊ BẮT GIỮ (phiếu hòa / VỢNG)';
+            }
+            if (ONLINE.isHost) renderHostControls([{ label: 'TIẾP TỤC ĐIỀU TRA', fn: 'hostContinueAfterResult' }]);
+            else renderHostControls([{ label: '' }]);
+        }
+
+        function renderHostControls(buttons) {
+            const box = document.getElementById('og-host-controls');
+            box.innerHTML = '';
+            if (!ONLINE.isHost) {
+                if (buttons) { const p = document.createElement('p'); p.style.cssText = 'color:#888; text-align:center; width:100%;'; p.innerText = 'Chờ chủ phòng điều khiển...'; box.appendChild(p); }
+                return;
+            }
+            (buttons || []).forEach((b) => {
+                const btn = document.createElement('button');
+                btn.type = 'button';
+                btn.className = 'nes-btn is-warning';
+                btn.style.flex = '1';
+                btn.innerText = b.label;
+                btn.onclick = () => { SFX.click(); window[b.fn](); };
+                box.appendChild(btn);
+            });
+        }
+
+        function startOnlineTimer(deadline) {
+            ONLINE.deadline = deadline;
+            clearInterval(ONLINE.timerInt);
+            const fill = document.getElementById('og-timer-fill');
+            const total = Math.max(deadline - Date.now(), 1);
+            const tick = () => {
+                const left = Math.max(deadline - Date.now(), 0);
+                fill.style.width = (left / total * 100) + '%';
+                fill.className = left > 0 && left < 10000 ? 'warn' : '';
+                if (left === 0) clearInterval(ONLINE.timerInt);
+            };
+            tick();
+            ONLINE.timerInt = setInterval(tick, 250);
+        }
+
+        function addOnlineChatClear() { document.getElementById('og-chat-box').innerHTML = ''; }
+        function addOnlineChat(from, text, kind) {
+            const box = document.getElementById('og-chat-box');
+            const div = document.createElement('div');
+            div.className = 'og-msg' + (kind === 'desc' ? ' kind-desc' : kind === 'sys' ? ' kind-sys' : '');
+            if (from) {
+                const b = document.createElement('b');
+                b.textContent = from + ': ';
+                div.appendChild(b);
+            }
+            div.appendChild(document.createTextNode(text));
+            box.appendChild(div);
+            while (box.children.length > 120) box.removeChild(box.firstChild);
+            box.scrollTop = box.scrollHeight;
+        }
+
+        function applyOnlineVictory(d) {
+            ONLINE.phase = 'victory';
+            clearInterval(ONLINE.timerInt);
+            const map = {
+                Dan: ['THÁM TỬ CHIẾN THẮNG', '#3498db'],
+                GianDiep: ['TỔ CHỨC ÁO ĐEN CHIẾN THẮNG', '#e76e55'],
+                SieuTromSurvive: ['SIÊU TRỘM CHIẾN THẮNG', '#209cee'],
+                SieuTromLatKeo: ['SIÊU TRỘM LẬT KÈO THẮNG', '#209cee'],
+                CoWin: ['THẾ LỰC NGẦM CÙNG CHIẾN THẮNG', '#e76e55']
+            };
+            const info = map[d.winner] || ['KẾT THÚC CHUYÊN ÁN', '#ffffff'];
+            switchScreen('online-victory-screen');
+            renderCaseIdentity();
+            SFX.victory();
+            buzz([90, 60, 90, 60, 180]);
+            document.getElementById('ov-faction').innerHTML = '<b style="color:' + info[1] + '">' + info[0] + '</b>';
+            document.getElementById('ov-words').innerHTML = 'Mật lệnh Thám Tử: <b style="color:#fff">' + esc(d.words.civ) + '</b> • Mật lệnh Áo Đen: <b style="color:#fff">' + esc(d.words.spy) + '</b>';
+            const roles = document.getElementById('ov-roles');
+            roles.innerHTML = '';
+            d.roles.forEach((r) => {
+                const rp = getRolePresentation(r.role);
+                const row = document.createElement('div');
+                row.className = 'rule-point-row';
+                const s = document.createElement('span');
+                s.textContent = r.name + (r.isAlive ? '' : ' (đã bị bắt)');
+                s.style.color = '#fff';
+                const b = document.createElement('b');
+                b.textContent = rp.label;
+                b.style.color = rp.color;
+                row.append(s, b);
+                roles.appendChild(row);
+            });
+            const pts = document.getElementById('ov-points');
+            pts.innerHTML = '';
+            const entries = Object.entries(d.points);
+            if (entries.length === 0) pts.innerHTML = '<p style="color:#888; margin:0;">Không ai nhận điểm ván này.</p>';
+            entries.forEach(([id, v]) => {
+                const p = onlineGetPlayer(id);
+                const row = document.createElement('div');
+                row.className = 'rule-point-row';
+                const s = document.createElement('span');
+                s.textContent = p ? p.name : id;
+                s.style.color = '#ddd';
+                const b = document.createElement('b');
+                b.textContent = '+' + v + 'đ';
+                b.style.color = '#f7d51d';
+                row.append(s, b);
+                pts.appendChild(row);
+            });
+            document.getElementById('ov-again').style.display = ONLINE.isHost ? 'inline-block' : 'none';
         }
     </script>
 </body>
