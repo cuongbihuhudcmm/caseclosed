@@ -828,6 +828,16 @@
             <ul id="lobby-players"></ul>
         </div>
         <div class="nes-container is-dark" id="lobby-host-config" style="max-width:520px; margin:0 auto 16px; display:none;">
+            <div style="text-align:left; margin-bottom:12px; padding:10px; border:2px solid #e74c3c; background:#000;">
+                <label style="color:#fff; font-size:16px; display:block; cursor:pointer;">
+                    <input type="checkbox" id="lobby-c4" style="transform:scale(1.3); margin-right:6px;" onchange="document.getElementById('lobby-c4-time').style.opacity=this.checked?'1':'.45'">
+                    <span style="color:#e74c3c;">Kích hoạt bom C4 (siêu khó)</span>
+                </label>
+                <div id="lobby-c4-time" style="margin-top:8px; opacity:.45;">
+                    <span style="color:#e74c3c; font-size:16px;">Thời gian (phút):</span>
+                    <input type="number" id="lobby-c4-min" class="nes-input is-dark" value="5" min="1" max="60" style="width:80px; display:inline-block;">
+                </div>
+            </div>
             <div style="display:flex; gap:12px; margin-bottom:12px;">
                 <label style="flex:1; color:#e76e55;">Áo đen:<input type="number" id="lobby-spies" class="nes-input is-dark" value="1" min="1" style="width:100%;"></label>
                 <label style="flex:1; color:#209cee;">Siêu trộm:<input type="number" id="lobby-kids" class="nes-input is-dark" value="1" min="0" style="width:100%;"></label>
@@ -875,6 +885,7 @@
             <input type="text" id="og-input" class="nes-input is-dark" style="flex:1;" placeholder="..." maxlength="200" onkeypress="if(event.key==='Enter') sendOnlineInput()">
             <button type="button" id="og-send" class="nes-btn is-error" onclick="sendOnlineInput()">GỬI</button>
         </div>
+        <div style="text-align:center; margin-top:10px;"><button type="button" class="nes-btn is-primary" style="font-size:15px; padding:6px 12px;" onclick="showMyOnlineRole()">HỒ SƠ CỦA TÔI</button></div>
         <div id="og-host-controls" style="display:flex; gap:10px; margin-top:12px;"></div>
     </div>
 
@@ -1483,6 +1494,13 @@
             drawPixelArt('mode-spy', spriteSpy, 5);
             const inviteCode = new URLSearchParams(location.search).get('p');
             if (inviteCode) document.getElementById('online-code').value = inviteCode.toUpperCase();
+            try {
+                const saved = JSON.parse(sessionStorage.getItem('cc_online'));
+                if (saved && saved.code && !inviteCode) {
+                    document.getElementById('online-code').value = saved.code;
+                    document.getElementById('online-name').value = saved.name || '';
+                }
+            } catch (e) {}
         });
 
         if ('serviceWorker' in navigator && window.isSecureContext) {
@@ -3290,6 +3308,7 @@
 
         // --- CƠ CHẾ GỠ BOM (DEFUSAL) ---
         function openDefuseModal() {
+            if (ONLINE.c4 && ONLINE.c4.started) return openOnlineDefuse();
             if (!isDefuserMode || !c4Unlocked || c4PermanentlyLocked || defuseAttemptUsed) {
                 const reason = c4PermanentlyLocked
                     ? 'C4 đã bị khóa vĩnh viễn. Không thể vô hiệu hóa.'
@@ -3314,6 +3333,7 @@
         }
 
         function checkDefusePin() {
+            if (ONLINE.c4 && ONLINE.c4.started) return onlineSendDefusePin();
             const pinInput = document.getElementById('defuse-pin-input').value.trim();
             if (pinInput === defuserPinCode) {
                 SFX.defuse();
@@ -3337,6 +3357,7 @@
         }
 
         function submitDefuseWord() {
+            if (ONLINE.c4 && ONLINE.c4.started) return onlineSendDefuseWord();
             if (!isDefuserMode || !c4Unlocked || c4PermanentlyLocked || defuseAttemptUsed) return;
             let wordInput = document.getElementById('defuse-word-input').value.trim().toLowerCase();
             document.getElementById('defuse-error-2').style.display = 'none';
@@ -3720,10 +3741,11 @@
         const ONLINE = {
             peer: null, conns: new Map(), hostConn: null, isHost: false, code: null,
             players: [], phase: 'lobby', round: 1, turnIdx: 0, descCount: 0,
-            myId: null, myName: '', myRole: null, myWord: null,
+            myId: null, myName: '', myRole: null, myWord: null, myIsDefuser: false, myPin: null,
             votes: new Map(), turnMs: 60000, voteMs: 30000, discussMs: 120000,
             civilianWord: '', spyWord: '', guesserId: null, voted: false,
-            timerInt: null, hostTimeouts: [], inputMode: 'off'
+            timerInt: null, hostTimeouts: [], inputMode: 'off',
+            c4: null, lastElim: null, c4TimerInt: null
         };
 
         function onlineStatus(msg) { const el = document.getElementById('online-status'); if (el) el.innerText = msg || ''; }
@@ -3787,6 +3809,10 @@
             try { if (ONLINE.peer) ONLINE.peer.destroy(); } catch (e) {}
             ONLINE.peer = null; ONLINE.conns.clear(); ONLINE.hostConn = null;
             ONLINE.players = []; ONLINE.phase = 'lobby'; ONLINE.myRole = null; ONLINE.myWord = null; ONLINE.voted = false;
+            ONLINE.c4 = null; ONLINE.lastElim = null; ONLINE.myIsDefuser = false; ONLINE.myPin = null;
+            stopOnlineC4Timer();
+            document.getElementById('bomb-container').style.display = 'none';
+            try { sessionStorage.removeItem('cc_online'); } catch (e) {}
             switchScreen('mode-screen');
         }
 
@@ -3854,6 +3880,38 @@
             else if (d.t === 'guess' && ONLINE.guesserId === conn.peer) {
                 hostResolveGuess(String(d.word).slice(0, 60));
             }
+            else if (d.t === 'defusePin' && ONLINE.c4 && !ONLINE.c4.done && ONLINE.c4.unlocked && !ONLINE.c4.permLocked && p.isDefuser && p.isAlive) {
+                hostValidateDefusePin(conn.peer, String(d.pin).slice(0, 8));
+            }
+            else if (d.t === 'defuseWord' && ONLINE.c4 && !ONLINE.c4.done && ONLINE.c4.unlocked && !ONLINE.c4.permLocked && p.isDefuser && p.isAlive) {
+                hostResolveDefuseWord(String(d.word).slice(0, 60));
+            }
+        }
+
+        function hostValidateDefusePin(peerId, pin) {
+            if (pin === ONLINE.c4.pin) {
+                SFX.defuse();
+                hostSendTo(peerId, { t: 'c4PinOk' });
+            } else {
+                SFX.eliminate();
+                ONLINE.c4.attempts--;
+                if (ONLINE.c4.attempts <= 0) {
+                    ONLINE.c4.permLocked = true;
+                    ONLINE.c4.unlocked = false;
+                    hostEmit({ t: 'c4State', unlocked: false, permLocked: true, attempts: 0 });
+                    hostSendTo(peerId, { t: 'c4PinFail', attemptsLeft: 0 });
+                } else {
+                    hostSendTo(peerId, { t: 'c4PinFail', attemptsLeft: ONLINE.c4.attempts });
+                }
+            }
+        }
+
+        function hostResolveDefuseWord(word) {
+            if (ONLINE.c4.done) return;
+            ONLINE.c4.done = true;
+            const ok = word.trim().toLowerCase() === ONLINE.spyWord.toLowerCase();
+            hostEmit({ t: 'c4Result', ok });
+            if (ok) hostVictory('DefusalWin'); else hostVictory('DefusalFail');
         }
 
         function hostOnLeave(conn) {
@@ -3894,11 +3952,21 @@
             });
             ONLINE.round = 1; ONLINE.turnIdx = 0; ONLINE.descCount = 0;
             ONLINE.votes.clear(); ONLINE.voted = false; ONLINE.guesserId = null;
+            ONLINE.lastElim = null;
+            const c4Enabled = document.getElementById('lobby-c4').checked;
+            const c4Minutes = Math.max(1, parseInt(document.getElementById('lobby-c4-min').value) || 5);
+            ONLINE.c4 = c4Enabled ? { pin: String(Math.floor(1000 + Math.random() * 9000)), unlocked: false, permLocked: false, attempts: 3, done: false, started: false, minutes: c4Minutes, deadline: 0 } : null;
+            if (ONLINE.c4) {
+                const danIds = ONLINE.players.filter((p) => p.role === 'Dan').map((p) => p.id);
+                const spyIds = ONLINE.players.filter((p) => p.role === 'GianDiep').map((p) => p.id);
+                if (danIds.length) onlineGetPlayer(danIds[Math.floor(Math.random() * danIds.length)]).isDefuser = true;
+                if (spyIds.length) onlineGetPlayer(spyIds[Math.floor(Math.random() * spyIds.length)]).isDefuser = true;
+            }
             currentCaseMeta = { number: 'CASE #' + String(Math.floor(1 + Math.random() * 999)).padStart(3, '0'), title: CASE_TITLES[Math.floor(Math.random() * CASE_TITLES.length)] };
             ONLINE.phase = 'reveal';
             hostEmit({ t: 'start', meta: currentCaseMeta });
             ONLINE.players.forEach((p) => {
-                const msg = { t: 'role', role: p.role, word: p.word };
+                const msg = { t: 'role', role: p.role, word: p.word, isDefuser: !!p.isDefuser, pin: p.isDefuser ? ONLINE.c4.pin : null };
                 if (p.id === ONLINE.myId) clientOnData(msg); else hostSendTo(p.id, msg);
             });
         }
@@ -3914,9 +3982,14 @@
                 h.innerHTML = "Bạn là <b style='color:#209cee'>SIÊU TRỘM</b>! Không có mật lệnh — hãy bịa câu miêu tả cho khéo!";
             } else {
                 w.innerText = ONLINE.myWord; w.style.color = '#f7d51d';
-                h.innerHTML = ONLINE.myRole === 'Dan'
-                    ? "Bạn là <b style='color:#3498db'>THÁM TỬ</b>. Tìm ra Áo Đen đang ẩn mình!"
-                    : "Bạn là <b style='color:#e76e55'>ÁO ĐEN</b>! Mật lệnh của Thám tử RẤT GIỐNG của bạn — diễn cho giống để trà trộn!";
+                if (ONLINE.myRole === 'GianDiep') {
+                    h.innerHTML = "Bạn là <b style='color:#e76e55'>ÁO ĐEN</b>! Mật lệnh của Thám tử RẤT GIỐNG của bạn — diễn cho giống để trà trộn!";
+                } else {
+                    h.innerHTML = "Bạn là <b style='color:#3498db'>THÁM TỬ</b>. Tìm ra Áo Đen đang ẩn mình!";
+                }
+                if (ONLINE.myIsDefuser) {
+                    h.innerHTML += "<br>Bạn còn là <b style='color:#f7d51d'>CHUYÊN GIA GỠ BOM</b>! Mã bảo mật: <b style='color:#e74c3c'>[" + ONLINE.myPin + "]</b>";
+                }
             }
         }
 
@@ -3940,7 +4013,20 @@
             ONLINE.phase = 'describe';
             ONLINE.descCount = 0;
             ONLINE.turnIdx = ONLINE.players.findIndex((p) => p.isAlive);
+            if (ONLINE.c4 && !ONLINE.c4.started && !ONLINE.c4.done) {
+                ONLINE.c4.started = true;
+                ONLINE.c4.deadline = Date.now() + ONLINE.c4.minutes * 60000;
+                hostEmit({ t: 'c4Start', deadline: ONLINE.c4.deadline });
+                hostLater(ONLINE.c4.minutes * 60000, hostC4TimeUp);
+            }
             hostStartTurn();
+        }
+
+        function hostC4TimeUp() {
+            if (!ONLINE.c4 || ONLINE.c4.done || ONLINE.phase === 'victory') return;
+            ONLINE.c4.done = true;
+            hostEmit({ t: 'c4Boom' });
+            hostVictory('TimeOut');
         }
 
         function hostStartTurn() {
@@ -4011,10 +4097,19 @@
                 const p = onlineGetPlayer(elimId);
                 p.isAlive = false;
                 elimRole = p.role; elimName = p.name;
+                if (ONLINE.c4 && !ONLINE.c4.done) {
+                    if (p.isDefuser && p.role === 'Dan') { ONLINE.c4.permLocked = true; ONLINE.c4.unlocked = false; }
+                    else if (!ONLINE.c4.unlocked) ONLINE.c4.unlocked = true;
+                }
+                ONLINE.lastElim = { id: elimId, c4: ONLINE.c4 ? { unlocked: ONLINE.c4.unlocked, permLocked: ONLINE.c4.permLocked, attempts: ONLINE.c4.attempts } : null };
             }
             ONLINE.phase = 'reveal-result';
-            hostEmit({ t: 'voteResult', tally: counts, eliminatedId: elimId, eliminatedRole: elimRole, eliminatedName: elimName });
+            hostEmit({
+                t: 'voteResult', tally: counts, eliminatedId: elimId, eliminatedRole: elimRole, eliminatedName: elimName,
+                c4: ONLINE.c4 ? { unlocked: ONLINE.c4.unlocked, permLocked: ONLINE.c4.permLocked, attempts: ONLINE.c4.attempts } : null
+            });
             if (elimId && elimRole === 'SieuTrom') {
+                ONLINE.lastElim = null;
                 ONLINE.guesserId = elimId;
                 const msg = { t: 'guessAsk' };
                 if (elimId === ONLINE.myId) clientOnData(msg); else hostSendTo(elimId, msg);
@@ -4072,15 +4167,25 @@
                     if (p.role === 'GianDiep') v = S.spyWin;
                     if (p.role === 'SieuTrom' && p.isAlive) v = S.kidSurvive;
                 }
+                else if (winner === 'TimeOut' || winner === 'DefusalFail') {
+                    if (p.role === 'GianDiep') v = S.spyWin; else v = S.timeOutPenalty;
+                }
+                else if (winner === 'DefusalWin') {
+                    if (p.role === 'Dan' && p.isDefuser) v = S.defuseWin;
+                    else if (p.role === 'Dan') v = p.isAlive ? S.danAlive : S.danDead;
+                }
                 if (v) points[p.id] = v;
             });
             hostEmit({ t: 'victory', winner, roles: ONLINE.players.map((p) => ({ name: p.name, role: p.role, isAlive: p.isAlive })), points, words: { civ: ONLINE.civilianWord, spy: ONLINE.spyWord } });
         }
 
         function hostRematch() {
-            ONLINE.players.forEach((p) => { p.isAlive = true; p.ready = false; p.gone = false; p.role = null; p.word = null; });
+            ONLINE.players.forEach((p) => { p.isAlive = true; p.ready = false; p.gone = false; p.role = null; p.word = null; p.isDefuser = false; });
             hostClearTimers();
             clearInterval(ONLINE.timerInt);
+            stopOnlineC4Timer();
+            document.getElementById('bomb-container').style.display = 'none';
+            ONLINE.c4 = null; ONLINE.lastElim = null;
             ONLINE.phase = 'lobby';
             hostEmit({ t: 'reset', players: onlinePublic() });
         }
@@ -4091,6 +4196,7 @@
                 ONLINE.myId = d.you;
                 ONLINE.players = d.players.map((x) => ({ ...x }));
                 onlineStatus('');
+                try { sessionStorage.setItem('cc_online', JSON.stringify({ code: ONLINE.code, name: ONLINE.myName })); } catch (e) {}
                 switchScreen('online-lobby-screen');
                 renderLobby();
             }
@@ -4104,11 +4210,41 @@
                 addOnlineChatClear();
                 addOnlineChat(null, 'Hồ sơ mật đã được phát! Đọc kỹ rồi xác nhận sẵn sàng.', 'sys');
             }
-            else if (d.t === 'role') { ONLINE.myRole = d.role; ONLINE.myWord = d.word; showOnlineReveal(); }
+            else if (d.t === 'role') {
+                ONLINE.myRole = d.role; ONLINE.myWord = d.word;
+                ONLINE.myIsDefuser = !!d.isDefuser; ONLINE.myPin = d.pin || null;
+                showOnlineReveal();
+            }
             else if (d.t === 'phase') applyOnlinePhase(d);
             else if (d.t === 'chat') addOnlineChat(d.from, d.text, d.kind || 'chat');
             else if (d.t === 'desc') addOnlineChat(d.from, d.text, 'desc');
             else if (d.t === 'voteResult') applyVoteResult(d);
+            else if (d.t === 'c4Start') { if (!ONLINE.c4) ONLINE.c4 = {}; ONLINE.c4.deadline = d.deadline; ONLINE.c4.started = true; onlineUpdateC4UI(); }
+            else if (d.t === 'c4State') { if (!ONLINE.c4) ONLINE.c4 = {}; Object.assign(ONLINE.c4, d); onlineUpdateC4UI(); }
+            else if (d.t === 'c4PinOk') { SFX.defuse(); document.getElementById('defuse-step-1').style.display = 'none'; document.getElementById('defuse-step-2').style.display = 'block'; document.getElementById('defuse-error-1').style.display = 'none'; }
+            else if (d.t === 'c4PinFail') {
+                SFX.eliminate(); buzz([120, 50, 120]);
+                if (d.attemptsLeft <= 0) {
+                    closeDefuseModal();
+                    showModal("Nhập sai mã PIN 3 lần!<br><b style='color:#e74c3c'>Hệ thống tự khóa C4 vĩnh viễn.</b>", 'alert');
+                } else {
+                    document.getElementById('defuse-error-1').style.display = 'block';
+                    document.getElementById('defuse-pin-attempts').innerText = 'Số lần thử còn lại: ' + d.attemptsLeft;
+                }
+            }
+            else if (d.t === 'c4Boom') { addOnlineChat(null, 'HẾT GIỜ! BOM ĐÃ NỔ!', 'sys'); }
+            else if (d.t === 'c4Result') {
+                closeDefuseModal();
+                stopOnlineC4Timer();
+                addOnlineChat(null, d.ok ? 'Mật mã chính xác — ĐÃ VÔ HIỆU HÓA BOM!' : 'CẮT NHẦM DÂY... BÙM!', 'sys');
+            }
+            else if (d.t === 'undo') {
+                ONLINE.players = d.players.map((x) => ({ ...x }));
+                if (d.c4 && ONLINE.c4) Object.assign(ONLINE.c4, d.c4);
+                addOnlineChat(null, 'Chủ phòng đã HOÀN TÁC lần bắt giữ gần nhất!', 'sys');
+                onlineUpdateC4UI();
+            }
+            else if (d.t === 'victory') applyOnlineVictory(d);
             else if (d.t === 'guessAsk') {
                 ONLINE.inputMode = 'guess';
                 setInputRow('Nhập MẬT LỆNH của Thám tử để LẬT KÈO...', 'LẬT KÈO!');
@@ -4119,10 +4255,11 @@
                 addOnlineChat(null, d.ok ? 'Siêu trộm đoán TRÚNG mật lệnh!' : 'Siêu trộm đoán SAI!', 'sys');
                 if (ONLINE.isHost) renderHostControls([{ label: 'TIẾP TỤC ĐIỀU TRA', fn: 'hostContinueAfterResult' }]);
             }
-            else if (d.t === 'victory') applyOnlineVictory(d);
             else if (d.t === 'reset') {
                 ONLINE.players = d.players.map((x) => ({ ...x }));
                 ONLINE.phase = 'lobby'; ONLINE.myRole = null; ONLINE.myWord = null;
+                ONLINE.myIsDefuser = false; ONLINE.myPin = null;
+                ONLINE.c4 = null; stopOnlineC4Timer();
                 addOnlineChatClear();
                 switchScreen('online-lobby-screen');
                 renderLobby();
@@ -4139,12 +4276,14 @@
             renderHostControls(null);
             if (d.phase === 'describe') {
                 label.innerText = 'MIÊU TẢ';
-                banner.innerText = 'VÒNG ' + d.round + ' — LƯỢT MIÊU TẢ: ' + d.speaker.name.toUpperCase();
+                const aliveN = ONLINE.players.filter((p) => p.isAlive).length;
+                banner.innerText = 'VÒNG ' + d.round + ' — LƯỢT MIÊU TẢ: ' + d.speaker.name.toUpperCase() + ' • CÒN SỐNG: ' + aliveN;
                 const isMe = d.speaker.id === ONLINE.myId;
                 setInputRow(isMe ? 'Nhập 1 câu miêu tả Mật lệnh của bạn...' : 'Đang chờ ' + d.speaker.name + ' miêu tả...', isMe ? 'GỬI' : '');
                 ONLINE.inputMode = isMe ? 'describe' : 'off';
                 voteArea.style.display = 'none';
                 SFX.tick();
+                if (isMe) buzz(60);
             } else if (d.phase === 'discuss') {
                 label.innerText = 'THẢO LUẬN';
                 banner.innerText = 'THẢO LUẬN! AI ĐANG DIỄN SÂU?';
@@ -4164,6 +4303,7 @@
                 SFX.eliminate();
             }
             startOnlineTimer(d.deadline);
+            onlineUpdateC4UI();
         }
 
         function setInputRow(placeholder, btnLabel, disabled) {
@@ -4185,6 +4325,8 @@
                     const sp = ONLINE.players[ONLINE.turnIdx];
                     if (sp && sp.id === ONLINE.myId) hostAcceptDescribe(sp, text.slice(0, 160));
                 } else if (ONLINE.hostConn) ONLINE.hostConn.send({ t: 'desc', text: text.slice(0, 160) });
+                ONLINE.inputMode = 'off';
+                setInputRow('Đã gửi. Chờ người tiếp theo...', '', true);
             } else if (ONLINE.inputMode === 'chat') {
                 if (ONLINE.isHost) hostEmit({ t: 'chat', from: ONLINE.myName, text: text.slice(0, 200) });
                 else if (ONLINE.hostConn) ONLINE.hostConn.send({ t: 'chat', text: text.slice(0, 200) });
@@ -4230,6 +4372,8 @@
             document.getElementById('og-vote-area').style.display = 'none';
             ONLINE.inputMode = 'off';
             setInputRow('Chờ chủ phòng...', '', true);
+            if (d.c4 && ONLINE.c4) Object.assign(ONLINE.c4, d.c4);
+            const aliveN = ONLINE.players.filter((p) => p.isAlive).length;
             const tallyText = Object.entries(d.tally).map(([id, c]) => {
                 const p = onlineGetPlayer(id);
                 return (p ? p.name : '???') + ': ' + c;
@@ -4240,13 +4384,17 @@
                 const rp = getRolePresentation(d.eliminatedRole);
                 addOnlineChat(null, 'Kết quả phiếu: ' + tallyText, 'sys');
                 addOnlineChat(null, d.eliminatedName + ' bị bắt giữ! Thân phận: ' + rp.label, 'sys');
-                document.getElementById('og-turn-banner').innerHTML = d.eliminatedName + ' BỊ BẮT GIỮ — <b style="color:' + rp.color + '">' + rp.label + '</b>';
+                document.getElementById('og-turn-banner').innerHTML = d.eliminatedName + ' BỊ BẮT GIỮ — <b style="color:' + rp.color + '">' + rp.label + '</b> • CÒN SỐNG: ' + aliveN;
             } else {
                 addOnlineChat(null, 'Kết quả phiếu: ' + tallyText + ' — Không ai bị bắt!', 'sys');
-                document.getElementById('og-turn-banner').innerText = 'KHÔNG AI BỊ BẮT GIỮ (phiếu hòa / VỢNG)';
+                document.getElementById('og-turn-banner').innerText = 'KHÔNG AI BỊ BẮT GIỮ (phiếu hòa / VỢNG) • CÒN SỐNG: ' + aliveN;
             }
-            if (ONLINE.isHost) renderHostControls([{ label: 'TIẾP TỤC ĐIỀU TRA', fn: 'hostContinueAfterResult' }]);
-            else renderHostControls([{ label: '' }]);
+            if (ONLINE.isHost) {
+                const buttons = [{ label: 'TIẾP TỤC ĐIỀU TRA', fn: 'hostContinueAfterResult' }];
+                if (ONLINE.lastElim) buttons.push({ label: 'HOÀN TÁC BẮT GIỮ', fn: 'hostUndoElimination' });
+                renderHostControls(buttons);
+            } else renderHostControls([{ label: '' }]);
+            onlineUpdateC4UI();
         }
 
         function renderHostControls(buttons) {
@@ -4301,12 +4449,18 @@
         function applyOnlineVictory(d) {
             ONLINE.phase = 'victory';
             clearInterval(ONLINE.timerInt);
+            stopOnlineC4Timer();
+            closeDefuseModal();
+            document.getElementById('bomb-container').style.display = 'none';
             const map = {
                 Dan: ['THÁM TỬ CHIẾN THẮNG', '#3498db'],
                 GianDiep: ['TỔ CHỨC ÁO ĐEN CHIẾN THẮNG', '#e76e55'],
                 SieuTromSurvive: ['SIÊU TRỘM CHIẾN THẮNG', '#209cee'],
                 SieuTromLatKeo: ['SIÊU TRỘM LẬT KÈO THẮNG', '#209cee'],
-                CoWin: ['THẾ LỰC NGẦM CÙNG CHIẾN THẮNG', '#e76e55']
+                CoWin: ['THẾ LỰC NGẦM CÙNG CHIẾN THẮNG', '#e76e55'],
+                TimeOut: ['ÁO ĐEN THẮNG — BOM ĐÃ NỔ', '#e74c3c'],
+                DefusalFail: ['ÁO ĐEN THẮNG — CẮT SAI DÂY', '#e74c3c'],
+                DefusalWin: ['ĐÃ GỠ BOM THÀNH CÔNG!', '#27ae60']
             };
             const info = map[d.winner] || ['KẾT THÚC CHUYÊN ÁN', '#ffffff'];
             switchScreen('online-victory-screen');
@@ -4348,6 +4502,104 @@
                 pts.appendChild(row);
             });
             document.getElementById('ov-again').style.display = ONLINE.isHost ? 'inline-block' : 'none';
+        }
+
+        function openOnlineDefuse() {
+            if (!ONLINE.c4 || ONLINE.c4.done || !ONLINE.c4.unlocked || ONLINE.c4.permLocked || ONLINE.c4.attempts <= 0 || !ONLINE.myIsDefuser) {
+                const reason = !ONLINE.c4 || ONLINE.c4.done ? 'Bom không thể gỡ lúc này.'
+                    : ONLINE.c4.permLocked ? 'C4 đã bị khóa vĩnh viễn.'
+                    : !ONLINE.c4.unlocked ? 'Chưa có lần bắt giữ nào. C4 vẫn đang khóa.'
+                    : 'Chỉ Chuyên gia giữ PIN mới gỡ được bom.';
+                showModal('<div style=\'text-align:center\'>' + reason + '</div>', 'alert');
+                return;
+            }
+            document.getElementById('defuse-step-1').style.display = 'block';
+            document.getElementById('defuse-step-2').style.display = 'none';
+            document.getElementById('defuse-pin-input').value = '';
+            document.getElementById('defuse-error-1').style.display = 'none';
+            document.getElementById('defuse-error-2').style.display = 'none';
+            document.getElementById('defuse-pin-attempts').innerText = 'Số lần thử còn lại: ' + ONLINE.c4.attempts;
+            document.getElementById('defuse-modal-overlay').style.display = 'flex';
+        }
+
+        function onlineSendDefusePin() {
+            const pin = document.getElementById('defuse-pin-input').value.trim();
+            if (!pin) return;
+            if (ONLINE.isHost) hostValidateDefusePin(ONLINE.myId, pin);
+            else if (ONLINE.hostConn) ONLINE.hostConn.send({ t: 'defusePin', pin });
+        }
+
+        function onlineSendDefuseWord() {
+            const word = document.getElementById('defuse-word-input').value.trim();
+            document.getElementById('defuse-error-2').style.display = 'none';
+            if (!word) {
+                SFX.eliminate();
+                document.getElementById('defuse-error-2').style.display = 'block';
+                return;
+            }
+            closeDefuseModal();
+            if (ONLINE.isHost) hostResolveDefuseWord(word.slice(0, 60));
+            else if (ONLINE.hostConn) ONLINE.hostConn.send({ t: 'defuseWord', word: word.slice(0, 60) });
+        }
+
+        function onlineUpdateC4UI() {
+            const box = document.getElementById('bomb-container');
+            const gameActive = document.getElementById('online-game-screen').classList.contains('active');
+            if (!ONLINE.c4 || !ONLINE.c4.started || ONLINE.c4.done || ONLINE.phase === 'victory' || ONLINE.phase === 'lobby' || !gameActive) {
+                box.style.display = 'none';
+                stopOnlineC4Timer();
+                return;
+            }
+            box.style.display = 'flex';
+            const btn = document.getElementById('btn-defuse');
+            const status = document.getElementById('c4-status');
+            const me = onlineGetPlayer(ONLINE.myId);
+            const iAmDefuser = !!(me && me.isDefuser && me.isAlive);
+            if (ONLINE.c4.permLocked) {
+                btn.disabled = true; btn.innerText = 'C4 VÔ HIỆU';
+                status.innerText = 'C4 ĐÃ BỊ KHÓA VĨNH VIỄN';
+            } else if (!ONLINE.c4.unlocked) {
+                btn.disabled = true; btn.innerText = 'GỠ BOM [KHÓA]';
+                status.innerText = 'C4 MỞ SAU LẦN BẮT GIỮ ĐẦU TIÊN';
+            } else if (iAmDefuser) {
+                btn.disabled = false; btn.innerText = 'GỠ BOM [X]';
+                status.innerText = 'BẠN GIỮ PIN — GỠ NGAY KẺO NỔ!';
+            } else {
+                btn.disabled = true; btn.innerText = 'GỠ BOM [KHÓA]';
+                status.innerText = 'C4 ĐÃ MỞ — CHUYÊN GIA HÃY HÀNH ĐỘNG';
+            }
+            clearInterval(ONLINE.c4TimerInt);
+            const tick = () => {
+                if (!ONLINE.c4 || !ONLINE.c4.deadline) return;
+                const left = Math.max(ONLINE.c4.deadline - Date.now(), 0);
+                const m = Math.floor(left / 60000).toString().padStart(2, '0');
+                const s = Math.floor(left / 1000 % 60).toString().padStart(2, '0');
+                document.getElementById('timer-text').innerText = m + ':' + s;
+                document.getElementById('bomb-timer').className = left > 0 && left <= 10000 ? 'bomb-warning' : '';
+            };
+            tick();
+            ONLINE.c4TimerInt = setInterval(tick, 250);
+        }
+
+        function stopOnlineC4Timer() { clearInterval(ONLINE.c4TimerInt); ONLINE.c4TimerInt = null; }
+
+        function showMyOnlineRole() {
+            const w = ONLINE.myRole === 'SieuTrom' ? '??? (Siêu trộm)' : ONLINE.myWord;
+            let html = 'Mật lệnh của bạn:<br><b style="color:#f7d51d; font-size:30px;">' + esc(w) + '</b>';
+            if (ONLINE.myRole === 'GianDiep') html += '<br><span style="color:#e76e55;">Bạn là ÁO ĐEN — diễn cho giống!</span>';
+            else if (ONLINE.myRole === 'Dan') html += '<br><span style="color:#3498db;">Bạn là THÁM TỬ.</span>';
+            else html += '<br><span style="color:#209cee;">Bạn là SIÊU TRỘM — bịa đi!</span>';
+            if (ONLINE.myIsDefuser) html += '<br>Mã PIN gỡ bom: <b style="color:#e74c3c;">[' + ONLINE.myPin + ']</b>';
+            showModal('<div style="text-align:center;">' + html + '</div>', 'alert');
+        }
+
+        function hostUndoElimination() {
+            if (!ONLINE.lastElim) return;
+            const p = onlineGetPlayer(ONLINE.lastElim.id);
+            if (p) p.isAlive = true;
+            if (ONLINE.c4 && ONLINE.lastElim.c4) Object.assign(ONLINE.c4, ONLINE.lastElim.c4);
+            ONLINE.lastElim = null;
+            hostEmit({ t: 'undo', players: onlinePublic(), c4: ONLINE.c4 ? { unlocked: ONLINE.c4.unlocked, permLocked: ONLINE.c4.permLocked, attempts: ONLINE.c4.attempts } : null });
         }
     </script>
 </body>
