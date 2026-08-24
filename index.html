@@ -387,50 +387,143 @@
             .rule-file-no { display: none; }
         }
 
-        /* --- INTRO RUOT DUOI 3 PHE --- */
-        #chase-screen { position: fixed; inset: 0; z-index: 10002; background: #07070d; display: none; overflow: hidden; cursor: pointer; }
+        /* --- CUTSCENE MO MAN: 5 PHAN CANH --- */
+        #chase-screen { position: fixed; inset: 0; z-index: 10002; background: #050508; display: none; overflow: hidden; cursor: pointer; }
         #chase-screen.active { display: block; }
-        .chase-speedlines {
-            position: absolute; inset: 0;
-            background: repeating-linear-gradient(180deg, transparent 0 34px, rgba(255, 255, 255, .05) 34px 38px);
-            animation: chaseLines .25s linear infinite;
-        }
-        @keyframes chaseLines { to { transform: translateY(-38px); } }
-        .chase-alert {
-            position: absolute; top: 15%; width: 100%; text-align: center;
-            color: #e74c3c; font-size: clamp(48px, 10vw, 84px); letter-spacing: 14px;
-            text-shadow: 4px 4px 0 #000; opacity: 0;
-            animation: chaseAlertBlink .3s steps(2) 8 forwards;
-        }
-        @keyframes chaseAlertBlink { 0% { opacity: 1; } 49% { opacity: 1; } 50% { opacity: 0; } 100% { opacity: 0; } }
-        .chase-runner { position: absolute; image-rendering: pixelated; }
-        .chase-spy { top: 54%; left: -100px; animation: chaseRunRight 2.4s steps(24) .7s forwards, runBounce .16s steps(2) infinite alternate; }
-        .chase-dan { top: 54%; left: -190px; animation: chaseRunRight 2.4s steps(24) .85s forwards, runBounce .16s steps(2) infinite alternate .1s; }
-        .chase-kid { top: 24%; right: -100px; animation: chaseRunLeft 2s steps(20) 2.7s forwards, runBounce .16s steps(2) infinite alternate; }
-        @keyframes chaseRunRight { to { left: 112%; } }
-        @keyframes chaseRunLeft { to { right: 112%; } }
-        @keyframes runBounce { from { transform: translateY(0); } to { transform: translateY(-9px); } }
-        .chase-flash { position: absolute; inset: 0; background: #fff; opacity: 0; pointer-events: none; animation: chaseFlash .4s steps(3) 4.9s forwards; }
-        @keyframes chaseFlash { 0% { opacity: 0; } 40% { opacity: 1; } 100% { opacity: 0; } }
-        .chase-title {
-            position: absolute; inset: 0; display: flex; flex-direction: column;
-            align-items: center; justify-content: center; gap: 22px; opacity: 0;
-            animation: chaseTitleIn .5s steps(5) 5.2s forwards;
-        }
-        @keyframes chaseTitleIn { from { opacity: 0; transform: scale(2.4); } to { opacity: 1; transform: scale(1); } }
-        .chase-title h1 {
-            color: #f7d51d; font-size: clamp(44px, 10vw, 88px); margin: 0; letter-spacing: 8px;
-            text-shadow: 6px 6px 0 #e76e55, 3px 3px 0 #000;
-        }
-        .chase-stamp {
-            color: #d94b3d; border: 5px solid currentColor; padding: 6px 16px;
-            font-size: clamp(18px, 4vw, 30px); letter-spacing: 6px;
-            transform: rotate(-6deg); background: rgba(30, 14, 10, .72);
-        }
-        .chase-tap { position: absolute; bottom: 12%; width: 100%; text-align: center; color: #27ae60; font-size: 26px; opacity: 0; animation: chaseTapIn .2s steps(2) 6.2s forwards; }
-        @keyframes chaseTapIn { to { opacity: 1; } }
-        #chase-screen.shake { animation: chaseShake .4s steps(6) 1; }
-        @keyframes chaseShake { 0% { transform: translate(5px, 3px); } 25% { transform: translate(-5px, -3px); } 50% { transform: translate(4px, -4px); } 75% { transform: translate(-4px, 3px); } 100% { transform: none; } }
+        .cs-scene { position: absolute; inset: 0; display: none; }
+        .cs-scene.active { display: block; }
+        .chase-skip { position: absolute; bottom: 3%; right: 4%; color: #666; font-size: 16px; letter-spacing: 2px; z-index: 50; }
+        .cs-moon { position: absolute; top: 7%; right: 8%; width: 84px; height: 84px; border-radius: 50%;
+            background: radial-gradient(circle at 35% 35%, #fdf6d8, #e8dba4 60%, #cdbd85);
+            box-shadow: 0 0 44px 12px rgba(244, 236, 205, .25), inset -8px -6px 0 rgba(31, 28, 22, .18); }
+
+        #cs1 { background: linear-gradient(#05050a 0%, #0a0a16 60%, #10101e 100%); }
+        .cs-lightning { position: absolute; inset: 0; background: #dfe6ff; opacity: 0; }
+        #cs1.active .cs-lightning { animation: csLightning 1s steps(2) .15s 2; }
+        @keyframes csLightning { 0% { opacity: 0; } 20% { opacity: .9; } 35% { opacity: .1; } 55% { opacity: .75; } 100% { opacity: 0; } }
+        .cs-roof { position: absolute; left: 0; right: 0; bottom: 0; height: 24%; background: #17131f; border-top: 5px solid #2c2438; }
+        .cs-roofdoor { position: absolute; right: 12%; bottom: 24%; width: 54px; height: 84px; background: #241a2c; border: 4px solid #0d0a12; border-bottom: none; transform-origin: bottom left; }
+        #cs1.active .cs-roofdoor { animation: csDoorBurst .5s steps(4) 1.8s forwards; }
+        @keyframes csDoorBurst { to { transform: rotate(-78deg) translate(-30px, -8px); opacity: .8; } }
+        .cs1-kaito { position: absolute; right: 34%; bottom: calc(24% + 6px); }
+        #cs1.active .cs1-kaito { animation: csBounce .5s steps(3) infinite alternate; }
+        .cs1-gem { position: absolute; right: 31%; bottom: calc(24% + 74px); filter: drop-shadow(0 0 8px #3aa0ff) drop-shadow(0 0 16px #3aa0ff); }
+        #cs1.active .cs1-gem { animation: csGemToss 1.1s ease-in-out infinite alternate; }
+        @keyframes csGemToss { from { transform: translateY(0); } to { transform: translateY(-34px); } }
+        @keyframes csBounce { from { transform: translateY(0); } to { transform: translateY(-5px); } }
+        .cs1-black { position: absolute; bottom: calc(24% + 4px); transform: translateX(340%); }
+        .cs1-b1 { right: 22%; } .cs1-b2 { right: 15%; bottom: calc(24% + 2px); } .cs1-b3 { right: 28%; bottom: calc(24% + 2px); }
+        #cs1.active .cs1-b1 { animation: csBlackIn .4s steps(4) 2s forwards; }
+        #cs1.active .cs1-b2 { animation: csBlackIn .4s steps(4) 2.2s forwards; }
+        #cs1.active .cs1-b3 { animation: csBlackIn .4s steps(4) 2.4s forwards; }
+        @keyframes csBlackIn { to { transform: translateX(0); } }
+
+        #cs2 { background: linear-gradient(#05050a, #0c0c18); }
+        .cs2-black { position: absolute; left: 4%; }
+        .cs2-b1 { top: 40%; } .cs2-b2 { top: 44%; left: 1%; } .cs2-b3 { top: 37%; left: 8%; }
+        .cs-muzzle { position: absolute; left: 13%; top: 44%; width: 26px; height: 18px; background: #ffe27a; opacity: 0; clip-path: polygon(0 40%, 100% 0, 70% 50%, 100% 100%, 0 60%); }
+        #cs2.active .cs-muzzle { animation: csMuzzle .45s steps(2) infinite; }
+        @keyframes csMuzzle { 0%, 60% { opacity: 0; } 70%, 100% { opacity: 1; } }
+        .cs-bullet { position: absolute; left: 15%; top: 46%; width: 16px; height: 5px; background: #f7d51d; box-shadow: 2px 2px 0 #7a5c00; opacity: 0; }
+        #cs2.active .cs-bu1 { animation: csBullet .5s linear infinite; }
+        #cs2.active .cs-bu2 { animation: csBullet .5s linear .12s infinite; }
+        #cs2.active .cs-bu3 { animation: csBullet .5s linear .24s infinite; }
+        #cs2.active .cs-bu4 { animation: csBullet .5s linear .36s infinite; }
+        @keyframes csBullet { 0% { opacity: 1; transform: translate(0, -6px); } 100% { opacity: 1; transform: translate(46vw, 30px); } }
+        .cs2-unit { position: absolute; left: 34%; top: 30%; }
+        #cs2.active .cs2-unit { animation: csGlide 1.5s steps(10) .55s forwards, csFall 1s steps(8) 2.15s forwards; }
+        @keyframes csGlide { to { transform: translate(26vw, 22vh) rotate(-10deg); } }
+        @keyframes csFall { from { transform: translate(26vw, 22vh) rotate(-10deg); } to { transform: translate(30vw, 68vh) rotate(24deg); } }
+        .cs-glider { position: absolute; left: 50%; top: -34px; transform: translateX(-50%); width: 0; height: 0;
+            border-left: 58px solid transparent; border-right: 58px solid transparent; border-bottom: 30px solid #e8e2d0;
+            filter: drop-shadow(2px 2px 0 rgba(0,0,0,.5)); }
+        .cs-ball { position: absolute; right: -80px; top: 12%; filter: drop-shadow(0 0 10px #f7d51d) drop-shadow(0 0 22px #f7d51d); }
+        #cs2.active .cs-ball { animation: csBallFly .5s linear 1.5s forwards; }
+        @keyframes csBallFly { to { transform: translate(-58vw, 34vh); } }
+        .cs2-dan { position: absolute; right: 6%; bottom: 10%; opacity: 0; transform: scale(2); filter: drop-shadow(3px 3px 0 #1d6b9e); }
+        #cs2.active .cs2-dan { animation: csDanReveal .4s steps(3) 2.6s forwards; }
+        @keyframes csDanReveal { to { opacity: 1; transform: scale(1); } }
+
+        .cs-citylights { position: absolute; inset: 0 0 30% 0;
+            background-image: radial-gradient(2px 2px at 40px 60px, #f7d51d 50%, transparent 51%),
+                radial-gradient(2px 2px at 160px 110px, #e76e55 50%, transparent 51%),
+                radial-gradient(3px 3px at 260px 40px, #fdf6d8 50%, transparent 51%),
+                radial-gradient(2px 2px at 340px 130px, #3498db 50%, transparent 51%);
+            background-size: 400px 180px; opacity: .8; }
+        #cs3.active .cs-citylights, #cs4.active .cs-citylights { animation: csCityScroll .22s linear infinite; }
+        @keyframes csCityScroll { to { transform: translateX(-400px); } }
+        .cs-train { position: absolute; left: 0; right: 0; bottom: 0; height: 32%; background: #333d4c; border-top: 7px solid #8d99a8; overflow: hidden; }
+        .cs-train-windows { position: absolute; inset: 12px 0;
+            background: repeating-linear-gradient(90deg, transparent 0 46px, rgba(210, 230, 255, .16) 46px 96px);
+            animation: csTrainScroll .4s linear infinite; }
+        @keyframes csTrainScroll { to { transform: translateX(-142px); } }
+        .cs-sign { position: absolute; bottom: 34%; width: 34px; height: 34px; background: #f7d51d; border: 4px solid #b3541e;
+            transform: rotate(45deg); opacity: 0; z-index: 1; }
+        #cs3.active .cs-sg1 { animation: csSignSweep 1.1s linear infinite; }
+        #cs3.active .cs-sg2 { animation: csSignSweep 1.1s linear .37s infinite; }
+        #cs3.active .cs-sg3 { animation: csSignSweep 1.1s linear .74s infinite; }
+        @keyframes csSignSweep { 0% { opacity: 1; left: 106%; } 100% { opacity: 1; left: -12%; } }
+        .cs3-kaito { position: absolute; bottom: calc(32% + 4px); left: 56%; }
+        #cs3.active .cs3-kaito { animation: csRunBob .34s steps(3) infinite alternate; }
+        @keyframes csRunBob { from { transform: translateX(0); } to { transform: translateX(-26px); } }
+        .cs3-dan-unit { position: absolute; bottom: calc(32% + 4px); left: 34%; }
+        #cs3.active .cs3-dan-unit { animation: csRunBob .34s steps(3) .1s infinite alternate; }
+        .cs-skate { position: absolute; left: 50%; bottom: -10px; transform: translateX(-50%); width: 52px; height: 8px; background: #222; }
+        .cs-flame { position: absolute; left: 100%; top: -4px; width: 30px; height: 12px; background: linear-gradient(90deg, #63c2ff, #2196f3);
+            filter: blur(1px); animation: csFlame .12s steps(2) infinite; }
+        @keyframes csFlame { 50% { transform: scaleX(.6) translateX(8px); } }
+
+        #cs4 { background: #08080f; }
+        .cs-rotor { position: absolute; top: 12%; right: 4%; width: 200px; height: 5px; background: #aab; opacity: 0; }
+        #cs4.active .cs-rotor { opacity: 1; animation: csRotor .14s linear infinite; }
+        @keyframes csRotor { 0%, 100% { transform: scaleX(1); } 50% { transform: scaleX(.15); } }
+        .cs4-heli { position: absolute; top: 13%; right: -30%; }
+        #cs4.active .cs4-heli { animation: csHeliIn 1.1s steps(8) forwards; }
+        @keyframes csHeliIn { to { right: 6%; } }
+        .cs-vbullet { position: absolute; width: 5px; height: 16px; background: #f7d51d; opacity: 0; }
+        .cs-vb1 { top: 24%; right: 13%; } .cs-vb2 { top: 24%; right: 11%; } .cs-vb3 { top: 24%; right: 15%; }
+        #cs4.active .cs-vb1 { animation: csVBullet .3s linear infinite; }
+        #cs4.active .cs-vb2 { animation: csVBullet .3s linear .1s infinite; }
+        #cs4.active .cs-vb3 { animation: csVBullet .3s linear .2s infinite; }
+        @keyframes csVBullet { 0% { opacity: 1; transform: translateY(0); } 100% { opacity: 1; transform: translateY(46vh); } }
+        .cs-muzzle2 { left: auto; right: 12%; top: 22%; position: absolute; }
+        #cs4.active .cs-muzzle2 { animation: csMuzzle .4s steps(2) infinite; }
+        .cs4-kaito { position: absolute; bottom: calc(32% + 4px); left: 56%; }
+        #cs4.active .cs4-kaito { animation: csRunBob .34s steps(3) infinite alternate; }
+        .cs4-dan { position: absolute; bottom: calc(32% + 4px); left: 34%; }
+        #cs4.active .cs4-dan { animation: csRunBob .34s steps(3) .1s infinite alternate; }
+        .cs-smoke { position: absolute; left: 58%; bottom: calc(32% + 30px); width: 30px; height: 30px; border-radius: 50%;
+            background: #9aa; opacity: 0; }
+        #cs4.active .cs-sm1 { animation: csSmoke .9s steps(5) 2.1s forwards; }
+        #cs4.active .cs-sm2 { animation: csSmoke .9s steps(5) 2.3s forwards; }
+        #cs4.active .cs-sm3 { animation: csSmoke .9s steps(5) 2.5s forwards; }
+        @keyframes csSmoke { 0% { opacity: .85; transform: scale(.4); } 100% { opacity: 0; transform: scale(3) translateY(-30px); } }
+        .cs-debris { position: absolute; left: 44%; bottom: calc(32% + 8px); width: 26px; height: 12px; background: #7d8794; border: 2px solid #4a525c; opacity: 0; }
+        #cs4.active .cs-debris { animation: csDebris .6s steps(7) 2.9s forwards; }
+        @keyframes csDebris { 0% { opacity: 1; transform: translate(0, 0) rotate(0); } 100% { opacity: 1; transform: translate(34vw, -46vh) rotate(320deg); } }
+        .cs-helismoke { position: absolute; top: 16%; right: 10%; width: 24px; height: 24px; border-radius: 50%; background: #888; opacity: 0; }
+        #cs4.active .cs-helismoke { animation: csSmoke 1s steps(5) 3.5s infinite; }
+        #cs4.active.cs-slowmo .cs-scene * { animation-play-state: paused !important; }
+        #cs4.cs-slowmo { transform: scale(1.07); transition: transform .3s; }
+        .cs-tunnel { position: absolute; top: 0; bottom: 0; width: 0; background: #000; z-index: 20; }
+        .cs-tunnel-l { left: 0; } .cs-tunnel-r { right: 0; }
+        #cs4.active .cs-tunnel-l { animation: csTunnel .55s steps(6) 4.2s forwards; }
+        #cs4.active .cs-tunnel-r { animation: csTunnel .55s steps(6) 4.2s forwards; }
+        @keyframes csTunnel { to { width: 56%; } }
+
+        #cs5 { background: #000; }
+        #cs5-particles { position: absolute; inset: 0; }
+        #cs5-particles span { position: absolute; left: 50%; top: 46%; width: 8px; height: 8px;
+            animation: csParticle 1.1s steps(8) forwards; }
+        @keyframes csParticle { from { transform: translate(var(--px), var(--py)); opacity: 1; } to { transform: translate(0, 0) scale(.3); opacity: .9; } }
+        .cs5-title { position: absolute; left: 0; right: 0; top: 40%; text-align: center;
+            font-size: clamp(44px, 9vw, 92px); letter-spacing: 10px; color: #e8e6e0; opacity: 0;
+            text-shadow: 4px 4px 0 #a8271f, 8px 8px 0 #000; }
+        .cs5-title.show { animation: csTitleSlam .4s steps(4) forwards; }
+        @keyframes csTitleSlam { from { opacity: 0; transform: scale(2.6); } to { opacity: 1; transform: scale(1); } }
+        .cs5-sub { position: absolute; left: 0; right: 0; top: 56%; text-align: center;
+            color: #f7d51d; font-size: 26px; letter-spacing: 6px; opacity: 0; }
+        .cs5-sub.show { opacity: 1; animation: blinkerAnim 1s steps(2) infinite; }
 
         /* --- CHON CHE DO --- */
         .mode-cards { display: flex; gap: 20px; justify-content: center; flex-wrap: wrap; max-width: 760px; margin: 36px auto 0; padding: 0 10px; }
@@ -765,19 +858,74 @@
         </div>
     </div>
 
-    <!-- CẢNH MỞ MÀN: 3 PHE RƯỢT ĐUỔI + TITLE -->
+    <!-- CẮT CẢNH MỞ MÀN: VỤ TRỘM DƯỚI TRĂNG -->
     <div id="chase-screen">
-        <div class="chase-speedlines"></div>
-        <div class="chase-alert">!!!</div>
-        <canvas id="chase-kid" class="pixel-canvas chase-runner chase-kid"></canvas>
-        <canvas id="chase-spy" class="pixel-canvas chase-runner chase-spy"></canvas>
-        <canvas id="chase-dan" class="pixel-canvas chase-runner chase-dan"></canvas>
-        <div class="chase-flash"></div>
-        <div class="chase-title">
-            <h1>CASECLOSED</h1>
-            <p class="chase-stamp">ĐIỆP VỤ TỐI MẬT</p>
+        <div class="cs-scene" id="cs1">
+            <div class="cs-lightning"></div>
+            <div class="cs-moon"></div>
+            <div class="city-skyline skyline-far" style="opacity:.5;"></div>
+            <div class="cs-roof"></div>
+            <div class="cs-roofdoor"></div>
+            <canvas id="cs1-kaito" class="pixel-canvas cs1-kaito"></canvas>
+            <canvas id="cs1-gem" class="pixel-canvas cs1-gem"></canvas>
+            <canvas id="cs1-b1" class="pixel-canvas cs1-black cs1-b1"></canvas>
+            <canvas id="cs1-b2" class="pixel-canvas cs1-black cs1-b2"></canvas>
+            <canvas id="cs1-b3" class="pixel-canvas cs1-black cs1-b3"></canvas>
         </div>
-        <p class="chase-tap blinker">- CHẠM ĐỂ TIẾP TỤC -</p>
+        <div class="cs-scene" id="cs2">
+            <div class="cs-moon" style="top:6%; right:10%; width:60px; height:60px;"></div>
+            <canvas id="cs2-b1" class="pixel-canvas cs2-black cs2-b1"></canvas>
+            <canvas id="cs2-b2" class="pixel-canvas cs2-black cs2-b2"></canvas>
+            <canvas id="cs2-b3" class="pixel-canvas cs2-black cs2-b3"></canvas>
+            <div class="cs-muzzle"></div>
+            <div class="cs-bullet cs-bu1"></div>
+            <div class="cs-bullet cs-bu2"></div>
+            <div class="cs-bullet cs-bu3"></div>
+            <div class="cs-bullet cs-bu4"></div>
+            <div class="cs2-unit" id="cs2-unit">
+                <div class="cs-glider"></div>
+                <canvas id="cs2-kaito" class="pixel-canvas"></canvas>
+            </div>
+            <div class="cs-ball" id="cs2-ball"><canvas id="cs2-ballc" class="pixel-canvas"></canvas></div>
+            <canvas id="cs2-dan" class="pixel-canvas cs2-dan"></canvas>
+        </div>
+        <div class="cs-scene" id="cs3">
+            <div class="cs-citylights"></div>
+            <div class="cs-train"><div class="cs-train-windows"></div></div>
+            <div class="cs-sign cs-sg1"></div>
+            <div class="cs-sign cs-sg2"></div>
+            <div class="cs-sign cs-sg3"></div>
+            <canvas id="cs3-kaito" class="pixel-canvas cs3-kaito"></canvas>
+            <div class="cs3-dan-unit">
+                <canvas id="cs3-dan" class="pixel-canvas"></canvas>
+                <div class="cs-skate"><div class="cs-flame"></div></div>
+            </div>
+        </div>
+        <div class="cs-scene" id="cs4">
+            <div class="cs-citylights"></div>
+            <div class="cs-train"><div class="cs-train-windows"></div></div>
+            <div class="cs-rotor"></div>
+            <canvas id="cs4-heli" class="pixel-canvas cs4-heli"></canvas>
+            <div class="cs-vbullet cs-vb1"></div>
+            <div class="cs-vbullet cs-vb2"></div>
+            <div class="cs-vbullet cs-vb3"></div>
+            <div class="cs-muzzle cs-muzzle2"></div>
+            <canvas id="cs4-kaito" class="pixel-canvas cs4-kaito"></canvas>
+            <canvas id="cs4-dan" class="pixel-canvas cs4-dan"></canvas>
+            <div class="cs-smoke cs-sm1"></div>
+            <div class="cs-smoke cs-sm2"></div>
+            <div class="cs-smoke cs-sm3"></div>
+            <div class="cs-debris"></div>
+            <div class="cs-helismoke"></div>
+            <div class="cs-tunnel cs-tunnel-l"></div>
+            <div class="cs-tunnel cs-tunnel-r"></div>
+        </div>
+        <div class="cs-scene" id="cs5">
+            <div id="cs5-particles"></div>
+            <div class="cs5-title" id="cs5-title">CASECLOSED</div>
+            <div class="cs5-sub blinker" id="cs5-sub">PRESS START</div>
+        </div>
+        <p class="chase-skip blinker">CHẠM ĐỂ BỎ QUA ►</p>
     </div>
 
     <!-- CHỌN CHẾ ĐỘ -->
@@ -1170,29 +1318,155 @@
 
         let chaseDone = false;
         let chaseTimers = [];
-        function showChaseIntro() {
-            const s = document.getElementById('chase-screen');
-            drawPixelArt('chase-spy', spriteSpy, 5);
-            drawPixelArt('chase-dan', spriteDetective, 5);
-            drawPixelArt('chase-kid', spriteKid, 5);
-            s.classList.remove('shake');
-            s.classList.add('active');
-            playNoise(0.35, 0.18);
-            chaseTimers.push(setTimeout(() => {
-                if (chaseDone) return;
-                SFX.doorclose();
-                s.classList.add('shake');
-            }, 5250));
+        let chaseMusicInt = null;
+        function cT(ms, fn) { chaseTimers.push(setTimeout(() => { if (!chaseDone) fn(); }, ms)); }
+        function chaseShowScene(id) {
+            document.querySelectorAll('.cs-scene').forEach((s) => s.classList.remove('active'));
+            document.getElementById(id).classList.add('active');
         }
+        function sfxThunder() { playNoise(0.7, 0.45); playTone(70, 'sawtooth', 0.4, 0.2); }
+        function sfxGunshot() { playNoise(0.06, 0.35); playTone(190, 'square', 0.04, 0.18); }
+        function sfxBoom(big) { playNoise(big ? 0.9 : 0.5, 0.55); playTone(55, 'sine', 0.6, 0.4); playTone(40, 'square', 0.5, 0.25); }
+        function sfxTach() { playTone(920, 'square', 0.03, 0.16); }
+        function startChaseMusic() {
+            const notes = [110, 110, 131, 110, 98, 98, 147, 131];
+            let i = 0;
+            chaseMusicInt = setInterval(() => {
+                playTone(notes[i % notes.length], 'square', 0.13, 0.11);
+                if (i % 4 === 0) playTone(notes[i % notes.length] / 2, 'triangle', 0.15, 0.09);
+                i++;
+            }, 155);
+        }
+        function stopChaseMusic() { clearInterval(chaseMusicInt); chaseMusicInt = null; }
+
+        function showChaseIntro() {
+            if (window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches) { finishChase(); return; }
+            const s = document.getElementById('chase-screen');
+            s.classList.add('active');
+
+            cT(0, () => {
+                chaseShowScene('cs1');
+                drawPixelArt('cs1-kaito', spriteKaito, 5);
+                drawPixelArt('cs1-gem', spriteGem, 4);
+                drawPixelArt('cs1-b1', spriteBlack, 5);
+                drawPixelArt('cs1-b2', spriteBlack, 5);
+                drawPixelArt('cs1-b3', spriteBlack, 5);
+                sfxThunder();
+            });
+            cT(550, sfxThunder);
+            cT(1900, () => { playNoise(0.25, 0.4); playTone(90, 'square', 0.2, 0.3); });
+            cT(2600, sfxGunshot);
+
+            cT(4400, () => {
+                chaseShowScene('cs2');
+                drawPixelArt('cs2-b1', spriteBlack, 5);
+                drawPixelArt('cs2-b2', spriteBlack, 5);
+                drawPixelArt('cs2-b3', spriteBlack, 5);
+                drawPixelArt('cs2-kaito', spriteKaito, 5);
+                drawPixelArt('cs2-ballc', spriteBall, 4);
+                drawPixelArt('cs2-dan', spriteDetective, 6);
+            });
+            cT(4700, sfxGunshot);
+            cT(4830, sfxGunshot);
+            cT(4960, sfxGunshot);
+            cT(5090, sfxGunshot);
+            cT(5220, sfxGunshot);
+            cT(5600, () => playTone(700, 'sine', 0.15, 0.15));
+            cT(6150, () => sfxBoom(false));
+
+            cT(8600, () => {
+                chaseShowScene('cs3');
+                drawPixelArt('cs3-kaito', spriteKaito, 5);
+                drawPixelArt('cs3-dan', spriteDetective, 5);
+                startChaseMusic();
+            });
+
+            cT(12400, () => {
+                chaseShowScene('cs4');
+                drawPixelArt('cs4-heli', spriteHeli, 5);
+                drawPixelArt('cs4-kaito', spriteKaito, 5);
+                drawPixelArt('cs4-dan', spriteDetective, 5);
+                playTone(85, 'sawtooth', 0.9, 0.18);
+            });
+            cT(13700, sfxGunshot);
+            cT(13820, sfxGunshot);
+            cT(13940, sfxGunshot);
+            cT(14060, sfxGunshot);
+            cT(14180, sfxGunshot);
+            cT(14300, sfxGunshot);
+            cT(14420, sfxGunshot);
+            cT(15200, () => playTone(320, 'square', 0.12, 0.2));
+            cT(15800, () => sfxBoom(false));
+            cT(16400, () => document.getElementById('cs4').classList.add('cs-slowmo'));
+            cT(17200, () => {
+                document.getElementById('cs4').classList.remove('cs-slowmo');
+                playTone(60, 'sine', 0.5, 0.3);
+            });
+
+            cT(17800, () => {
+                stopChaseMusic();
+                chaseShowScene('cs5');
+                sfxBoom(true);
+                const box = document.getElementById('cs5-particles');
+                box.innerHTML = '';
+                const colors = ['#e8e6e0', '#a8271f', '#e8e6e0', '#c23b2e'];
+                for (let i = 0; i < 26; i++) {
+                    const sp = document.createElement('span');
+                    const ang = Math.random() * Math.PI * 2;
+                    const dist = 160 + Math.random() * 320;
+                    sp.style.setProperty('--px', Math.cos(ang) * dist + 'px');
+                    sp.style.setProperty('--py', Math.sin(ang) * dist + 'px');
+                    sp.style.background = colors[i % colors.length];
+                    box.appendChild(sp);
+                }
+            });
+            cT(19000, () => {
+                document.getElementById('cs5-title').classList.add('show');
+                sfxTach(); setTimeout(sfxTach, 70); setTimeout(sfxTach, 140); setTimeout(sfxTach, 210);
+            });
+            cT(20100, () => document.getElementById('cs5-sub').classList.add('show'));
+        }
+
+        function jumpToTitleScene() {
+            chaseTimers.forEach(clearTimeout);
+            stopChaseMusic();
+            document.getElementById('cs4').classList.remove('cs-slowmo');
+            chaseShowScene('cs5');
+            sfxBoom(true);
+            const box = document.getElementById('cs5-particles');
+            box.innerHTML = '';
+            const colors = ['#e8e6e0', '#a8271f', '#e8e6e0', '#c23b2e'];
+            for (let i = 0; i < 26; i++) {
+                const sp = document.createElement('span');
+                const ang = Math.random() * Math.PI * 2;
+                const dist = 160 + Math.random() * 320;
+                sp.style.setProperty('--px', Math.cos(ang) * dist + 'px');
+                sp.style.setProperty('--py', Math.sin(ang) * dist + 'px');
+                sp.style.background = colors[i % colors.length];
+                box.appendChild(sp);
+            }
+            setTimeout(() => {
+                if (chaseDone) return;
+                document.getElementById('cs5-title').classList.add('show');
+                sfxTach(); setTimeout(sfxTach, 70); setTimeout(sfxTach, 140); setTimeout(sfxTach, 210);
+            }, 1100);
+            setTimeout(() => { if (!chaseDone) document.getElementById('cs5-sub').classList.add('show'); }, 2200);
+        }
+
         function finishChase() {
             if (chaseDone) return;
             chaseDone = true;
             chaseTimers.forEach(clearTimeout);
+            stopChaseMusic();
             const s = document.getElementById('chase-screen');
-            s.classList.remove('active', 'shake');
+            s.classList.remove('active');
             switchScreen('mode-screen');
         }
-        document.getElementById('chase-screen').addEventListener('click', finishChase);
+        document.getElementById('chase-screen').addEventListener('click', () => {
+            if (chaseDone) return;
+            if (document.getElementById('cs5').classList.contains('active')) finishChase();
+            else jumpToTitleScene();
+        });
 
         function enterOffline() { switchScreen('init-screen'); }
         function enterOnline() {
@@ -1369,6 +1643,55 @@
             "00000AA0000",
             "0000AAAA000",
             "000AAAAAA00"
+        ];
+        const spriteKaito = [
+            "00099900000",
+            "00099900000",
+            "00555555500",
+            "00022222000",
+            "002A2222000",
+            "00222222000",
+            "00555555000",
+            "05555555550",
+            "05555555550",
+            "00555555000",
+            "00600006000"
+        ];
+        const spriteBlack = [
+            "00000000000",
+            "00022220000",
+            "00666666000",
+            "00022220000",
+            "00044440000",
+            "00444444000",
+            "04444444490",
+            "04444444490",
+            "00444444000",
+            "00044440000",
+            "00060060000"
+        ];
+        const spriteGem = [
+            "00300",
+            "03330",
+            "33333",
+            "03330",
+            "00300"
+        ];
+        const spriteBall = [
+            "055550",
+            "555555",
+            "566655",
+            "566655",
+            "555555",
+            "055550"
+        ];
+        const spriteHeli = [
+            "0000000000000000",
+            "0000099000000000",
+            "0666666666000000",
+            "0626666666699900",
+            "0666666666669900",
+            "0009900099000000"
         ];
         
         const spriteDynamite = [
