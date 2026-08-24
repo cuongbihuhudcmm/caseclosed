@@ -23,14 +23,15 @@
         body { 
             font-family: 'VT323', monospace; font-size: 24px; padding: 20px; 
             color: #e0e0e0; line-height: 1.5; margin: 0; min-height: 100vh;
-            overflow-x: hidden; position: relative; background-color: #090910; 
+            overflow-x: hidden; position: relative;
+            background: radial-gradient(1300px 700px at 50% -12%, #15152c 0%, #0b0b16 52%, #090910 100%);
             padding-bottom: 150px; 
         }
         
         .retro-bg { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; z-index: -2; }
         .retro-bg::after {
             content: ''; position: absolute; bottom: 0; left: -50%; width: 200%; height: 50%;
-            background-image: linear-gradient(transparent 65%, rgba(231, 110, 85, 0.4) 68%, transparent 70%), linear-gradient(90deg, transparent 65%, rgba(231, 110, 85, 0.4) 68%, transparent 70%);
+            background-image: linear-gradient(transparent 65%, rgba(231, 110, 85, 0.26) 68%, transparent 70%), linear-gradient(90deg, transparent 65%, rgba(231, 110, 85, 0.26) 68%, transparent 70%);
             background-size: 60px 20px, 20px 60px; transform: perspective(300px) rotateX(60deg); animation: gridMove 2s linear infinite;
         }
 
@@ -253,6 +254,8 @@
             .retro-bg::after, .cyber-dust-1, .cyber-dust-2, .cyber-dust-3 { animation: none !important; }
             .scanlines { display: none; }
             .anim-bounce, .anim-shake, .anim-wave, .anim-float, .blinker, .pixel-arrow, .reveal-mascot { animation: none !important; }
+            .pixel-moon, .title-beam::before, #confetti-layer span { animation: none !important; }
+            body.victory-party #confetti-layer { display: none; }
             #intro-screen { transition: none; }
         }
 
@@ -263,15 +266,92 @@
             max-width: 150px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
             font-size: 17px; padding: 4px 12px;
         }
+
+        /* --- KHONG KHI DEM TOI MOI: SKYLINE + MAT TRANG --- */
+        .city-skyline {
+            position: fixed; left: 0; right: 0; bottom: 0; pointer-events: none;
+            background-repeat: repeat-x; background-position: left bottom;
+            background-size: auto 100%; z-index: -1;
+        }
+        .skyline-far {
+            height: clamp(110px, 26vh, 225px); opacity: .6;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 240 60' shape-rendering='crispEdges'%3E%3Cg fill='%230d0d16'%3E%3Crect x='10' y='20' width='34' height='40'/%3E%3Crect x='58' y='30' width='26' height='30'/%3E%3Crect x='98' y='14' width='30' height='46'/%3E%3Crect x='142' y='26' width='34' height='34'/%3E%3Crect x='188' y='18' width='30' height='42'/%3E%3C/g%3E%3C/svg%3E");
+        }
+        .skyline-near {
+            height: clamp(80px, 20vh, 175px);
+            background-image:
+                linear-gradient(to top, rgba(247, 213, 29, .05), transparent 32%),
+                url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 240 60' shape-rendering='crispEdges'%3E%3Cg fill='%23131320'%3E%3Crect x='0' y='28' width='26' height='32'/%3E%3Crect x='28' y='16' width='20' height='44'/%3E%3Crect x='37' y='8' width='2' height='8'/%3E%3Crect x='50' y='32' width='30' height='28'/%3E%3Crect x='82' y='10' width='24' height='50'/%3E%3Crect x='108' y='24' width='28' height='36'/%3E%3Crect x='138' y='18' width='18' height='42'/%3E%3Crect x='158' y='30' width='32' height='30'/%3E%3Crect x='192' y='12' width='22' height='48'/%3E%3Crect x='216' y='26' width='24' height='34'/%3E%3C/g%3E%3Cg fill='%23f7d51d' opacity='.5'%3E%3Crect x='5' y='33' width='3' height='4'/%3E%3Crect x='14' y='41' width='3' height='4'/%3E%3Crect x='33' y='21' width='3' height='4'/%3E%3Crect x='40' y='29' width='3' height='4'/%3E%3Crect x='56' y='37' width='3' height='4'/%3E%3Crect x='68' y='44' width='3' height='4'/%3E%3Crect x='88' y='16' width='3' height='4'/%3E%3Crect x='96' y='25' width='3' height='4'/%3E%3Crect x='113' y='30' width='3' height='4'/%3E%3Crect x='124' y='38' width='3' height='4'/%3E%3Crect x='143' y='24' width='3' height='4'/%3E%3Crect x='166' y='35' width='3' height='4'/%3E%3Crect x='178' y='43' width='3' height='4'/%3E%3Crect x='198' y='18' width='3' height='4'/%3E%3Crect x='206' y='27' width='3' height='4'/%3E%3C/g%3E%3Cg fill='%23e76e55' opacity='.45'%3E%3Crect x='47' y='47' width='3' height='4'/%3E%3Crect x='92' y='40' width='3' height='4'/%3E%3Crect x='120' y='47' width='3' height='4'/%3E%3Crect x='147' y='36' width='3' height='4'/%3E%3Crect x='202' y='44' width='3' height='4'/%3E%3C/g%3E%3C/svg%3E");
+        }
+        .pixel-moon {
+            position: fixed; top: 6vh; right: 7vw; width: clamp(52px, 9vw, 76px); aspect-ratio: 1;
+            border-radius: 50%; z-index: -1; pointer-events: none;
+            background: radial-gradient(circle at 35% 35%, #fdf6d8, #e8dba4 60%, #cdbd85);
+            box-shadow: 0 0 36px 8px rgba(244, 236, 205, .13), inset -8px -6px 0 rgba(31, 28, 22, .18);
+            animation: moonDrift 7s ease-in-out infinite alternate;
+        }
+        .pixel-moon::after {
+            content: ''; position: absolute; inset: 0; border-radius: 50%;
+            background:
+                radial-gradient(circle at 62% 30%, rgba(31, 28, 22, .22) 0 6px, transparent 7px),
+                radial-gradient(circle at 30% 62%, rgba(31, 28, 22, .18) 0 5px, transparent 6px),
+                radial-gradient(circle at 55% 68%, rgba(31, 28, 22, .15) 0 4px, transparent 5px);
+        }
+        @keyframes moonDrift { from { transform: translateY(0); } to { transform: translateY(7px); } }
+
+        .title-beam { display: inline-block; position: relative; overflow: hidden; padding: 0 6px; }
+        .title-beam::before {
+            content: ''; position: absolute; top: -20%; bottom: -20%; width: 30%; left: -40%;
+            background: linear-gradient(100deg, transparent 20%, rgba(255, 244, 214, .18) 50%, transparent 80%);
+            transform: skewX(-18deg); animation: titleSweep 5s steps(10) infinite;
+        }
+        @keyframes titleSweep { 0% { left: -40%; } 60%, 100% { left: 120%; } }
+
+        #confetti-layer { display: none; position: fixed; inset: 0; z-index: 9985; pointer-events: none; overflow: hidden; }
+        body.victory-party #confetti-layer { display: block; }
+        #confetti-layer span { position: absolute; top: -14px; box-shadow: 2px 2px 0 rgba(0, 0, 0, .45); animation: confettiFall linear infinite; }
+        @keyframes confettiFall { 0% { transform: translateY(-8vh) rotate(0deg); } 100% { transform: translateY(112vh) rotate(200deg); } }
+
+        .board-decor { position: absolute; inset: 0; z-index: 0; pointer-events: none; }
+        .board-decor .pin {
+            position: absolute; width: 9px; height: 9px; border-radius: 50%;
+            background: #b53a2d; border: 2px solid #6d1916; box-shadow: 2px 2px 0 rgba(0, 0, 0, .5);
+        }
+        .board-decor .p1 { top: 13%; left: 11%; }
+        .board-decor .p2 { top: 72%; left: 79%; }
+        .board-decor .p3 { top: 21%; left: 61%; }
+        .board-decor .string {
+            position: absolute; height: 2px; background: #9f2f28; opacity: .55;
+            transform-origin: left center; box-shadow: 0 0 3px rgba(0, 0, 0, .8);
+        }
+        .board-decor .s1 { top: calc(13% + 4px); left: calc(11% + 4px); width: 68%; transform: rotate(21deg); }
+        .board-decor .s2 { top: calc(21% + 4px); left: calc(61% + 4px); width: 18.5%; transform: rotate(116deg); }
+        .board-decor .photo {
+            position: absolute; width: 54px; height: 64px; background: #171512;
+            border: 4px solid #ddd1a5; box-shadow: 3px 3px 0 rgba(0, 0, 0, .55); opacity: .92;
+        }
+        .board-decor .ph1 { top: 7%; left: 2.5%; transform: rotate(-7deg); }
+        .board-decor .ph2 { bottom: 5%; right: 2%; transform: rotate(6deg); }
+        @media screen and (max-width: 560px) {
+            .board-decor .photo { display: none; }
+        }
+
+        #custom-modal-overlay, #score-settings-overlay, #score-editor-overlay, #defuse-modal-overlay {
+            backdrop-filter: blur(3px) saturate(1.15);
+        }
     </style>
 </head>
 <body>
 
     <div class="retro-bg"></div>
+    <div class="city-skyline skyline-far" aria-hidden="true"></div>
+    <div class="city-skyline skyline-near" aria-hidden="true"></div>
+    <div class="pixel-moon" aria-hidden="true"></div>
     <div class="cyber-dust-1"></div>
     <div class="cyber-dust-2"></div>
     <div class="cyber-dust-3"></div>
     <div class="scanlines"></div>
+    <div id="confetti-layer" aria-hidden="true"></div>
     <div id="case-arrest-overlay" class="case-arrest-overlay" aria-hidden="true"><div class="case-arrest-overlay__stamp">ĐÃ BẮT GIỮ</div></div>
     <div id="case-reveal-flash" class="case-reveal-flash" aria-hidden="true"><div class="case-reveal-flash__label">HỒ SƠ MẬT ĐÃ MỞ</div></div>
 
@@ -321,7 +401,7 @@
         </div>
         
         <div style="text-align: center; margin-top: 45px;">
-            <h2 class="arcade-title" style="color: #f7d51d; font-size: 52px; text-shadow: 6px 6px 0px #e76e55, 3px 3px 0px #000; letter-spacing: 6px; margin: 0;">CASECLOSED</h2>
+            <h2 class="arcade-title" style="color: #f7d51d; font-size: 52px; text-shadow: 6px 6px 0px #e76e55, 3px 3px 0px #000; letter-spacing: 6px; margin: 0;"><span class="title-beam">CASECLOSED</span></h2>
             <p class="subtitle-text">ĐIỆP VỤ TỐI MẬT</p>
         </div>
         
@@ -467,6 +547,11 @@
     <div id="vote-screen" class="screen">
         <div class="case-file-bar"><span class="case-file-bar__number case-number">CASE #---</span><span class="case-file-bar__title case-title">HỒ SƠ ĐANG KHỞI TẠO</span><span class="case-file-bar__state">HIỆN TRƯỜNG PHONG TỎA</span></div>
         <div class="deduction-board">
+            <div class="board-decor" aria-hidden="true">
+                <span class="photo ph1"></span><span class="photo ph2"></span>
+                <i class="pin p1"></i><i class="pin p2"></i><i class="pin p3"></i>
+                <i class="string s1"></i><i class="string s2"></i>
+            </div>
             <div class="deduction-board__header">
                 <div><p class="deduction-board__title text-pop">BẢNG SUY LUẬN</p><span style="color:#e2d2a0; font-size:16px;">Chạm hồ sơ nghi phạm để phát lệnh bắt giữ.</span></div>
                 <div style="text-align:right;"><span class="case-classified-stamp">NGHI PHẠM</span><br><button type="button" class="nes-btn is-warning" style="font-size: 15px; padding: 5px 9px; margin-top:9px;" onclick="openReviewMode()">XEM HỒ SƠ CỦA BẠN</button></div>
@@ -1020,6 +1105,18 @@
             drawPixelArt('main-logo-3', spriteKid, 8);
             
             drawPixelArt('bomb-icon', spriteDynamite, 6);
+
+            const confettiLayer = document.getElementById('confetti-layer');
+            const palette = ['#f7d51d', '#e76e55', '#3498db', '#209cee', '#e0e0e0'];
+            for (let i = 0; i < 16; i++) {
+                const piece = document.createElement('span');
+                piece.style.left = (Math.random() * 100) + 'vw';
+                piece.style.width = piece.style.height = (4 + Math.random() * 5) + 'px';
+                piece.style.background = palette[i % palette.length];
+                piece.style.animationDelay = (Math.random() * 2.2) + 's';
+                piece.style.animationDuration = (2.6 + Math.random() * 2) + 's';
+                confettiLayer.appendChild(piece);
+            }
             
             updateMenuButtons();
             updateC4Settings();
@@ -1085,6 +1182,7 @@
         function switchScreen(screenId) { 
             document.querySelectorAll('.screen').forEach(s => s.classList.remove('active')); 
             document.getElementById(screenId).classList.add('active'); 
+            document.body.classList.toggle('victory-party', screenId === 'victory-screen');
             if (screenId === 'setup-screen') updateRecentPlayers();
         }
         
