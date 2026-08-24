@@ -153,6 +153,8 @@
         #bomb-container {
             position: fixed; bottom: 20px; right: 20px; z-index: 9990;
             display: none; flex-direction: column; align-items: flex-end; gap: 5px;
+            background: rgba(9, 9, 16, .84); border: 2px solid #3a3a4a;
+            padding: 8px; box-shadow: 4px 4px 0 rgba(0, 0, 0, .5);
         }
         #bomb-timer {
             position: relative; width: 252px; height: 108px; filter: drop-shadow(4px 4px 0 rgba(0,0,0,0.8));
@@ -229,10 +231,7 @@
 
         /* --- FIX MOBILE RESPONSIVE --- */
         @media screen and (max-width: 768px) {
-            #bomb-container { transform: scale(0.65); transform-origin: bottom right; bottom: 10px; right: 10px; }
-        }
-        @media screen and (max-width: 400px) {
-            #bomb-container { transform: scale(0.55); }
+            #bomb-container { transform: scale(0.72); transform-origin: bottom right; bottom: 10px; right: 10px; }
         }
         /* --- MENU CHÍNH CUSTOM --- */
         .main-action-btn {
@@ -339,6 +338,12 @@
         #custom-modal-overlay, #score-settings-overlay, #score-editor-overlay, #defuse-modal-overlay {
             backdrop-filter: blur(3px) saturate(1.15);
         }
+
+        .main-title { font-size: 52px; letter-spacing: 6px; }
+        @media screen and (max-width: 430px) {
+            .main-title { font-size: 33px; letter-spacing: 3px; }
+            .pill-grid { gap: 18px; }
+        }
     </style>
 </head>
 <body>
@@ -362,7 +367,7 @@
             <div id="timer-text">00:00</div>
         </div>
         <div id="c4-status" style="max-width:220px; color:#f7d51d; font-size:12px; text-align:right; line-height:1.45; text-shadow:1px 1px #000;"></div>
-        <button id="btn-defuse" class="nes-btn is-error" style="width: 100%; font-size: 16px; padding: 4px;" onclick="openDefuseModal()">GỠ BOM [X]</button>
+        <button id="btn-defuse" class="nes-btn is-error" style="width: 100%; font-size: 18px; padding: 10px 4px; min-height: 44px;" onclick="openDefuseModal()">GỠ BOM [X]</button>
     </div>
 
     <!-- MÀN HÌNH INTRO: BEESTUDIO -->
@@ -401,7 +406,7 @@
         </div>
         
         <div style="text-align: center; margin-top: 45px;">
-            <h2 class="arcade-title" style="color: #f7d51d; font-size: 52px; text-shadow: 6px 6px 0px #e76e55, 3px 3px 0px #000; letter-spacing: 6px; margin: 0;"><span class="title-beam">CASECLOSED</span></h2>
+            <h2 class="arcade-title main-title" style="color: #f7d51d; text-shadow: 6px 6px 0px #e76e55, 3px 3px 0px #000; margin: 0;"><span class="title-beam">CASECLOSED</span></h2>
             <p class="subtitle-text">ĐIỆP VỤ TỐI MẬT</p>
         </div>
         
@@ -1337,9 +1342,9 @@
                 list.innerHTML += `<li style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 8px; background: rgba(0,0,0,0.5); padding: 5px 10px;">
                     <span style="color: #fff; flex:1;" class="text-pop">${esc(name)}</span>
                     <div style="display:flex; gap:5px;">
-                        <button class="nes-btn" style="padding: 4px 8px; font-size: 16px;" onclick="movePlayerUp(${i})">▲</button>
-                        <button class="nes-btn" style="padding: 4px 8px; font-size: 16px;" onclick="movePlayerDown(${i})">▼</button>
-                        <button class="nes-btn is-error" style="padding: 4px 12px; font-size: 16px;" onclick="removePlayer(${i})">X</button>
+                        <button class="nes-btn" style="min-width: 42px; min-height: 42px; padding: 4px 8px; font-size: 18px;" onclick="movePlayerUp(${i})">▲</button>
+                        <button class="nes-btn" style="min-width: 42px; min-height: 42px; padding: 4px 8px; font-size: 18px;" onclick="movePlayerDown(${i})">▼</button>
+                        <button class="nes-btn is-error" style="min-width: 42px; min-height: 42px; padding: 4px 12px; font-size: 18px;" onclick="removePlayer(${i})">X</button>
                     </div>
                 </li>`; 
             });
@@ -2682,7 +2687,7 @@
                 canvas.className = 'pixel-canvas pill-item'; 
                 canvas.onclick = () => takePill(canvas, i); 
                 board.appendChild(canvas);
-                drawPixelArt(canvas, spritePill, 6); 
+                drawPixelArt(canvas, spritePill, 7); 
             });
         }
 
