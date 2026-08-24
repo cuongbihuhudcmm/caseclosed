@@ -7,6 +7,7 @@
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="mobile-web-app-capable" content="yes">
     <meta name="theme-color" content="#090910">
+    <meta name="description" content="CASECLOSED - quản trò offline cho Ai là gián điệp: phân vai bí mật, bỏ phiếu loại nghi phạm, chế độ bom C4 và bảng điểm nhiều ván.">
     <meta name="application-name" content="CASECLOSED">
     <title>CASECLOSED - Điệp Vụ Tối Mật</title>
     <link rel="icon" type="image/png" sizes="192x192" href="./icon-192.png?v=3">
@@ -15,8 +16,8 @@
     <link rel="manifest" href="./site.webmanifest?v=3">
     <meta name="apple-mobile-web-app-title" content="CASECLOSED">
     
-    <link href="https://fonts.googleapis.com/css2?family=VT323&display=swap" rel="stylesheet">
-    <link href="https://unpkg.com/nes.css@2.3.0/css/nes.min.css" rel="stylesheet" />
+    <link href="./fonts/vt323.css?v=1" rel="stylesheet">
+    <link href="./vendor/nes.min.css?v=1" rel="stylesheet" />
     <style>
         /* --- BACKGROUND CHUẨN 8-BIT --- */
         body { 
@@ -246,6 +247,13 @@
         .subtitle-text {
             color: #3498db; font-size: 20px; letter-spacing: 5px; 
             margin-top: 10px; text-shadow: 2px 2px 0 #000;
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            .retro-bg::after, .cyber-dust-1, .cyber-dust-2, .cyber-dust-3 { animation: none !important; }
+            .scanlines { display: none; }
+            .anim-bounce, .anim-shake, .anim-wave, .anim-float, .blinker, .pixel-arrow, .reveal-mascot { animation: none !important; }
+            #intro-screen { transition: none; }
         }
     </style>
 </head>
@@ -575,6 +583,7 @@
                 <p style="color:#f7d51d; font-size: 18px;">MÃ BẢO MẬT (4 SỐ):</p>
                 <input type="number" id="defuse-pin-input" class="nes-input is-dark" style="text-align:center; font-size:40px !important; letter-spacing: 15px; margin-bottom: 15px;" placeholder="****">
                 <p id="defuse-error-1" style="color:#e74c3c; display:none; font-size: 16px;" class="blinker">MÃ SAI! TỪ CHỐI TRUY CẬP!</p>
+                <p id="defuse-pin-attempts" style="color:#95a5a6; font-size:14px; margin-top:8px;">Số lần thử còn lại: 3</p>
                 <div style="display: flex; gap: 10px; justify-content: center; margin-top: 15px;">
                     <button class="nes-btn" onclick="closeDefuseModal()">HỦY BỎ</button>
                     <button class="nes-btn is-error" onclick="checkDefusePin()">XÁC NHẬN</button>
@@ -585,6 +594,7 @@
                 <p style="color:#27ae60; font-size: 18px;">TRUY CẬP THÀNH CÔNG.</p>
                 <p style="color:#fff; font-size: 16px;">Hãy nhập TỪ KHÓA CỦA ÁO ĐEN để vô hiệu hóa ngòi nổ:</p>
                 <input type="text" id="defuse-word-input" class="nes-input is-dark" style="text-align:center; font-size:24px !important; margin-bottom: 15px;">
+                <p id="defuse-error-2" style="color:#e74c3c; display:none; font-size: 15px;" class="blinker">PHẢI NHẬP TỪ KHÓA TRƯỚC KHI CẮT DÂY!</p>
                 <div style="display: flex; gap: 10px; justify-content: center; margin-top: 15px;">
                     <button class="nes-btn" onclick="closeDefuseModal()">HỦY BỎ</button>
                     <button class="nes-btn is-warning" onclick="submitDefuseWord()">✂ CẮT DÂY</button>
@@ -611,6 +621,19 @@
             if (elem.requestFullscreen) { elem.requestFullscreen().catch((e) => console.log(e)); } 
             else if (elem.webkitRequestFullscreen) { elem.webkitRequestFullscreen(); } 
             else if (elem.msRequestFullscreen) { elem.msRequestFullscreen(); }
+        }
+
+        let wakeLockSentinel = null;
+        async function requestWakeLock() {
+            try {
+                if ('wakeLock' in navigator && !wakeLockSentinel) wakeLockSentinel = await navigator.wakeLock.request('screen');
+            } catch (e) {}
+        }
+        function releaseWakeLock() {
+            if (wakeLockSentinel) { wakeLockSentinel.release().catch(() => {}); wakeLockSentinel = null; }
+        }
+        function buzz(pattern) {
+            if (navigator.vibrate) { try { navigator.vibrate(pattern); } catch (e) {} }
         }
 
         const AudioContext = window.AudioContext || window.webkitAudioContext;
@@ -734,10 +757,16 @@
             doorCloseSfx.pause();
             doorCloseSfx.currentTime = 0;
             doorCloseSfx.play().catch(() => {});
-            caseIntroTimer = setTimeout(() => {
+            const finishIntroSequence = () => {
+                clearTimeout(caseIntroTimer);
                 intro.classList.remove('active');
                 showHandoffScreen();
-            }, 5550);
+            };
+            const flash = intro.querySelector('.case-intro-flash');
+            if (flash._caseIntroEndHandler) flash.removeEventListener('animationend', flash._caseIntroEndHandler);
+            flash._caseIntroEndHandler = finishIntroSequence;
+            flash.addEventListener('animationend', finishIntroSequence, { once: true });
+            caseIntroTimer = setTimeout(finishIntroSequence, 6500);
         }
 
         document.addEventListener('click', (e) => {
@@ -966,8 +995,10 @@
         let c4Unlocked = false;
         let c4PermanentlyLocked = false;
         let defuseAttemptUsed = false;
+        let defusePinAttemptsLeft = 3;
         
-        let currentScoreSettings = { danAlive: 3, danDead: 2, spyWin: 5, kidSurvive: 6, kidHack: 10, defuseWin: 10, timeOutPenalty: 0 };
+        const DEFAULT_SCORE_SETTINGS = Object.freeze({ danAlive: 3, danDead: 2, spyWin: 5, kidSurvive: 6, kidHack: 10, defuseWin: 10, timeOutPenalty: 0 });
+        let currentScoreSettings = { ...DEFAULT_SCORE_SETTINGS };
 
         document.addEventListener("DOMContentLoaded", () => {
             drawPixelArt('bee-logo', spriteBee, 10);
@@ -988,14 +1019,40 @@
             });
         }
 
+        document.addEventListener('visibilitychange', () => {
+            if (document.visibilityState === 'visible' && isTimerActive) requestWakeLock();
+        });
+
+        document.addEventListener('keydown', (e) => {
+            if (e.key !== 'Escape') return;
+            const closers = [
+                ['defuse-modal-overlay', closeDefuseModal],
+                ['score-settings-overlay', () => closeScoreSettings(false)],
+                ['score-editor-overlay', closeScoreEditor],
+                ['custom-modal-overlay', closeModal]
+            ];
+            for (const [id, fn] of closers) {
+                const el = document.getElementById(id);
+                if (el && el.style.display !== 'none' && el.style.display !== '') { fn(); break; }
+            }
+        });
+
+        function readSessions() {
+            try { return JSON.parse(localStorage.getItem('uc_all_sessions')) || {}; } catch (e) { return {}; }
+        }
+
+        function esc(text) {
+            return String(text).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+        }
+
         function updateMenuButtons() {
-            let allSessions = JSON.parse(localStorage.getItem('uc_all_sessions') || '{}');
+            let allSessions = readSessions();
             if (Object.keys(allSessions).length > 0) document.getElementById('btn-continue').style.display = 'inline-block';
             else document.getElementById('btn-continue').style.display = 'none';
         }
 
         function saveData() { 
-            let allSessions = JSON.parse(localStorage.getItem('uc_all_sessions') || '{}');
+            let allSessions = readSessions();
             if (!currentSessionId) currentSessionId = 'CASE_' + Date.now();
             let sessionName = playerNamesInput.length > 0 ? "Hồ Sơ: " + playerNamesInput.slice(0, 3).join(", ") + (playerNamesInput.length > 3 ? "..." : "") : "Hồ sơ Trống";
             allSessions[currentSessionId] = { 
@@ -1020,14 +1077,15 @@
         function startNewSession() { 
             requestFullScreen(); 
             stopTimer();
+            releaseWakeLock();
             currentSessionId = 'CASE_' + Date.now(); playerNamesInput = []; globalScores = {}; playedHistory = [];
-            currentScoreSettings = { danAlive: 3, danDead: 2, spyWin: 5, kidSurvive: 6, kidHack: 10, defuseWin: 10, timeOutPenalty: 0 };
+            currentScoreSettings = { ...DEFAULT_SCORE_SETTINGS };
             updateNameList(); updateRoleCount(); switchScreen('setup-screen'); 
         }
 
         function showLoadScreen() {
-            requestFullScreen(); stopTimer();
-            let allSessions = JSON.parse(localStorage.getItem('uc_all_sessions') || '{}');
+            requestFullScreen(); stopTimer(); releaseWakeLock();
+            let allSessions = readSessions();
             let listDiv = document.getElementById('session-list'); listDiv.innerHTML = '';
             let keys = Object.keys(allSessions).sort((a,b) => b.localeCompare(a));
             
@@ -1038,8 +1096,8 @@
                     listDiv.innerHTML += `
                     <div style="display: flex; align-items: stretch; margin-bottom: 15px; width: 100%; gap: 10px;">
                         <button type="button" class="nes-btn is-primary" style="flex: 1; text-align: left; padding: 12px 15px;" onclick="loadSession('${k}')">
-                            <b style="color:#f7d51d; font-size: 16px; display: block; margin-bottom: 4px; text-shadow: 2px 2px 0 #000;">${s.date}</b>
-                            <span style="font-size: 20px; color: #fff; text-shadow: 2px 2px 0 #000;">${s.name} (${s.players.length} Đặc Vụ)</span>
+                            <b style="color:#f7d51d; font-size: 16px; display: block; margin-bottom: 4px; text-shadow: 2px 2px 0 #000;">${esc(s.date)}</b>
+                            <span style="font-size: 20px; color: #fff; text-shadow: 2px 2px 0 #000;">${esc(s.name)} (${s.players.length} Đặc Vụ)</span>
                         </button>
                         <button type="button" class="nes-btn is-error" style="display: flex; align-items: center; padding: 10px 15px; font-size: 16px;" onclick="deleteSession('${k}')">XÓA</button>
                     </div>`;
@@ -1049,23 +1107,24 @@
         }
 
         function loadSession(id) {
-            let allSessions = JSON.parse(localStorage.getItem('uc_all_sessions') || '{}'), s = allSessions[id];
+            let allSessions = readSessions(), s = allSessions[id];
             if(s) {
                 currentSessionId = id; playerNamesInput = s.players || []; globalScores = s.scores || {}; playedHistory = s.history || [];
-                currentScoreSettings = s.scoreSettings || { danAlive: 3, danDead: 2, spyWin: 5, kidSurvive: 6, kidHack: 10, defuseWin: 10, timeOutPenalty: 0 };
+                currentScoreSettings = Object.assign({}, DEFAULT_SCORE_SETTINGS, s.scoreSettings || {});
                 updateNameList(); updateRoleCount(); switchScreen('setup-screen');
             }
         }
 
         function deleteSession(id) {
             showModal("<div style='text-align:center'>Hủy vĩnh viễn hồ sơ này khỏi máy chủ?</div>", "confirm", () => {
-                let allSessions = JSON.parse(localStorage.getItem('uc_all_sessions') || '{}'); delete allSessions[id];
+                let allSessions = readSessions(); delete allSessions[id];
                 localStorage.setItem('uc_all_sessions', JSON.stringify(allSessions)); showLoadScreen(); updateMenuButtons();
             });
         }
 
         function exitToMenu() {
             stopTimer();
+            releaseWakeLock();
             switchScreen('init-screen');
             updateMenuButtons();
             playBackgroundMusic();
@@ -1077,8 +1136,8 @@
             document.getElementById('setting-spy-win').value = currentScoreSettings.spyWin;
             document.getElementById('setting-kid-survive').value = currentScoreSettings.kidSurvive;
             document.getElementById('setting-kid-hack').value = currentScoreSettings.kidHack;
-            document.getElementById('setting-defuse-win').value = currentScoreSettings.defuseWin !== undefined ? currentScoreSettings.defuseWin : 10;
-            document.getElementById('setting-timeout-penalty').value = currentScoreSettings.timeOutPenalty !== undefined ? currentScoreSettings.timeOutPenalty : 0;
+            document.getElementById('setting-defuse-win').value = currentScoreSettings.defuseWin;
+            document.getElementById('setting-timeout-penalty').value = currentScoreSettings.timeOutPenalty;
             document.getElementById('score-settings-overlay').style.display = 'flex';
         }
 
@@ -1129,7 +1188,7 @@
             const list = document.getElementById('name-list'); list.innerHTML = "";
             playerNamesInput.forEach((name, i) => { 
                 list.innerHTML += `<li style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 8px; background: rgba(0,0,0,0.5); padding: 5px 10px;">
-                    <span style="color: #fff; flex:1;" class="text-pop">${name}</span>
+                    <span style="color: #fff; flex:1;" class="text-pop">${esc(name)}</span>
                     <div style="display:flex; gap:5px;">
                         <button class="nes-btn" style="padding: 4px 8px; font-size: 16px;" onclick="movePlayerUp(${i})">▲</button>
                         <button class="nes-btn" style="padding: 4px 8px; font-size: 16px;" onclick="movePlayerDown(${i})">▼</button>
@@ -1139,481 +1198,1135 @@
             });
         }
 
-        // Kho từ được chuẩn hóa: giữ nguyên tên riêng, thương hiệu, game và nhân vật;
-        // chỉ Việt hóa những từ tiếng Anh phổ thông để trải nghiệm chơi thống nhất.
-        const COMMON_ENGLISH_TO_VIETNAMESE = Object.freeze({
-            Cat:'Mèo', Dog:'Chó', Boy:'Con trai', Girl:'Con gái', Man:'Đàn ông', Woman:'Phụ nữ', Water:'Nước', Fire:'Lửa', Ice:'Băng', Snow:'Tuyết', Car:'Ô tô', Bus:'Xe buýt', Phone:'Điện thoại', Laptop:'Máy tính xách tay', Tablet:'Máy tính bảng', Computer:'Máy tính',
-            Red:'Đỏ', Blue:'Xanh dương', Black:'Đen', White:'Trắng', Sun:'Mặt trời', Moon:'Mặt trăng', King:'Vua', Queen:'Nữ hoàng', Gold:'Vàng', Silver:'Bạc', Guitar:'Đàn guitar', Piano:'Đàn piano', Football:'Bóng đá', Basketball:'Bóng rổ',
-            Left:'Trái', Right:'Phải', Up:'Lên', Down:'Xuống', Good:'Tốt', Bad:'Xấu', Happy:'Vui', Sad:'Buồn', Morning:'Buổi sáng', Evening:'Buổi tối', Summer:'Mùa hè', Winter:'Mùa đông', Spring:'Mùa xuân', Autumn:'Mùa thu',
-            Teacher:'Giáo viên', Student:'Học sinh', Doctor:'Bác sĩ', Nurse:'Y tá', Dentist:'Nha sĩ', Farmer:'Nông dân', Builder:'Thợ xây', Actor:'Diễn viên', Singer:'Ca sĩ', Single:'Độc thân', Married:'Đã kết hôn',
-            Hello:'Xin chào', Goodbye:'Tạm biệt', Yes:'Có', No:'Không', True:'Đúng', False:'Sai', Buy:'Mua', Sell:'Bán', Open:'Mở', Close:'Đóng', Start:'Bắt đầu', Stop:'Dừng', Winner:'Người thắng', Loser:'Người thua',
-            Hot:'Nóng', Cold:'Lạnh', Big:'Lớn', Small:'Nhỏ', Fast:'Nhanh', Slow:'Chậm', Hard:'Cứng', Soft:'Mềm', Heavy:'Nặng', Light:'Nhẹ', Clean:'Sạch', Dirty:'Bẩn', Rich:'Giàu', Poor:'Nghèo', Old:'Cũ', New:'Mới', Empty:'Trống', Full:'Đầy', Simple:'Đơn giản', Complex:'Phức tạp', Cheap:'Rẻ', Expensive:'Đắt',
-            Laugh:'Cười', Cry:'Khóc', Love:'Yêu', Hate:'Ghét', Walk:'Đi bộ', Run:'Chạy', Stand:'Đứng', Sit:'Ngồi', Push:'Đẩy', Pull:'Kéo', Win:'Thắng', Lose:'Thua', Play:'Chơi', Work:'Làm việc', Read:'Đọc', Write:'Viết', Speak:'Nói', Listen:'Lắng nghe', Give:'Cho', Take:'Lấy', Teach:'Dạy', Learn:'Học', Arrive:'Đến', Depart:'Rời đi', Ask:'Hỏi', Answer:'Trả lời', Break:'Làm vỡ', Fix:'Sửa', Catch:'Bắt', Throw:'Ném', Find:'Tìm', Grow:'Lớn lên', Shrink:'Co lại', Hide:'Giấu', Seek:'Tìm kiếm', Sing:'Hát', Dance:'Nhảy múa', Smile:'Mỉm cười', Frown:'Nhăn mặt', Accept:'Chấp nhận', Reject:'Từ chối', Agree:'Đồng ý', Disagree:'Không đồng ý', Begin:'Bắt đầu', End:'Kết thúc', Build:'Xây dựng', Destroy:'Phá hủy', Miss:'Trượt', Create:'Tạo ra', Ruin:'Phá hỏng', Enjoy:'Tận hưởng', Suffer:'Chịu đựng', Forget:'Quên', Remember:'Nhớ', Ignore:'Phớt lờ', Notice:'Nhận ra', Join:'Tham gia', Leave:'Rời đi', Keep:'Giữ', Share:'Chia sẻ', Pass:'Đạt', Fail:'Trượt', Save:'Tiết kiệm', Spend:'Chi tiêu', Show:'Hiện ra', Trust:'Tin tưởng', Doubt:'Nghi ngờ', Attack:'Tấn công', Defend:'Phòng thủ', Combine:'Kết hợp', Separate:'Tách rời', Punish:'Trừng phạt', Reward:'Khen thưởng',
-            Apple:'Táo', Orange:'Cam', Banana:'Chuối', Melon:'Dưa', Coffee:'Cà phê', Tea:'Trà', Milk:'Sữa', Bread:'Bánh mì', Rice:'Cơm', Meat:'Thịt', Fish:'Cá', Chicken:'Gà', Beef:'Thịt bò', Pizza:'Bánh pizza', Burger:'Bánh mì kẹp thịt', Salad:'Xa lát', Soup:'Súp', Sweet:'Ngọt', Sour:'Chua', Bitter:'Đắng', Spicy:'Cay', Breakfast:'Bữa sáng', Dinner:'Bữa tối', Lunch:'Bữa trưa', Snack:'Bữa ăn nhẹ',
-            Shirt:'Áo sơ mi', Pants:'Quần dài', Dress:'Váy liền', Skirt:'Chân váy', Hat:'Mũ', Cap:'Mũ lưỡi trai', Shoes:'Giày', Socks:'Tất', House:'Nhà', Home:'Nhà', Room:'Phòng', Door:'Cửa', Window:'Cửa sổ', Wall:'Tường', Bed:'Giường', Sofa:'Ghế sô pha', Chair:'Ghế', Table:'Bàn', Desk:'Bàn làm việc', Lamp:'Đèn', Pen:'Bút', Pencil:'Bút chì', Book:'Sách', Paper:'Giấy', School:'Trường học', Class:'Lớp học',
-            Train:'Tàu hỏa', Plane:'Máy bay', Boat:'Thuyền', Ship:'Tàu thủy', Helicopter:'Trực thăng', Rain:'Mưa', Wind:'Gió', Storm:'Bão', Mountain:'Núi', River:'Sông', Ocean:'Đại dương', Sea:'Biển', Tree:'Cây', Flower:'Hoa', Forest:'Rừng', Jungle:'Rừng rậm', Rabbit:'Thỏ', Hamster:'Chuột hamster', Lion:'Sư tử', Tiger:'Hổ', Bear:'Gấu', Panda:'Gấu trúc', Bird:'Chim', Duck:'Vịt', Eagle:'Đại bàng', Wolf:'Chó sói', Shark:'Cá mập', Snake:'Rắn', Worm:'Giun',
-            Uncle:'Chú', Aunt:'Cô', Brother:'Anh trai', Sister:'Chị gái', Father:'Bố', Mother:'Mẹ', Week:'Tuần', Month:'Tháng', Year:'Năm', Decade:'Thập kỷ', Day:'Ngày', Hour:'Giờ', Minute:'Phút', Second:'Giây', Circle:'Hình tròn', Square:'Hình vuông', Triangle:'Hình tam giác', Rectangle:'Hình chữ nhật',
-            Screen:'Màn hình', Keyboard:'Bàn phím', Mouse:'Chuột máy tính', Pad:'Bàn di chuột', Camera:'Máy ảnh', Speaker:'Loa', Video:'Video', Audio:'Âm thanh', Music:'Âm nhạc', Movie:'Phim', Plate:'Đĩa', Bowl:'Bát', Fork:'Nĩa', Spoon:'Thìa', Printer:'Máy in', Scanner:'Máy quét', Battery:'Pin', Charger:'Bộ sạc', Cable:'Dây cáp', Adapter:'Bộ chuyển đổi', Router:'Bộ định tuyến', Modem:'Bộ phát mạng', Folder:'Thư mục', File:'Tệp', Hall:'Sảnh', Floor:'Sàn nhà', Roof:'Mái nhà', Ceiling:'Trần nhà', Garden:'Vườn', Yard:'Sân', Street:'Đường phố', Avenue:'Đại lộ', Bridge:'Cầu', Tunnel:'Đường hầm', City:'Thành phố', Town:'Thị trấn', Village:'Làng', Countryside:'Nông thôn', Country:'Quốc gia', Continent:'Châu lục', Stream:'Suối', Valley:'Thung lũng', Island:'Đảo', Peninsula:'Bán đảo', Volcano:'Núi lửa', Earthquake:'Động đất', Weather:'Thời tiết', Climate:'Khí hậu', Future:'Tương lai', Past:'Quá khứ',
-            Desktop:'Máy tính để bàn', Master:'Cao thủ', Challenger:'Thách đấu', Like:'Thích', Download:'Tải xuống', Upload:'Tải lên', Online:'Trực tuyến', Offline:'Ngoại tuyến', Enter:'Nhập', Space:'Phím cách', Delete:'Xóa', Backspace:'Xóa lùi', Copy:'Sao chép', Paste:'Dán', Inbox:'Hộp thư', Comment:'Bình luận', Follow:'Theo dõi', Subscribe:'Đăng ký', Mute:'Tắt tiếng', Block:'Chặn', Troll:'Chọc phá', Spam:'Tin rác', Night:'Đêm', Midnight:'Nửa đêm', Watch:'Đồng hồ', Desert:'Sa mạc', Boss:'Trùm', Micro:'Mi cờ rô',
-            'Game offline':'Trò chơi ngoại tuyến', 'Game online':'Trò chơi trực tuyến', Livestream:'Phát trực tiếp'
-        });
-
-        // Các cặp dịch ra tiếng Việt thành đồng nghĩa, bao-hàm hoặc quá gượng;
-        // loại chúng khỏi tất cả chế độ, thay vì để chúng phá cân bằng C4.
-        const REJECTED_WORD_PAIR_IDS = new Set([
-            196, 208, 274, 453, 1089, 1090, 1091, 1092, 1093, 1094,
-            1095, 1096, 1097, 1098, 1099, 1100, 1101, 1102, 1103, 1104,
-            1112, 1113, 1114, 1115, 1116, 1117, 1118, 1119, 1120, 1121,
-            1122, 1123, 1133, 1134, 1140, 1141, 1145, 1146, 1147
-        ]);
-        const EASY_WORD_PAIR_RANGES = [[688, 711], [799, 848], [940, 998]];
-        const C4_WORD_PAIR_IDS = new Set([7, 10, 12, 13, 55, 82, 90, 91, 92, 101, 102, 103, 104, 179, 180, 185, 210, 226, 227, 230, 236, 237, 238, 241, 242, 243, 244, 245, 278, 279, 280, 281, 282, 322, 323, 324, 325, 326, 327, 398, 399, 400, 401, 402, 403, 404, 405, 406, 407, 408, 409, 410, 611, 612, 613, 614, 615, 616, 617, 618, 619, 620, 621, 622, 623, 624, 625, 626, 627, 628, 629, 630, 631, 632, 633, 634, 635, 636, 637, 670, 671, 672, 673, 674, 675, 676, 677, 678, 713, 714, 715, 716, 717, 718, 719, 720, 721, 722, 723, 724, 725, 726, 727, 728, 729, 730, 731, 733, 734, 735, 736, 737, 738, 739, 1149, 1150, 1151, 1152, 1153, 1154, 1155, 1156, 1157, 1158, 1159, 1165, 1167, 1168]);
-
-        const PRESERVED_SPECIAL_PAIR_IDS = new Set([32, 568]);
-
-        function localizeWord(word, id) {
-            if (PRESERVED_SPECIAL_PAIR_IDS.has(id)) return word;
-            return COMMON_ENGLISH_TO_VIETNAMESE[word] || word;
-        }
-
-        function getWordPairTier(id) {
-            if (REJECTED_WORD_PAIR_IDS.has(id)) return 'loai';
-            if (C4_WORD_PAIR_IDS.has(id)) return 'c4';
-            if (EASY_WORD_PAIR_RANGES.some(([start, end]) => id >= start && id <= end)) return 'de';
-            return 'chuan';
-        }
-
+                // Kho cap tu da Viet hoa, khu trung lap; tier ("de" | "chuan" | "c4") gan truc tiep tung dong.
         const rawWordDatabase = [
-            { a: "Chó", b: "Mèo" }, { a: "Bánh pizza", b: "Bánh mì kẹp thịt" }, { a: "Bãi biển", b: "Ngọn núi" },
-            { a: "Cà phê", b: "Trà" }, { a: "Ô tô", b: "Xe buýt" }, { a: "Mặt trời", b: "Mặt trăng" },
-            { a: "Quả chuối", b: "Quả táo" }, { a: "Nước hoa", b: "Lăn khử mùi" }, { a: "Adidas", b: "Nike" },
-            { a: "Ba lô", b: "Va li" }, { a: "Bồn sục", b: "Phòng xông hơi" }, { a: "Giày thể thao", b: "Xăng đan" },
-            { a: "Kính râm", b: "Kính cận" }, { a: "Đàn piano", b: "Đàn guitar" }, { a: "Du thuyền", b: "Xe dã ngoại" },
-            { a: "Sushi", b: "Bánh pizza" }, { a: "Bánh mì kẹp thịt", b: "Xúc xích" }, { a: "Sô cô la", b: "Vani" },
-            { a: "Bia", b: "Rượu vang" }, { a: "Rượu whiskey", b: "Rượu vodka" }, { a: "Sữa", b: "Nước ép" },
-            { a: "Bánh mì", b: "Bơ" }, { a: "Cơm", b: "Mì ống" }, { a: "Thịt gà", b: "Thịt bò" },
-            { a: "Quả táo", b: "Quả cam" }, { a: "Quả chuối", b: "Dâu tây" }, { a: "Cà rốt", b: "Súp lơ" },
-            { a: "Khoai tây", b: "Cà chua" }, { a: "Hành tây", b: "Tỏi" }, { a: "Muối", b: "Hạt tiêu" },
-            { a: "Đường", b: "Mật ong" }, { a: "Nước lọc", b: "Nước ngọt" }, { a: "Apple", b: "Microsoft" },
-            { a: "Google", b: "Facebook" }, { a: "Amazon", b: "Netflix" }, { a: "Bánh xèo", b: "Bánh rán" },
-            { a: "Kem", b: "Bánh kem" }, { a: "McDonalds", b: "KFC" }, { a: "Ô tô", b: "Xe máy" },
-            { a: "Vi rút", b: "Vi khuẩn" }, { a: "Chúa tể những chiếc nhẫn", b: "Người Hobbit" }, { a: "Harry Potter", b: "Voldemort" },
-            { a: "Siêu nhân", b: "Người dơi" }, { a: "Người nhện", b: "Người sắt" }, { a: "Đội trưởng Mỹ", b: "Thần sấm" },
-            { a: "Bánh pizza", b: "Mì ống" }, { a: "Bóng đá", b: "Bóng rổ" }, { a: "Âm nhạc", b: "Khiêu vũ" },
-            { a: "Chó", b: "Chó sói" }, { a: "Quả táo", b: "Quả lê" }, { a: "Ô tô", b: "Xe tải" },
-            { a: "Bút chì", b: "Bút máy" }, { a: "Bánh pizza", b: "Lasagna" }, { a: "Facebook", b: "Instagram" },
-            { a: "Kính râm", b: "Kính bơi" }, { a: "Máy tính xách tay", b: "Máy tính bảng" }, { a: "Bác sĩ", b: "Bác sĩ phẫu thuật" },
-            { a: "Bitcoin", b: "Ethereum" }, { a: "Đồng hồ", b: "Nhẫn" }, { a: "Bom", b: "Súng" },
-            { a: "Einstein", b: "Newton" }, { a: "Áo sơ mi", b: "Áo len" }, { a: "Bóng đá", b: "Bóng bầu dục" },
-            { a: "Máy bay", b: "Trực thăng" }, { a: "Dòng sông", b: "Cái hồ" }, { a: "Đại dương", b: "Dòng sông" },
-            { a: "Giáo viên", b: "Giáo sư" }, { a: "Xe đạp", b: "Xe máy" }, { a: "Muối", b: "Đường" },
-            { a: "Dao", b: "Kéo" }, { a: "Cái ghế", b: "Ghế dài" }, { a: "Lâu đài", b: "Ngôi nhà" },
-            { a: "Tàu hỏa", b: "Xe buýt" }, { a: "Gương", b: "Cửa sổ" }, { a: "Con chuột", b: "Chuột cống" },
-            { a: "Dưa chuột", b: "Bí ngòi" }, { a: "Dâu tây", b: "Quả mâm xôi" }, { a: "Quả chuối", b: "Chuối tá quạ" },
-            { a: "Trái dừa", b: "Quả dứa" }, { a: "Con rồng", b: "Khủng long" }, { a: "Bóng ma", b: "Thây ma" },
-            { a: "Đầu bếp", b: "Quầy bếp" }, { a: "Cái xẻng", b: "Cái rìu" }, { a: "Kim tự tháp", b: "Đền thờ" },
-            { a: "Núi lửa", b: "Ngọn núi" }, { a: "Sa mạc", b: "Bãi cát" }, { a: "Đám mây", b: "Sương mù" },
-            { a: "Tuyết", b: "Mưa đá" }, { a: "Thám tử", b: "Tội phạm" }, { a: "Rừng rậm", b: "Rừng cây" },
-            { a: "Đồng hồ treo tường", b: "Đồng hồ đeo tay" }, { a: "Bánh mì", b: "Bánh nướng" }, { a: "Bức tranh", b: "Bản phác thảo" },
-            { a: "Cái ô", b: "Cái lọng" }, { a: "Đồ vest", b: "Cà vạt" }, { a: "Tất", b: "Bít tất" },
-            { a: "Thắt lưng", b: "Quần jean" }, { a: "Vương miện", b: "Cái mũ" }, { a: "Ba lê", b: "Hip Hop" },
-            { a: "Con vẹt", b: "Con quạ" }, { a: "Con dơi", b: "Cú mèo" }, { a: "Ngọn nến", b: "Đèn lồng" },
-            { a: "Thư viện", b: "Trường đại học" }, { a: "Bảo tàng", b: "Phòng trưng bày" }, { a: "Đài phát thanh", b: "Podcast" },
-            { a: "Báo mạng", b: "Tờ báo" }, { a: "Bút máy", b: "Tờ giấy" }, { a: "Mặt trăng", b: "Mặt trời" },
-            { a: "Quần vợt", b: "Cầu lông" }, { a: "Trượt tuyết", b: "Tuyết" }, { a: "Bơi lội", b: "Lặn biển" },
-            { a: "Chạy bộ", b: "Đi dạo" }, { a: "Thang máy", b: "Thang cuốn" }, { a: "Phà", b: "Du thuyền" },
-            { a: "Bản đồ", b: "Hệ thống định vị" }, { a: "Thuyền buồm", b: "Du thuyền" }, { a: "Sao băng", b: "Vệ tinh" },
-            { a: "Hành tinh", b: "Ngôi sao" }, { a: "Động đất", b: "Sóng thần" }, { a: "Sứa", b: "Bạch tuộc" },
-            { a: "Chó sói", b: "Con cáo" }, { a: "Chim ưng", b: "Kền kền" }, { a: "Thằn lằn", b: "Tắc kè" },
-            { a: "Elvis Presley", b: "The Beatles" }, { a: "Leonardo da Vinci", b: "Michelangelo" }, { a: "Napoleon", b: "Julius Caesar" },
-            { a: "Mario", b: "Luigi" }, { a: "Sonic", b: "Tails" }, { a: "Pac-Man", b: "Tetris" },
-            { a: "Fortnite", b: "Minecraft" }, { a: "Call of Duty", b: "Battlefield" }, { a: "Game of Thrones", b: "Chúa tể những chiếc nhẫn" },
-            { a: "Star Wars", b: "Star Trek" }, { a: "Harry Potter", b: "Percy Jackson" }, { a: "Dracula", b: "Frankenstein" },
-            { a: "James Bond", b: "Đặc vụ" }, { a: "Homer Simpson", b: "Peter Griffin" }, { a: "SpongeBob", b: "Patrick" },
-            { a: "Godzilla", b: "King Kong" }, { a: "Lego", b: "Playmobil" }, { a: "UNO", b: "Cờ tỷ phú" },
-            { a: "Catan", b: "Risk" }, { a: "Blackjack", b: "Xì phé" }, { a: "Bingo", b: "Roulette" },
-            { a: "New York", b: "Los Angeles" }, { a: "Paris", b: "London" }, { a: "Rome", b: "Athens" },
-            { a: "Sydney", b: "Melbourne" }, { a: "Rio de Janeiro", b: "Buenos Aires" }, { a: "Đỉnh Everest", b: "Nepal" },
-            { a: "Amazon", b: "Sông Nile" }, { a: "Grand Canyon", b: "Thác Niagara" }, { a: "Taj Mahal", b: "Vạn Lý Trường Thành" },
-            { a: "Tháp Eiffel", b: "Tượng Nữ thần Tự do" }, { a: "Big Ben", b: "Tháp nghiêng Pisa" }, { a: "Thế vận hội", b: "World Cup" },
-            { a: "NBA", b: "NFL" }, { a: "Đánh gôn", b: "Bóng chày" }, { a: "UFC", b: "WWE" },
-            { a: "Twitch", b: "Netflix" }, { a: "Twitter", b: "Facebook" }, { a: "SpaceX", b: "Tesla" },
-            { a: "Burger King", b: "McDonald’s" }, { a: "Sony", b: "Samsung" }, { a: "Mercedes", b: "BMW" },
-            { a: "Đại học Harvard", b: "Đại học MIT" }, { a: "Đại học Oxford", b: "Trường cấp 3" }, { a: "CIA", b: "FBI" },
-            { a: "Hitler", b: "Stalin" }, { a: "Tesla", b: "Porsche" }, { a: "iPhone", b: "Samsung" },
-            { a: "PlayStation", b: "Xbox" }, { a: "Windows", b: "MacOS" }, { a: "YouTube", b: "TikTok" },
-            { a: "Twitch", b: "Kick" }, { a: "Spotify", b: "Apple Music" }, { a: "Reddit", b: "Discord" },
-            { a: "Instagram", b: "Snapchat" }, { a: "ChatGPT", b: "Gemini" }, { a: "Đồng hồ", b: "Đồng hồ mặt trời" },
-            { a: "Máy tính xách tay", b: "Máy tính để bàn" }, { a: "Cá mập", b: "Cá heo" }, { a: "Chim cánh cụt", b: "Hải âu" },
-            { a: "Mặt trăng", b: "Hành tinh" }, { a: "Sao chổi", b: "Tiểu hành tinh" }, { a: "Cây cầu", b: "Đường hầm" },
-            { a: "Xe buýt", b: "Tàu điện" }, { a: "Tàu hỏa", b: "Tàu một ray" }, { a: "Con thuyền", b: "Tàu ngầm" },
-            { a: "Cuốn sổ", b: "Nhật ký" }, { a: "Cái thìa", b: "Cái nĩa" }, { a: "Cái đĩa", b: "Cái bát" },
-            { a: "Đài phun nước", b: "Thác nước" }, { a: "Hồ nước", b: "Ao nước" }, { a: "Hươu cao cổ", b: "Ngựa vằn" },
-            { a: "Con voi", b: "Tê giác" }, { a: "Cá sấu", b: "Cá sấu mõm dài" }, { a: "Con hàu", b: "Ngao" },
-            { a: "Vàng", b: "Bạc" }, { a: "Bạch kim", b: "Vàng" }, { a: "Vải bò", b: "Vải nhung" },
-            { a: "Áo khoác", b: "Áo choàng" }, { a: "Khăn quàng", b: "Cà vạt" }, { a: "Ủng", b: "Giày thể thao" },
-            { a: "Mũ bảo hiểm", b: "Cái mũ" }, { a: "Vòng cổ", b: "Vòng tay" }, { a: "Nhẫn", b: "Hoa tai" },
-            { a: "Mi cờ rô", b: "Cái loa" }, { a: "Tai nghe", b: "Tai nghe nhét tai" }, { a: "Tivi", b: "Đài phát thanh" },
-            { a: "Máy chiếu", b: "Màn hình" }, { a: "Máy tính", b: "Máy đánh chữ" }, { a: "Đèn pin", b: "Đèn lồng" },
-            { a: "Cái lều", b: "Nhà gỗ" }, { a: "La bàn", b: "Bản đồ" }, { a: "Thẻ lên máy bay", b: "Căn cước công dân" },
-            { a: "Vé", b: "Hóa đơn" }, { a: "Hộ chiếu", b: "Vé máy bay" }, { a: "Tàu điện ngầm", b: "Taxi" },
-            { a: "Bầu trời", b: "Máy bay phản lực" }, { a: "Xe máy", b: "Xe tay ga" }, { a: "Ván lướt sóng", b: "Ván trượt" },
-            { a: "Bóng chày", b: "Bóng đá" }, { a: "Bóng chuyền", b: "Bóng rổ" }, { a: "Bóng bàn", b: "Cầu lông" },
-            { a: "Tiệm bánh", b: "Người bán thịt" }, { a: "Câu đố", b: "Ô chữ" }, { a: "Thẻ bài", b: "Xúc xắc" },
-            { a: "Ném bowling", b: "Đánh gôn" }, { a: "Chạy việt dã", b: "Chạy nước rút" }, { a: "Đấu kiếm", b: "Bắn cung" },
-            { a: "Quyền anh", b: "Võ karate" }, { a: "Khúc côn cầu", b: "Bóng đá" }, { a: "Buổi hòa nhạc", b: "Lễ hội" },
-            { a: "Tiểu thuyết", b: "Bài thơ" }, { a: "Từ điển", b: "Bách khoa toàn thư" }, { a: "Dược sĩ", b: "Bác sĩ" },
-            { a: "Kỹ sư", b: "Kiến trúc sư" }, { a: "Lính cứu hỏa", b: "Cảnh sát" }, { a: "Nước Đức", b: "Nước Pháp" },
-            { a: "Phi công", b: "Phi hành gia" }, { a: "Thẩm phán", b: "Hình phạt" }, { a: "Thợ làm bánh", b: "Đầu bếp" },
-            { a: "Nông dân", b: "Ngư dân" }, { a: "Thợ rèn", b: "Thợ mộc" }, { a: "Thiên đường", b: "Địa ngục" },
-            { a: "Bầu trời", b: "Đám mây" }, { a: "Nhật Bản", b: "Trung Quốc" }, { a: "Nước Đức", b: "Bia" },
-            { a: "Bộ phim", b: "Diễn viên" }, { a: "Màn hình", b: "Tivi" }, { a: "Nước Pháp", b: "Tháp Eiffel" },
-            { a: "Thần sấm", b: "Tia chớp" }, { a: "Obi Wan", b: "Thần lực" }, { a: "Đĩa bay", b: "Thiết bị bay không người lái" },
-            { a: "Chúa trời", b: "Thiên đường" }, { a: "Bánh bột ngô", b: "Bánh xèo Mexico" }, { a: "Bánh mì Pháp", b: "Bánh mì Ý" },
-            { a: "Bánh mì kẹp xúc xích", b: "Xúc xích Đức" }, { a: "Nước tăng lực", b: "Nước ngọt" }, { a: "Nước cốt dừa", b: "Sữa đậu nành" },
-            { a: "Picasso", b: "Van Gogh" }, { a: "Mozart", b: "Beethoven" }, { a: "Messi", b: "Ronaldo" },
-            { a: "Bayern Munich", b: "Real Madrid" }, { a: "Ferrari", b: "Lamborghini" }, { a: "Coca-Cola", b: "Pepsi" },
-            { a: "London", b: "Paris" }, { a: "Los Angeles", b: "New York" }, { a: "Big Ben", b: "Tháp nghiêng Pisa" },
-            { a: "Tượng Nữ thần Tự do", b: "Tháp Eiffel" }, { a: "Con chuột", b: "Bàn phím" }, { a: "Tivi", b: "Máy tính xách tay" },
-            { a: "Tủ quần áo", b: "Tủ kính" }, { a: "Cây phong", b: "Cây bụi" }, { a: "Máy sưởi", b: "Máy sấy tóc" },
-            { a: "Cái đèn", b: "Ngọn nến" }, { a: "Cái gối", b: "Cái chăn" }, { a: "Mi cờ rô", b: "Máy ảnh" },
-            { a: "Lò nướng", b: "Lò vi sóng" }, { a: "Cái chảo", b: "Cái nồi" }, { a: "Máy tính bảng", b: "Điện thoại thông minh" },
-            { a: "Cầu thang", b: "Thang máy" }, { a: "Nhạc Techno", b: "Nhạc Rap" }, { a: "Nhạc Rock", b: "Nhạc Pop" },
-            { a: "Bóng bàn", b: "Cầu lông" }, { a: "Cửa sổ", b: "Cái cửa" }, { a: "Lò nướng", b: "Hệ thống sưởi" },
-            { a: "Đồng hồ đeo tay", b: "Đồng hồ báo thức" }, { a: "Giường ngủ", b: "Ghế sô pha" }, { a: "Quyển sách", b: "Tờ báo" },
-            { a: "Khu rừng", b: "Công viên" }, { a: "Rạp chiếu phim", b: "Sân bowling" }, { a: "Netflix", b: "Rạp chiếu phim" },
-            { a: "Hồ bơi", b: "Bãi biển" }, { a: "Cái ly", b: "Cái cốc" }, { a: "Công việc", b: "Sở thích" },
-            { a: "Chúa Giê-su", b: "Ông già Noel" }, { a: "Áo lót", b: "Bikini" },
-            { a: "Sơn Tùng M-TP", b: "Jack" }, { a: "Độ Mixi", b: "PewPew" }, { a: "Trấn Thành", b: "Trường Giang" },
-            { a: "Hồ Ngọc Hà", b: "Mỹ Tâm" }, { a: "Đen Vâu", b: "Binz" }, { a: "MONO", b: "HIEUTHUHAI" },
-            { a: "Lê Dương Bảo Lâm", b: "Kiều Minh Tuấn" }, { a: "Ninh Dương Lan Ngọc", b: "Thúy Ngân" },
-            { a: "Suboi", b: "JustaTee" }, { a: "Tóc Tiên", b: "Bảo Anh" }, { a: "Đàm Vĩnh Hưng", b: "Tuấn Hưng" },
-            { a: "Jisoo", b: "Jennie" }, { a: "Rosé", b: "Lisa" }, { a: "Ronaldo", b: "Messi" }, { a: "Faker", b: "SofM" },
-            { a: "Facebook", b: "Instagram" }, { a: "Tiktok", b: "Youtube" }, { a: "Tinder", b: "Bumble" },
-            { a: "Zalo", b: "Messenger" }, { a: "Shopee", b: "Lazada" }, { a: "Grab", b: "Be" },
-            { a: "iPhone", b: "Samsung" }, { a: "Macbook", b: "Windows" }, { a: "Máy tính bảng", b: "Máy tính xách tay" },
-            { a: "Tai nghe có dây", b: "Tai nghe không dây" }, { a: "Bàn phím cơ", b: "Bàn phím thường" },
-            { a: "Chuột không dây", b: "Chuột có dây" }, { a: "Mạng Wifi", b: "Mạng 4G" },
-            { a: "ChatGPT", b: "Gemini" }, { a: "ZaloPay", b: "MoMo" }, { a: "Vợ", b: "Người yêu" }, 
-            { a: "Chồng", b: "Bạn trai" }, { a: "Em gái mưa", b: "Bạn thân" }, { a: "Người yêu cũ", b: "Tình đầu" }, 
-            { a: "Tình đơn phương", b: "Tình sét đánh" }, { a: "Độc thân", b: "Thất tình" }, { a: "Trà xanh", b: "Tiểu tam" }, 
-            { a: "Trapboy", b: "Fuckboy" }, { a: "Bố chồng", b: "Bố vợ" }, { a: "Mẹ chồng", b: "Mẹ vợ" }, 
-            { a: "Tuần trăng mật", b: "Đêm tân hôn" }, { a: "Đám cưới", b: "Đám hỏi" }, { a: "Cắm sừng", b: "Bắt cá hai tay" }, 
-            { a: "Bạn thân", b: "Đồng nghiệp" }, { a: "Phông bạt", b: "Sống ảo" }, { a: "Bún đậu mắm tôm", b: "Bún chả" }, 
-            { a: "Phở bò", b: "Bún bò" }, { a: "Cơm tấm", b: "Cơm rang" }, { a: "Bánh mì", b: "Bánh bao" }, 
-            { a: "Trà sữa", b: "Trà chanh" }, { a: "Cà phê sữa", b: "Bạc xỉu" }, { a: "Lẩu Thái", b: "Lẩu hải sản" }, 
-            { a: "Thịt nướng", b: "Gà rán" }, { a: "Nem rán", b: "Gỏi cuốn" }, { a: "Bánh xèo", b: "Bánh khọt" }, 
-            { a: "Nước ép cam", b: "Sinh tố xoài" }, { a: "Coca", b: "Pepsi" }, { a: "Mì tôm", b: "Phở gói" }, 
-            { a: "Sầu riêng", b: "Mít" }, { a: "Trứng vịt lộn", b: "Trứng cút lộn" }, { a: "Hành lá", b: "Rau mùi" }, 
-            { a: "Trứng rán", b: "Trứng luộc" }, { a: "Tương ớt", b: "Tương cà" }, { a: "Bún riêu", b: "Bún ốc" }, 
-            { a: "Bánh chưng", b: "Bánh tét" }, { a: "Xôi đậu xanh", b: "Xôi gấc" }, { a: "Cơm rang", b: "Cơm trộn" }, 
-            { a: "Nước mắm", b: "Nước tương" }, { a: "Sữa tươi", b: "Sữa đặc" }, { a: "Cà phê đen", b: "Cà phê sữa" }, 
-            { a: "Rượu", b: "Bia" }, { a: "Chanh leo", b: "Cam vắt" }, { a: "Bánh quy", b: "Bánh xốp" }, 
-            { a: "Bánh sinh nhật", b: "Bánh trung thu" }, { a: "Muối vừng", b: "Muối tiêu" }, { a: "Cháo sườn", b: "Cháo trai" }, 
-            { a: "Nước lọc", b: "Nước khoáng" }, { a: "Sinh tố", b: "Nước ép" }, { a: "Liên Minh", b: "Liên Quân" }, 
-            { a: "PUBG", b: "Free Fire" }, { a: "Tốc Chiến", b: "Mobile Legends" }, { a: "CSGO", b: "Valorant" }, 
-            { a: "FO4", b: "PES" }, { a: "Cầu lông", b: "Quần vợt" }, { a: "Bóng đá", b: "Bóng rổ" }, 
-            { a: "Bóng rổ", b: "Bóng chuyền" }, { a: "Cờ vua", b: "Cờ tướng" }, { a: "Ma sói", b: "Mèo nổ" }, 
-            { a: "Tiến lên", b: "Phỏm" }, { a: "Cờ tỷ phú", b: "Cờ cá ngựa" }, { a: "Chạy bộ", b: "Đi bộ" }, 
-            { a: "Bơi lội", b: "Lặn biển" }, { a: "Giảng viên", b: "Giáo viên" }, { a: "Lớp trưởng", b: "Lớp phó" }, 
-            { a: "Sinh viên", b: "Học sinh" }, { a: "Ký túc xá", b: "Nhà trọ" }, { a: "Kiểm tra miệng", b: "Thi học kỳ" }, 
-            { a: "Giám thị", b: "Bảo vệ" }, { a: "Bác sĩ", b: "Y tá" }, { a: "Công an", b: "Bộ đội" }, 
-            { a: "Lập trình viên", b: "Thiết kế" }, { a: "Ca sĩ", b: "Diễn viên" }, { a: "Nhà văn", b: "Nhà báo" }, 
-            { a: "Kế toán", b: "Thu ngân" }, { a: "Streamer", b: "Youtuber" }, { a: "Thợ cắt tóc", b: "Thợ trang điểm" }, 
-            { a: "Nông dân", b: "Ngư dân" }, { a: "Thợ xây", b: "Thợ mộc" }, { a: "Nhạc sĩ", b: "Họa sĩ" }, 
-            { a: "Đầu bếp", b: "Bồi bàn" }, { a: "Giám đốc", b: "Thư ký" }, { a: "Phi công", b: "Thủy thủ" }, 
-            { a: "Lao công", b: "Bảo vệ" }, { a: "Luật sư", b: "Thẩm phán" }, { a: "Áo phông", b: "Áo sơ mi" }, 
-            { a: "Quần đùi", b: "Quần lót" }, { a: "Giày thể thao", b: "Giày da" }, { a: "Dép tông", b: "Dép tổ ong" }, 
-            { a: "Bàn chải", b: "Khăn mặt" }, { a: "Sữa tắm", b: "Dầu gội" }, { a: "Kính cận", b: "Kính râm" }, 
-            { a: "Bút bi", b: "Bút chì" }, { a: "Son lì", b: "Son dưỡng" }, { a: "Kem chống nắng", b: "Sữa rửa mặt" }, 
-            { a: "Tủ lạnh", b: "Điều hòa" }, { a: "Xe máy", b: "Xe đạp điện" }, { a: "Ô tô", b: "Taxi" }, 
-            { a: "Mũ bảo hiểm", b: "Mũ lưỡi trai" }, { a: "Chăn", b: "Gối" }, { a: "Quạt trần", b: "Quạt cây" }, 
-            { a: "Bếp ga", b: "Bếp từ" }, { a: "Ấm siêu tốc", b: "Phích nước" }, { a: "Bát", b: "Đĩa" }, 
-            { a: "Đũa", b: "Thìa" }, { a: "Nồi", b: "Chảo" }, { a: "Chổi đót", b: "Cây lau nhà" }, 
-            { a: "Thước kẻ", b: "Compa" }, { a: "Cục tẩy", b: "Bút xóa" }, { a: "Băng dính", b: "Hồ dán" }, 
-            { a: "Kéo", b: "Dao rọc giấy" }, { a: "Lược", b: "Gương" }, { a: "Màn", b: "Đệm" }, 
-            { a: "Cờ đỏ", b: "Cờ xanh" }, { a: "Hướng nội", b: "Hướng ngoại" }, { a: "Bóc phốt", b: "Hóng biến" }, 
-            { a: "Thao túng tâm lý", b: "Tẩy não" }, { a: "Suy nghĩ nhiều", b: "Đau đầu" }, { a: "Báo thủ", b: "Trẻ trâu" }, 
-            { a: "Phông bạt", b: "Lùa gà" }, { a: "Xà lơ", b: "Vô tri" }, { a: "Mỏ hỗn", b: "Thảo mai" }, 
-            { a: "Đu thần tượng", b: "Đẩy thuyền" }, { a: "Cà khịa", b: "Đá đểu" }, { a: "Lụy tình", b: "Trai ngoan" }, 
-            { a: "Mãi mận", b: "Mãi keo" }, { a: "Cẩu lương", b: "Trà xanh" }, { a: "Bùng kèo", b: "Cao su" }, 
-            { a: "Kể khổ", b: "Làm mình làm mẩy" }, { a: "Hà Nội", b: "Sài Gòn" }, { a: "Đà Lạt", b: "Sapa" }, 
-            { a: "Vịnh Hạ Long", b: "Tràng An" }, { a: "Hồ Gươm", b: "Nguyễn Huệ" }, { a: "Cầu Vàng", b: "Cầu Rồng" }, 
-            { a: "Chợ Bến Thành", b: "Chợ Đồng Xuân" }, { a: "Hồ Tây", b: "Hồ Gươm" }, { a: "Lăng Bác", b: "Văn Miếu" }, 
-            { a: "Phú Quốc", b: "Nha Trang" }, { a: "Tạ Hiện", b: "Bùi Viện" }, { a: "Chợ đêm", b: "Siêu thị" }, 
-            { a: "Quán nét", b: "Quán bida" }, { a: "Rap Việt", b: "Anh Trai Say Hi" }, { a: "Táo Quân", b: "Thách Thức Danh Hài" }, 
-            { a: "Doraemon", b: "Nobita" }, { a: "Conan", b: "Kaito Kid" }, { a: "Tom", b: "Oggy" }, 
-            { a: "Siêu nhân Gao", b: "Siêu nhân Nhện" }, { a: "Iron Man", b: "Batman" }, { a: "Thanos", b: "Deadpool" }, 
-            { a: "Bát Giới", b: "Ngộ Không" }, { a: "Lão Hạc", b: "Cậu Vàng" }, { a: "Elsa", b: "Rapunzel" }, 
-            { a: "Harry Potter", b: "Voldemort" }, { a: "Running Man", b: "Hai Ngày Một Đêm" }, { a: "Chó Corgi", b: "Chó Husky" }, 
-            { a: "Mèo Anh", b: "Mèo mướp" }, { a: "Cua đồng", b: "Ghẹ biển" }, { a: "Cá mập", b: "Cá voi" }, 
-            { a: "Đại bàng", b: "Cú mèo" }, { a: "Khỉ", b: "Vượn" }, { a: "Rắn", b: "Trăn" }, 
-            { a: "Muỗi", b: "Ruồi" }, { a: "Gián", b: "Chuột" }, { a: "Cây đào", b: "Cây mai" }, 
-            { a: "Quả sầu riêng", b: "Quả mít" }, { a: "Quả chanh", b: "Quả sấu" }, { a: "Củ sắn", b: "Củ đậu" }, 
-            { a: "Rau muống", b: "Bắp cải" }, { a: "Hoa hồng", b: "Hoa cúc" }, { a: "Xương rồng", b: "Nha đam" }, 
-            { a: "Cáo", b: "Chồn" }, { a: "Rùa", b: "Ốc sên" }, { a: "Cá sấu", b: "Cá heo" }, 
-            { a: "Tôm", b: "Cua" }, { a: "Bạch tuộc", b: "Mực" }, { a: "Sư tử", b: "Hổ" }, 
-            { a: "Gà trống", b: "Gà mái" }, { a: "Bò", b: "Trâu" }, { a: "Bướm", b: "Ong" }, 
-            { a: "Chim sẻ", b: "Đại bàng" }, { a: "Cây đa", b: "Cây bàng" }, { a: "Hoa sen", b: "Hoa súng" }, 
-            { a: "Hoa lan", b: "Hoa mai" }, { a: "Cỏ ba lá", b: "Cỏ bốn lá" }, { a: "Đánh răng", b: "Súc miệng" }, 
-            { a: "Tắm đứng", b: "Tắm bồn" }, { a: "Gội đầu", b: "Cắt tóc" }, { a: "Ngủ nướng", b: "Thức khuya" }, 
-            { a: "Quét nhà", b: "Lau nhà" }, { a: "Giặt tay", b: "Giặt máy" }, { a: "Cạo râu", b: "Nhổ râu" }, 
-            { a: "Đi siêu thị", b: "Đi chợ" }, { a: "Chuyển khoản", b: "Rút tiền" }, { a: "Hát karaoke", b: "Đi bar" }, 
-            { a: "Khóc thầm", b: "Cười to" }, { a: "Tắc đường", b: "Vượt đèn đỏ" }, { a: "Đọc sách", b: "Nghe nhạc" }, 
-            { a: "Đặt đồ ăn", b: "Tự nấu" }, { a: "Khóc", b: "Cười" }, { a: "Thức", b: "Ngủ" }, 
-            { a: "Đi bộ", b: "Chạy bộ" }, { a: "Bơi", b: "Lặn" }, { a: "Ăn", b: "Uống" }, 
-            { a: "Đọc", b: "Viết" }, { a: "Mua", b: "Bán" }, { a: "Đóng", b: "Mở" }, 
-            { a: "Kéo", b: "Đẩy" }, { a: "Hát", b: "Múa" }, { a: "Đấm", b: "Đá" }, 
-            { a: "Nhéo", b: "Cấu" }, { a: "Nhai", b: "Nuốt" }, { a: "Thở", b: "Nín thở" }, 
-            { a: "Ngáp", b: "Hắt xì" }, { a: "Khóc nấc", b: "Cười mỉm" }, { a: "Ngày", b: "Đêm" }, 
-            { a: "Sáng", b: "Tối" }, { a: "Hoàng hôn", b: "Bình minh" }, { a: "Xuân", b: "Thu" }, 
-            { a: "Hạ", b: "Đông" }, { a: "Nắng", b: "Mưa" }, { a: "Gió", b: "Bão" }, 
-            { a: "Sấm", b: "Sét" }, { a: "Sông", b: "Suối" }, { a: "Biển", b: "Hồ" }, 
-            { a: "Núi", b: "Đồi" }, { a: "Rừng", b: "Sa mạc" }, { a: "Đường nhựa", b: "Đường đất" }, 
-            { a: "Cầu", b: "Hầm" }, { a: "Nông thôn", b: "Thành phố" }, { a: "Tay", b: "Chân" }, 
-            { a: "Mắt", b: "Mũi" }, { a: "Miệng", b: "Môi" }, { a: "Răng", b: "Lưỡi" }, 
-            { a: "Tóc", b: "Râu" }, { a: "Bụng", b: "Lưng" }, { a: "Ngón tay", b: "Ngón chân" }, 
-            { a: "Facebook", b: "Instagram" }, { a: "Youtube", b: "Tiktok" }, { a: "Nike", b: "Adidas" }, 
-            { a: "Gucci", b: "Dior" }, { a: "Apple", b: "Samsung" }, { a: "Honda", b: "Yamaha" }, 
-            { a: "Pepsi", b: "Coca" }, { a: "Grab", b: "Uber" }, { a: "Tinder", b: "Bumble" }, 
-            { a: "Shopee", b: "Lazada" }, { a: "Google", b: "Yahoo" }, { a: "Windows", b: "MacOS" }, 
-            { a: "Laptop", b: "Desktop" }, { a: "Mouse", b: "Keyboard" }, { a: "Black", b: "White" }, 
-            { a: "Sun", b: "Moon" }, { a: "King", b: "Queen" }, { a: "Marvel", b: "DC" }, 
-            { a: "Master", b: "Challenger" }, { a: "Like", b: "Share" }, { a: "Download", b: "Upload" }, 
-            { a: "Online", b: "Offline" }, { a: "Enter", b: "Space" }, { a: "Delete", b: "Backspace" }, 
-            { a: "Copy", b: "Paste" }, { a: "Zoom", b: "Skype" }, { a: "Word", b: "Excel" }, 
-            { a: "Inbox", b: "Comment" }, { a: "Follow", b: "Subscribe" }, { a: "Mute", b: "Block" }, 
-            { a: "Troll", b: "Spam" }, { a: "Story", b: "Reels" }, { a: "Podcast", b: "Vlog" }, 
-            { a: "Iron Man", b: "Batman" }, { a: "Superman", b: "Spiderman" }, { a: "Gold", b: "Silver" }, 
-            { a: "Start", b: "Stop" }, { a: "Winner", b: "Loser" }, { a: "Máy bay", b: "Trực thăng" }, 
-            { a: "Tàu hỏa", b: "Tàu thủy" }, { a: "Xe cứu thương", b: "Xe cứu hỏa" }, { a: "Xe tải", b: "Xe bồn" }, 
-            { a: "Gương chiếu hậu", b: "Kính chắn gió" }, { a: "Vô lăng", b: "Tay lái" }, { a: "Phà", b: "Đò" }, 
-            { a: "Xe buýt", b: "Xe khách" }, { a: "Du thuyền", b: "Ca nô" }, { a: "Tàu ngầm", b: "Tàu sân bay" }, 
-            { a: "Đường sắt", b: "Đường thủy" }, { a: "Biển báo giao thông", b: "Đèn giao thông" }, { a: "Tủ quần áo", b: "Tủ giày" }, 
-            { a: "Bàn ăn", b: "Bàn làm việc" }, { a: "Ghế sofa", b: "Ghế đẩu" }, { a: "Đèn chùm", b: "Đèn tuýp" }, 
-            { a: "Máy hút bụi", b: "Robot lau nhà" }, { a: "Lò vi sóng", b: "Lò nướng" }, { a: "Nồi chiên không dầu", b: "Nồi áp suất" }, 
-            { a: "Bếp than", b: "Bếp củi" }, { a: "Máy rửa bát", b: "Máy sấy quần áo" }, { a: "Nệm cao su", b: "Nệm lò xo" }, 
-            { a: "Rèm cửa", b: "Cửa cuốn" }, { a: "Chìa khóa", b: "Ổ khóa" }, { a: "Sao chổi", b: "Sao băng" }, 
-            { a: "Mặt trời", b: "Trái đất" }, { a: "Hố đen", b: "Dải ngân hà" }, { a: "Nhật thực", b: "Nguyệt thực" }, 
-            { a: "Bão cát", b: "Bão tuyết" }, { a: "Động đất", b: "Sóng thần" }, { a: "Mây", b: "Sương mù" }, 
-            { a: "Cầu vồng", b: "Cực quang" }, { a: "Hạn hán", b: "Lũ lụt" }, { a: "Băng trôi", b: "Núi lửa" }, 
-            { a: "Giọt sương", b: "Giọt mưa" }, { a: "Bột ngọt", b: "Bột nêm" }, { a: "Hành khô", b: "Tỏi khô" }, 
-            { a: "Ớt tươi", b: "Mù tạt" }, { a: "Dấm", b: "Chanh" }, { a: "Sữa chua", b: "Váng sữa" }, 
-            { a: "Trân châu đen", b: "Trân châu trắng" }, { a: "Thạch dừa", b: "Thạch rau câu" }, { a: "Đường", b: "Muối" }, 
-            { a: "Nước mắm", b: "Mắm tôm" }, { a: "Dầu ăn", b: "Dầu hào" }, { a: "Gừng", b: "Sả" }, 
-            { a: "Chó sói", b: "Cáo" }, { a: "Gấu trúc", b: "Gấu Bắc Cực" }, { a: "Hươu cao cổ", b: "Đà điểu" }, 
-            { a: "Tê giác", b: "Hà mã" }, { a: "Chim công", b: "Chim phượng" }, { a: "Gà lôi", b: "Gà tây" }, 
-            { a: "Chuồn chuồn", b: "Đom đóm" }, { a: "Kiến", b: "Mối" }, { a: "Rết", b: "Cuốn chiếu" }, 
-            { a: "Mực ống", b: "Mực lá" }, { a: "Tôm hùm", b: "Cá mập" }, { a: "Nai", b: "Bò tót" }, 
-            { a: "Áo khoác", b: "Áo len" }, { a: "Quần lửng", b: "Quần ngố" }, { a: "Váy liền", b: "Chân váy" }, 
-            { a: "Dây chuyền", b: "Hoa tai" }, { a: "Túi xách", b: "Balo" }, { a: "Ví da", b: "Bóp đựng tiền" }, 
-            { a: "Khăn quàng", b: "Găng tay" }, { a: "Áo mưa", b: "Ô che nắng" }, { a: "Dây giày", b: "Lót giày" }, 
-            { a: "Thắt lưng", b: "Dây nịt" }, { a: "Kỹ sư", b: "Kiến trúc sư" }, { a: "Thợ hàn", b: "Thợ tiện" }, 
-            { a: "Kế toán", b: "Kiểm toán" }, { a: "Nhân sự", b: "Hành chính" }, { a: "Tiếp viên hàng không", b: "Lễ tân" }, 
-            { a: "Thợ điện", b: "Thợ nước" }, { a: "Biên tập viên", b: "MC truyền hình" }, { a: "Chuyên viên", b: "Giám đốc" }, 
-            { a: "Đạo diễn", b: "Quay phim" }, { a: "Tự tin", b: "Tự ti" }, { a: "Buồn chán", b: "Cô đơn" }, 
-            { a: "Giận dữ", b: "Sợ hãi" }, { a: "Ghen tị", b: "Ngưỡng mộ" }, { a: "Lo lắng", b: "Hồi hộp" }, 
-            { a: "Đau đầu", b: "Đau bụng" }, { a: "Chóng mặt", b: "Buồn nôn" }, { a: "Say rượu", b: "Say xe" }, 
-            { a: "Hạnh phúc", b: "Mãn nguyện" }, { a: "Cat", b: "Dog" }, { a: "Boy", b: "Girl" }, 
-            { a: "Man", b: "Woman" }, { a: "Water", b: "Fire" }, { a: "Ice", b: "Snow" }, 
-            { a: "Car", b: "Bus" }, { a: "Phone", b: "Laptop" }, { a: "Red", b: "Blue" }, 
-            { a: "Guitar", b: "Piano" }, { a: "Football", b: "Basketball" }, { a: "Left", b: "Right" }, 
-            { a: "Up", b: "Down" }, { a: "Good", b: "Bad" }, { a: "Happy", b: "Sad" }, 
-            { a: "Morning", b: "Evening" }, { a: "Summer", b: "Winter" }, { a: "Teacher", b: "Student" }, 
-            { a: "Doctor", b: "Nurse" }, { a: "Single", b: "Married" }, { a: "Hello", b: "Goodbye" }, 
-            { a: "Yes", b: "No" }, { a: "True", b: "False" }, { a: "Buy", b: "Sell" }, 
-            { a: "Open", b: "Close" }, { a: "Tòa tháp", b: "Tòa nhà" }, { a: "Biệt thự", b: "Lâu đài" }, 
-            { a: "Đình làng", b: "Đền thờ" }, { a: "Miếu", b: "Chùa" }, { a: "Cửa sổ", b: "Cửa chính" }, 
-            { a: "Cầu thang", b: "Thang máy" }, { a: "Ban công", b: "Sân thượng" }, { a: "Tầng hầm", b: "Tầng trệt" }, 
-            { a: "Tường", b: "Vách ngăn" }, { a: "Cột điện", b: "Cột cờ" }, { a: "Bãi đỗ xe", b: "Trạm xăng" }, 
-            { a: "Công viên", b: "Vườn hoa" }, { a: "Nghĩa trang", b: "Bệnh viện" }, { a: "Sân bay", b: "Bến xe" }, 
-            { a: "Búa", b: "Đinh" }, { a: "Kìm", b: "Cờ lê" }, { a: "Tua vít", b: "Ốc vít" }, 
-            { a: "Cưa", b: "Rựa" }, { a: "Xẻng", b: "Cuốc" }, { a: "Kéo", b: "Dao" }, 
-            { a: "Cân", b: "Thước" }, { a: "Chổi", b: "Đồ hót rác" }, { a: "Bơm tiêm", b: "Nhíp" }, 
-            { a: "Kim khâu", b: "Chỉ khâu" }, { a: "Súng", b: "Đạn" }, { a: "Kiếm", b: "Khiên" }, 
-            { a: "Cung", b: "Tên" }, { a: "Pháo", b: "Lựu đạn" }, { a: "Game offline", b: "Game online" }, 
-            { a: "Chuột máy tính", b: "Tay cầm" }, { a: "Sát thủ", b: "Đấu sĩ" }, { a: "Xạ thủ", b: "Pháp sư" }, 
-            { a: "Rừng", b: "Đi mid" }, { a: "Quái vật", b: "Boss" }, { a: "Hồi máu", b: "Tăng giáp" }, 
-            { a: "Bắn tỉa", b: "Cận chiến" }, { a: "Bàn phím", b: "Màn hình" }, { a: "Tai nghe", b: "Loa vi tính" }, 
-            { a: "Điểm kinh nghiệm", b: "Cấp độ" }, { a: "Thắng", b: "Thua" }, { a: "Trống đồng", b: "Cồng chiêng" }, 
-            { a: "Áo dài", b: "Áo bà ba" }, { a: "Nón lá", b: "Nón quai thao" }, { a: "Cải lương", b: "Chèo" }, 
-            { a: "Tuồng", b: "Đờn ca tài tử" }, { a: "Ca dao", b: "Tục ngữ" }, { a: "Thần thoại", b: "Cổ tích" }, 
-            { a: "Múa rối nước", b: "Múa lân" }, { a: "Tre", b: "Trúc" }, { a: "Hoa sen", b: "Hoa mai" }, 
-            { a: "Long", b: "Phụng" }, { a: "Quy", b: "Lân" }, { a: "Quạt giấy", b: "Quạt nan" }, 
-            { a: "Sốt", b: "Cảm lạnh" }, { a: "Ho", b: "Hắt hơi" }, { a: "Dị ứng", b: "Ngộ độc" }, 
-            { a: "Thuốc Tây", b: "Thuốc Nam" }, { a: "Tiêm", b: "Uống thuốc" }, { a: "Khám bệnh", b: "Phẫu thuật" }, 
-            { a: "Máu", b: "Nước biển" }, { a: "Băng gạc", b: "Thuốc sát trùng" }, { a: "Khẩu trang", b: "Mặt nạ y tế" }, 
-            { a: "Cặp nhiệt độ", b: "Ống nghe" }, { a: "Sự thật", b: "Dối trá" }, { a: "Quá khứ", b: "Tương lai" }, 
-            { a: "Hòa bình", b: "Chiến tranh" }, { a: "Hữu hình", b: "Vô hình" }, { a: "Thành công", b: "Thất bại" }, 
-            { a: "Dũng cảm", b: "Hèn nhát" }, { a: "Thông minh", b: "Ngốc nghếch" }, { a: "Đẹp", b: "Xấu" }, 
-            { a: "Nhanh", b: "Chậm" }, { a: "Cao", b: "Thấp" }, { a: "Dài", b: "Ngắn" }, 
-            { a: "Cứng", b: "Mềm" }, { a: "Nặng", b: "Nhẹ" }, { a: "Khô", b: "Ướt" }, 
-            { a: "Bắc Cực", b: "Nam Cực" }, { a: "Châu Á", b: "Châu Âu" }, { a: "Vĩ tuyến", b: "Kinh tuyến" }, 
-            { a: "Quần đảo", b: "Bán đảo" }, { a: "Đầm lầy", b: "Rừng ngập mặn" }, { a: "Đồng bằng", b: "Cao nguyên" }, 
-            { a: "Hang động", b: "Vách đá" }, { a: "Không khí", b: "Nước" }, { a: "Khí quyển", b: "Tầng ôzôn" }, 
-            { a: "Ô nhiễm", b: "Tái chế" }, { a: "Hot", b: "Cold" }, { a: "Big", b: "Small" }, 
-            { a: "Fast", b: "Slow" }, { a: "Hard", b: "Soft" }, { a: "Heavy", b: "Light" }, 
-            { a: "Clean", b: "Dirty" }, { a: "Rich", b: "Poor" }, { a: "Old", b: "New" }, 
-            { a: "Empty", b: "Full" }, { a: "Simple", b: "Complex" }, { a: "Cheap", b: "Expensive" }, 
-            { a: "Laugh", b: "Cry" }, { a: "Love", b: "Hate" }, { a: "Walk", b: "Run" }, 
-            { a: "Stand", b: "Sit" }, { a: "Push", b: "Pull" }, { a: "Win", b: "Lose" }, 
-            { a: "Play", b: "Work" }, { a: "Read", b: "Write" }, { a: "Speak", b: "Listen" }, 
-            { a: "Give", b: "Take" }, { a: "Teach", b: "Learn" }, { a: "Arrive", b: "Depart" }, 
-            { a: "Ask", b: "Answer" }, { a: "Break", b: "Fix" }, { a: "Catch", b: "Throw" }, 
-            { a: "Find", b: "Lose" }, { a: "Grow", b: "Shrink" }, { a: "Hide", b: "Seek" }, 
-            { a: "Sing", b: "Dance" }, { a: "Smile", b: "Frown" }, { a: "Accept", b: "Reject" }, 
-            { a: "Agree", b: "Disagree" }, { a: "Begin", b: "End" }, { a: "Build", b: "Destroy" }, 
-            { a: "Catch", b: "Miss" }, { a: "Create", b: "Ruin" }, { a: "Enjoy", b: "Suffer" }, 
-            { a: "Forget", b: "Remember" }, { a: "Ignore", b: "Notice" }, { a: "Join", b: "Leave" }, 
-            { a: "Keep", b: "Share" }, { a: "Pass", b: "Fail" }, { a: "Save", b: "Spend" }, 
-            { a: "Show", b: "Hide" }, { a: "Stop", b: "Start" }, { a: "Trust", b: "Doubt" }, 
-            { a: "Attack", b: "Defend" }, { a: "Combine", b: "Separate" }, { a: "Punish", b: "Reward" }, 
-            { a: "Toán học", b: "Vật lý" }, { a: "Hóa học", b: "Sinh học" }, { a: "Lịch sử", b: "Địa lý" }, 
-            { a: "Ngữ văn", b: "Tiếng Anh" }, { a: "Thể dục", b: "Quốc phòng" }, { a: "Bảng đen", b: "Phấn trắng" }, 
-            { a: "Bút dạ", b: "Phấn" }, { a: "Sách giáo khoa", b: "Vở bài tập" }, { a: "Giấy thi", b: "Giấy nháp" }, 
-            { a: "Học thêm", b: "Học bù" }, { a: "Thi giữa kỳ", b: "Thi cuối kỳ" }, { a: "Trượt môn", b: "Học lại" }, 
-            { a: "Bút mực", b: "Bút chì" }, { a: "Điểm mười", b: "Điểm liệt" }, { a: "Họp phụ huynh", b: "Sổ liên lạc" }, 
-            { a: "Màu đỏ", b: "Màu hồng" }, { a: "Màu xanh lá", b: "Màu xanh biển" }, { a: "Màu đen", b: "Màu trắng" }, 
-            { a: "Màu vàng", b: "Màu cam" }, { a: "Màu tím", b: "Màu nâu" }, { a: "Hình tròn", b: "Hình cầu" }, 
-            { a: "Hình vuông", b: "Hình chữ nhật" }, { a: "Hình tam giác", b: "Hình chóp" }, { a: "Đường thẳng", b: "Đường cong" }, 
-            { a: "Lập phương", b: "Trụ" }, { a: "Đàn Guitar", b: "Đàn Ukulele" }, { a: "Đàn Piano", b: "Đàn Organ" }, 
-            { a: "Sáo", b: "Tiêu" }, { a: "Trống", b: "Cồng chiêng" }, { a: "Nhạc Pop", b: "Nhạc Rock" }, 
-            { a: "Nhạc Bolero", b: "Nhạc Trữ tình" }, { a: "Nhạc Trẻ", b: "Nhạc Rap" }, { a: "Micro", b: "Loa" }, 
-            { a: "Ca từ", b: "Giai điệu" }, { a: "Nốt nhạc", b: "Khuông nhạc" }, { a: "Nhạc công", b: "Ca sĩ" }, 
-            { a: "Rồng", b: "Phượng hoàng" }, { a: "Kỳ lân", b: "Nhân mã" }, { a: "Tiên cá", b: "Phù thủy" }, 
-            { a: "Ma cà rồng", b: "Người sói" }, { a: "Yêu tinh", b: "Ác quỷ" }, { a: "Quái vật", b: "Thần linh" }, 
-            { a: "Người ngoài hành tinh", b: "Đĩa bay" }, { a: "Siêu anh hùng", b: "Ác nhân" }, { a: "Ma quỷ", b: "Thần tiên" }, 
-            { a: "Thiên thần", b: "Ác quỷ" }, { a: "Huy chương vàng", b: "Huy chương bạc" }, { a: "Trọng tài", b: "Huấn luyện viên" }, 
-            { a: "Sân cỏ", b: "Sân đất nện" }, { a: "Vợt cầu lông", b: "Vợt tennis" }, { a: "Quả bóng", b: "Quả cầu" }, 
-            { a: "Khởi động", b: "Giãn cơ" }, { a: "Thẻ vàng", b: "Thẻ đỏ" }, { a: "Việt vị", b: "Ném biên" }, 
-            { a: "Sút phạt", b: "Đánh đầu" }, { a: "Khán đài", b: "Sân vận động" }, { a: "Vận động viên", b: "Khán giả" }, 
-            { a: "Sữa tắm", b: "Xà bông" }, { a: "Dầu gội", b: "Kem xả" }, { a: "Kem đánh răng", b: "Nước súc miệng" }, 
-            { a: "Lăn khử mùi", b: "Nước hoa" }, { a: "Son môi", b: "Má hồng" }, { a: "Kem nền", b: "Phấn phủ" }, 
-            { a: "Tẩy da chết", b: "Nước hoa hồng" }, { a: "Mặt nạ", b: "Kem dưỡng da" }, { a: "Dao cạo râu", b: "Nhíp" }, 
-            { a: "Dũa móng tay", b: "Kéo cắt móng" }, { a: "Bông ngoáy tai", b: "Bông tẩy trang" }, { a: "Tin nhắn", b: "Cuộc gọi" }, 
-            { a: "Mật khẩu", b: "Tài khoản" }, { a: "Cáp sạc", b: "Sạc dự phòng" }, { a: "Ốp lưng", b: "Kính cường lực" }, 
-            { a: "Wifi", b: "Điểm phát sóng" }, { a: "Bàn phím ảo", b: "Màn hình cảm ứng" }, { a: "Củ sạc", b: "Dây sạc" }, 
-            { a: "Livestream", b: "Quay video" }, { a: "Thả tim", b: "Thả phẫn nộ" }, { a: "Nhắn tin", b: "Gọi video" }, 
-            { a: "Bạn bè", b: "Người theo dõi" }, { a: "Mã bảo mật", b: "Sinh trắc học" }, { a: "Đường phèn", b: "Đường trắng" }, 
-            { a: "Muối hột", b: "Muối tinh" }, { a: "Hành tây", b: "Tỏi" }, { a: "Rau muống", b: "Rau lang" }, 
-            { a: "Cà chua", b: "Cà rốt" }, { a: "Thịt lợn", b: "Thịt bò" }, { a: "Thịt gà", b: "Thịt vịt" }, 
-            { a: "Tôm hùm", b: "Cua hoàng đế" }, { a: "Cá hồi", b: "Cá ngừ" }, { a: "Hành tím", b: "Hành lá" }, 
-            { a: "Xì dầu", b: "Mù tạt" }, { a: "Apple", b: "Orange" }, { a: "Banana", b: "Melon" }, 
-            { a: "Coffee", b: "Tea" }, { a: "Milk", b: "Water" }, { a: "Bread", b: "Rice" }, 
-            { a: "Meat", b: "Fish" }, { a: "Chicken", b: "Beef" }, { a: "Pizza", b: "Burger" }, 
-            { a: "Salad", b: "Soup" }, { a: "Shirt", b: "Pants" }, { a: "Dress", b: "Skirt" }, 
-            { a: "Hat", b: "Cap" }, { a: "Shoes", b: "Socks" }, { a: "House", b: "Home" }, 
-            { a: "Room", b: "Door" }, { a: "Window", b: "Wall" }, { a: "Bed", b: "Sofa" }, 
-            { a: "Chair", b: "Table" }, { a: "Desk", b: "Lamp" }, { a: "Pen", b: "Pencil" }, 
-            { a: "Book", b: "Paper" }, { a: "School", b: "Class" }, { a: "Train", b: "Plane" }, 
-            { a: "Boat", b: "Ship" }, { a: "Sun", b: "Star" }, { a: "Rain", b: "Snow" }, 
-            { a: "Wind", b: "Storm" }, { a: "Mountain", b: "River" }, { a: "Ocean", b: "Sea" }, 
-            { a: "Tree", b: "Flower" }, { a: "Forest", b: "Jungle" }, { a: "Rabbit", b: "Hamster" }, 
-            { a: "Lion", b: "Tiger" }, { a: "Bear", b: "Panda" }, { a: "Bird", b: "Duck" }, 
-            { a: "Uncle", b: "Aunt" }, { a: "Brother", b: "Sister" }, { a: "Father", b: "Mother" }, 
-            { a: "Doctor", b: "Dentist" }, { a: "Farmer", b: "Builder" }, { a: "Actor", b: "Singer" }, 
-            { a: "Gold", b: "Diamond" }, { a: "Spring", b: "Autumn" }, { a: "Week", b: "Month" }, 
-            { a: "Year", b: "Decade" }, { a: "Day", b: "Hour" }, { a: "Minute", b: "Second" }, 
-            { a: "Circle", b: "Square" }, { a: "Triangle", b: "Rectangle" }, { a: "Screen", b: "Keyboard" }, 
-            { a: "Music", b: "Movie" }, { a: "Video", b: "Audio" }, { a: "Camera", b: "Speaker" }, 
-            { a: "Sweet", b: "Sour" }, { a: "Bitter", b: "Spicy" }, { a: "Breakfast", b: "Dinner" }, 
-            { a: "Lunch", b: "Snack" }, { a: "Plate", b: "Bowl" }, { a: "Fork", b: "Spoon" }, 
-            { a: "Giám đốc", b: "Tổng tài" }, { a: "Quản lý", b: "Tổ trưởng" }, { a: "Thư ký", b: "Trợ lý" }, 
-            { a: "Nhân viên", b: "Chuyên viên" }, { a: "Thực tập sinh", b: "Thử việc" }, { a: "Tiền mặt", b: "Chuyển khoản" }, 
-            { a: "Thẻ tín dụng", b: "Thẻ ghi nợ" }, { a: "Sổ đỏ", b: "Sổ hồng" }, { a: "Đất nền", b: "Căn hộ" }, 
-            { a: "Tiền lương", b: "Tiền thưởng" }, { a: "Khởi nghiệp", b: "Làm thuê" }, { a: "Mã bảo mật", b: "Mật khẩu" }, 
-            { a: "Vân tay", b: "Nhận diện khuôn mặt" }, { a: "Ghim giấy", b: "Kẹp bướm" }, { a: "Bảng trắng", b: "Bảng từ" }, 
-            { a: "Phòng khách", b: "Phòng ngủ" }, { a: "Phòng bếp", b: "Phòng tắm" }, { a: "Nhà đất", b: "Chung cư" }, 
-            { a: "Nhà trọ", b: "Khách sạn" }, { a: "Trần nhà", b: "Sàn nhà" }, { a: "Cửa sổ", b: "Cửa ra vào" }, 
-            { a: "Mái ngói", b: "Mái tôn" }, { a: "Sân trước", b: "Vườn sau" }, { a: "Hàng rào", b: "Bức tường" }, 
-            { a: "Giếng nước", b: "Bể nước" }, { a: "Anh họ", b: "Em họ" }, { a: "Chú", b: "Bác" }, 
-            { a: "Cô", b: "Dì" }, { a: "Cậu", b: "Mợ" }, { a: "Bố dượng", b: "Mẹ kế" }, 
-            { a: "Cháu đích tôn", b: "Cháu ngoại" }, { a: "Con nuôi", b: "Con ruột" }, { a: "Chị dâu", b: "Em chồng" }, 
-            { a: "Anh rể", b: "Em vợ" }, { a: "Ông nội", b: "Ông ngoại" }, { a: "Bánh bột lọc", b: "Bánh nậm" }, 
-            { a: "Bánh cuốn", b: "Bánh ướt" }, { a: "Bánh canh", b: "Bánh canh cua" }, { a: "Miến lươn", b: "Miến ngan" }, 
-            { a: "Cháo lươn", b: "Cháo vịt" }, { a: "Lẩu ếch", b: "Lẩu bò" }, { a: "Trà đào", b: "Trà quất" }, 
-            { a: "Trà sen", b: "Trà lài" }, { a: "Xúc xích", b: "Lạp xưởng" }, { a: "Chả lụa", b: "Nem chua" }, 
-            { a: "Gà luộc", b: "Gà ủ muối" }, { a: "Bò bít tết", b: "Bò lúc lắc" }, { a: "Bánh flan", b: "Rau câu" }, 
-            { a: "Sữa bắp", b: "Sữa đậu nành" }, { a: "Nước mắm", b: "Mắm nêm" }, { a: "Xe đạp điện", b: "Xe máy điện" }, 
-            { a: "Xe giường nằm", b: "Xe ghế ngồi" }, { a: "Đường cao tốc", b: "Đường quốc lộ" }, { a: "Tàu điện ngầm", b: "Cáp treo" }, 
-            { a: "Đèn xanh", b: "Đèn vàng" }, { a: "Phanh xe", b: "Chân ga" }, { a: "Cầu vượt", b: "Hầm chui" }, 
-            { a: "Ngã ba", b: "Ngã tư" }, { a: "Vòng xuyến", b: "Bùng binh" }, { a: "Bến tàu", b: "Sân bay" }, 
-            { a: "Hổ", b: "Báo" }, { a: "Báo đốm", b: "Báo hoa mai" }, { a: "Ngựa vằn", b: "Ngựa hoang" }, 
-            { a: "Lợn rừng", b: "Lợn nhà" }, { a: "Ếch", b: "Nhái" }, { a: "Cóc", b: "Ễnh ương" }, 
-            { a: "Tắc kè", b: "Thằn lằn" }, { a: "Châu chấu", b: "Cào cào" }, { a: "Bọ cạp", b: "Rết" }, 
-            { a: "Chim sâu", b: "Chim sẻ" }, { a: "Nói dối", b: "Lừa gạt" }, { a: "Khóc lóc", b: "Mếu máo" }, 
-            { a: "Cười mỉm", b: "Cười mỉa" }, { a: "Đánh đập", b: "Hành hung" }, { a: "Chạy trốn", b: "Lẩn tránh" }, 
-            { a: "Khen ngợi", b: "Nịnh hót" }, { a: "Chỉ trích", b: "Chửi bới" }, { a: "Nhìn lén", b: "Lườm nguýt" }, 
-            { a: "Giấu giếm", b: "Che đậy" }, { a: "Xin lỗi", b: "Bào chữa" }, { a: "Từ chối", b: "Phủ nhận" }, 
-            { a: "Đồng ý", b: "Chấp nhận" }, { a: "Khuyên tai", b: "Dây chuyền" }, { a: "Lắc tay", b: "Vòng chân" }, 
-            { a: "Đồng hồ cơ", b: "Đồng hồ điện tử" }, { a: "Túi chéo", b: "Túi tote" }, { a: "Kính râm", b: "Kính viễn vọng" }, 
-            { a: "Nơ cài tóc", b: "Băng đô" }, { a: "Gọng kính", b: "Mắt kính" }, { a: "Khăn tay", b: "Khăn quàng cổ" }, 
-            { a: "Look", b: "See" }, { a: "Hear", b: "Listen" }, { a: "Speak", b: "Talk" }, 
-            { a: "Shout", b: "Yell" }, { a: "Cry", b: "Weep" }, { a: "Laugh", b: "Smile" }, 
-            { a: "Run", b: "Sprint" }, { a: "Walk", b: "Stroll" }, { a: "Jump", b: "Leap" }, 
-            { a: "Smart", b: "Clever" }, { a: "Stupid", b: "Silly" }, { a: "Beautiful", b: "Pretty" }, 
-            { a: "Ugly", b: "Hideous" }, { a: "Fast", b: "Quick" }, { a: "Glad", b: "Happy" }, 
-            { a: "Mad", b: "Angry" }, { a: "City", b: "Town" }, { a: "Village", b: "Countryside" }, 
-            { a: "Street", b: "Road" }, { a: "River", b: "Lake" }, { a: "Ocean", b: "Beach" }, 
-            { a: "Forest", b: "Wood" }, { a: "Mountain", b: "Hill" }, { a: "Buy", b: "Purchase" }, 
-            { a: "Keep", b: "Hold" }, { a: "Help", b: "Assist" }, { a: "Finish", b: "Complete" }, 
-            { a: "Begin", b: "Start" }, { a: "Choose", b: "Select" }, { a: "Idea", b: "Thought" }, 
-            { a: "Job", b: "Career" }, { a: "Money", b: "Cash" }, { a: "Card", b: "Coin" }, 
-            { a: "Child", b: "Kid" }, { a: "Student", b: "Pupil" }, { a: "Ship", b: "Boat" }, 
-            { a: "Plane", b: "Helicopter" }, { a: "Apple", b: "Pear" }, { a: "Lemon", b: "Lime" }, 
-            { a: "Sugar", b: "Salt" }, { a: "Bread", b: "Cake" }, { a: "Milk", b: "Juice" }, 
-            { a: "Meat", b: "Pork" }, { a: "Beef", b: "Steak" }, { a: "Dog", b: "Puppy" }, 
-            { a: "Cat", b: "Kitten" }, { a: "Bird", b: "Eagle" }, { a: "Bear", b: "Wolf" }, 
-            { a: "Fish", b: "Shark" }, { a: "Snake", b: "Worm" }, { a: "Sun", b: "Star" }, 
-            { a: "Wind", b: "Breeze" }, { a: "Rain", b: "Drop" }, { a: "Snow", b: "Ice" }, 
-            { a: "Spring", b: "Summer" }, { a: "Night", b: "Midnight" }, { a: "Week", b: "Weekend" }, 
-            { a: "Day", b: "Date" }, { a: "Time", b: "Clock" }, { a: "Watch", b: "Phone" },
-            // ĐỢT 8: BỔ SUNG MỚI (901 - 1000)
-            { a: "Máy ảnh", b: "Máy quay" }, { a: "Ống kính", b: "Kính lọc" }, { a: "Đèn flash", b: "Hắt sáng" },
-            { a: "Chân máy", b: "Gậy tự sướng" }, { a: "Thẻ nhớ", b: "Ổ cứng" }, { a: "Sạc dự phòng", b: "Củ sạc" },
-            { a: "Tai nghe", b: "Loa bluetooth" }, { a: "Bàn phím", b: "Chuột máy tính" }, { a: "Màn hình", b: "Máy chiếu" },
-            { a: "Quạt máy", b: "Điều hòa" }, { a: "Máy sấy", b: "Máy ép tóc" }, { a: "Bàn ủi", b: "Cây ủi hơi nước" },
-            { a: "Máy giặt", b: "Máy sấy quần áo" }, { a: "Tủ lạnh", b: "Tủ đông" }, { a: "Bếp điện", b: "Bếp hồng ngoại" },
-            { a: "Lò vi sóng", b: "Lò nướng" }, { a: "Nồi cơm điện", b: "Nồi áp suất" }, { a: "Bình nóng lạnh", b: "Máy nước nóng" },
-            { a: "Máy lọc nước", b: "Cây nước nóng lạnh" }, { a: "Máy hút mùi", b: "Quạt thông gió" }, { a: "Áo sơ mi", b: "Áo thun" },
-            { a: "Quần jean", b: "Quần âu" }, { a: "Áo khoác", b: "Áo phao" }, { a: "Váy ngắn", b: "Đầm dài" },
-            { a: "Giày tây", b: "Giày lười" }, { a: "Dép lê", b: "Giày xăng đan" }, { a: "Mũ len", b: "Mũ phớt" },
-            { a: "Khăn len", b: "Khăn lụa" }, { a: "Thắt lưng", b: "Dây nịt" }, { a: "Ví tiền", b: "Cặp sách" },
-            { a: "Cà phê", b: "Trà sữa" }, { a: "Nước ngọt", b: "Nước khoáng" }, { a: "Bia", b: "Rượu vang" },
-            { a: "Sinh tố", b: "Nước ép" }, { a: "Kem", b: "Sữa chua" }, { a: "Bánh ngọt", b: "Bánh mặn" },
-            { a: "Kẹo dẻo", b: "Kẹo cứng" }, { a: "Hạt hướng dương", b: "Hạt điều" }, { a: "Bánh tráng", b: "Bánh đa" },
-            { a: "Mì tôm", b: "Phở bò" }, { a: "Con chó", b: "Con mèo" }, { a: "Con gà", b: "Con vịt" },
-            { a: "Con lợn", b: "Con bò" }, { a: "Con hổ", b: "Con báo" }, { a: "Con ngựa", b: "Con lừa" },
-            { a: "Con cừu", b: "Con dê" }, { a: "Con thỏ", b: "Con chuột" }, { a: "Con khỉ", b: "Con vượn" },
-            { a: "Con rắn", b: "Con trăn" }, { a: "Con cá", b: "Con tôm" }, { a: "Xe đạp", b: "Xe máy" },
-            { a: "Ô tô", b: "Xe buýt" }, { a: "Tàu hỏa", b: "Tàu điện" }, { a: "Máy bay", b: "Trực thăng" },
-            { a: "Thuyền", b: "Ghe" }, { a: "Ca nô", b: "Du thuyền" }, { a: "Xe tải", b: "Xe khách" },
-            { a: "Xe cứu thương", b: "Xe cảnh sát" }, { a: "Xe đạp điện", b: "Xe máy điện" }, { a: "Xe lăn", b: "Xe đẩy" },
-            { a: "Bút bi", b: "Bút chì" }, { a: "Thước kẻ", b: "Compa" }, { a: "Tẩy", b: "Gọt bút chì" },
-            { a: "Cặp sách", b: "Ba lô" }, { a: "Vở viết", b: "Sách giáo khoa" }, { a: "Bảng đen", b: "Phấn viết" },
-            { a: "Bút lông", b: "Bảng trắng" }, { a: "Ghế học sinh", b: "Bàn học" }, { a: "Giấy kiểm tra", b: "Giấy nháp" },
-            { a: "Hộp bút", b: "Cặp đựng tài liệu" }, { a: "Computer", b: "Laptop" }, { a: "Phone", b: "Tablet" },
-            { a: "Printer", b: "Scanner" }, { a: "Camera", b: "Speaker" }, { a: "Screen", b: "Keyboard" },
-            { a: "Mouse", b: "Pad" }, { a: "Battery", b: "Charger" }, { a: "Cable", b: "Adapter" },
-            { a: "Router", b: "Modem" }, { a: "Folder", b: "File" }, { a: "Paper", b: "Pen" },
-            { a: "Desk", b: "Chair" }, { a: "Room", b: "Hall" }, { a: "Door", b: "Window" },
-            { a: "Wall", b: "Floor" }, { a: "Roof", b: "Ceiling" }, { a: "Garden", b: "Yard" },
-            { a: "Street", b: "Avenue" }, { a: "Bridge", b: "Tunnel" }, { a: "City", b: "Village" },
-            { a: "Country", b: "Continent" }, { a: "Ocean", b: "Sea" }, { a: "River", b: "Stream" },
-            { a: "Mountain", b: "Valley" }, { a: "Forest", b: "Desert" }, { a: "Island", b: "Peninsula" },
-            { a: "Volcano", b: "Earthquake" }, { a: "Weather", b: "Climate" }, { a: "Winter", b: "Summer" },
-            { a: "Future", b: "Past" }
-        ].map((item, index) => ({
-            a: localizeWord(item.a, index),
-            b: localizeWord(item.b, index),
-            id: index,
-            tier: getWordPairTier(index)
-        })).filter((item) => item.tier !== 'loai'); 
+            { a: "Chó", b: "Mèo", tier: "chuan" },
+            { a: "Bánh pizza", b: "Bánh mì kẹp thịt", tier: "chuan" },
+            { a: "Bãi biển", b: "Ngọn núi", tier: "chuan" },
+            { a: "Cà phê", b: "Trà", tier: "chuan" },
+            { a: "Ô tô", b: "Xe buýt", tier: "chuan" },
+            { a: "Mặt trời", b: "Mặt trăng", tier: "chuan" },
+            { a: "Quả chuối", b: "Quả táo", tier: "chuan" },
+            { a: "Nước hoa", b: "Lăn khử mùi", tier: "c4" },
+            { a: "Adidas", b: "Nike", tier: "chuan" },
+            { a: "Ba lô", b: "Va li", tier: "chuan" },
+            { a: "Bồn sục", b: "Phòng xông hơi", tier: "c4" },
+            { a: "Giày thể thao", b: "Xăng đan", tier: "chuan" },
+            { a: "Kính râm", b: "Kính cận", tier: "c4" },
+            { a: "Đàn piano", b: "Đàn guitar", tier: "c4" },
+            { a: "Du thuyền", b: "Xe dã ngoại", tier: "chuan" },
+            { a: "Sushi", b: "Bánh pizza", tier: "chuan" },
+            { a: "Bánh mì kẹp thịt", b: "Xúc xích", tier: "chuan" },
+            { a: "Sô cô la", b: "Vani", tier: "chuan" },
+            { a: "Bia", b: "Rượu vang", tier: "chuan" },
+            { a: "Rượu whiskey", b: "Rượu vodka", tier: "chuan" },
+            { a: "Sữa", b: "Nước ép", tier: "chuan" },
+            { a: "Bánh mì", b: "Bơ", tier: "chuan" },
+            { a: "Cơm", b: "Mì ống", tier: "chuan" },
+            { a: "Thịt gà", b: "Thịt bò", tier: "chuan" },
+            { a: "Quả táo", b: "Quả cam", tier: "chuan" },
+            { a: "Quả chuối", b: "Dâu tây", tier: "chuan" },
+            { a: "Cà rốt", b: "Súp lơ", tier: "chuan" },
+            { a: "Khoai tây", b: "Cà chua", tier: "chuan" },
+            { a: "Hành tây", b: "Tỏi", tier: "chuan" },
+            { a: "Muối", b: "Hạt tiêu", tier: "chuan" },
+            { a: "Đường", b: "Mật ong", tier: "chuan" },
+            { a: "Nước lọc", b: "Nước ngọt", tier: "chuan" },
+            { a: "Apple", b: "Microsoft", tier: "chuan" },
+            { a: "Google", b: "Facebook", tier: "chuan" },
+            { a: "Amazon", b: "Netflix", tier: "chuan" },
+            { a: "Bánh xèo", b: "Bánh rán", tier: "chuan" },
+            { a: "Kem", b: "Bánh kem", tier: "chuan" },
+            { a: "McDonalds", b: "KFC", tier: "chuan" },
+            { a: "Ô tô", b: "Xe máy", tier: "chuan" },
+            { a: "Vi rút", b: "Vi khuẩn", tier: "chuan" },
+            { a: "Chúa tể những chiếc nhẫn", b: "Người Hobbit", tier: "chuan" },
+            { a: "Harry Potter", b: "Voldemort", tier: "chuan" },
+            { a: "Siêu nhân", b: "Người dơi", tier: "chuan" },
+            { a: "Người nhện", b: "Người sắt", tier: "chuan" },
+            { a: "Đội trưởng Mỹ", b: "Thần sấm", tier: "chuan" },
+            { a: "Bánh pizza", b: "Mì ống", tier: "chuan" },
+            { a: "Bóng đá", b: "Bóng rổ", tier: "chuan" },
+            { a: "Âm nhạc", b: "Khiêu vũ", tier: "chuan" },
+            { a: "Chó", b: "Chó sói", tier: "chuan" },
+            { a: "Quả táo", b: "Quả lê", tier: "chuan" },
+            { a: "Ô tô", b: "Xe tải", tier: "chuan" },
+            { a: "Bút chì", b: "Bút máy", tier: "chuan" },
+            { a: "Bánh pizza", b: "Lasagna", tier: "chuan" },
+            { a: "Facebook", b: "Instagram", tier: "chuan" },
+            { a: "Kính râm", b: "Kính bơi", tier: "chuan" },
+            { a: "Máy tính xách tay", b: "Máy tính bảng", tier: "c4" },
+            { a: "Bác sĩ", b: "Bác sĩ phẫu thuật", tier: "chuan" },
+            { a: "Bitcoin", b: "Ethereum", tier: "chuan" },
+            { a: "Đồng hồ", b: "Nhẫn", tier: "chuan" },
+            { a: "Bom", b: "Súng", tier: "chuan" },
+            { a: "Einstein", b: "Newton", tier: "chuan" },
+            { a: "Áo sơ mi", b: "Áo len", tier: "chuan" },
+            { a: "Bóng đá", b: "Bóng bầu dục", tier: "chuan" },
+            { a: "Máy bay", b: "Trực thăng", tier: "chuan" },
+            { a: "Dòng sông", b: "Cái hồ", tier: "chuan" },
+            { a: "Đại dương", b: "Dòng sông", tier: "chuan" },
+            { a: "Giáo viên", b: "Giáo sư", tier: "chuan" },
+            { a: "Xe đạp", b: "Xe máy", tier: "chuan" },
+            { a: "Muối", b: "Đường", tier: "chuan" },
+            { a: "Dao", b: "Kéo", tier: "chuan" },
+            { a: "Cái ghế", b: "Ghế dài", tier: "chuan" },
+            { a: "Lâu đài", b: "Ngôi nhà", tier: "chuan" },
+            { a: "Tàu hỏa", b: "Xe buýt", tier: "chuan" },
+            { a: "Gương", b: "Cửa sổ", tier: "chuan" },
+            { a: "Con chuột", b: "Chuột cống", tier: "chuan" },
+            { a: "Dưa chuột", b: "Bí ngòi", tier: "chuan" },
+            { a: "Dâu tây", b: "Quả mâm xôi", tier: "chuan" },
+            { a: "Quả chuối", b: "Chuối tá quạ", tier: "chuan" },
+            { a: "Trái dừa", b: "Quả dứa", tier: "chuan" },
+            { a: "Con rồng", b: "Khủng long", tier: "chuan" },
+            { a: "Bóng ma", b: "Thây ma", tier: "chuan" },
+            { a: "Đầu bếp", b: "Quầy bếp", tier: "chuan" },
+            { a: "Cái xẻng", b: "Cái rìu", tier: "c4" },
+            { a: "Kim tự tháp", b: "Đền thờ", tier: "chuan" },
+            { a: "Núi lửa", b: "Ngọn núi", tier: "chuan" },
+            { a: "Sa mạc", b: "Bãi cát", tier: "chuan" },
+            { a: "Đám mây", b: "Sương mù", tier: "chuan" },
+            { a: "Tuyết", b: "Mưa đá", tier: "chuan" },
+            { a: "Thám tử", b: "Tội phạm", tier: "chuan" },
+            { a: "Rừng rậm", b: "Rừng cây", tier: "chuan" },
+            { a: "Đồng hồ treo tường", b: "Đồng hồ đeo tay", tier: "c4" },
+            { a: "Bánh mì", b: "Bánh nướng", tier: "c4" },
+            { a: "Bức tranh", b: "Bản phác thảo", tier: "c4" },
+            { a: "Cái ô", b: "Cái lọng", tier: "chuan" },
+            { a: "Đồ vest", b: "Cà vạt", tier: "chuan" },
+            { a: "Tất", b: "Bít tất", tier: "chuan" },
+            { a: "Thắt lưng", b: "Quần jean", tier: "chuan" },
+            { a: "Vương miện", b: "Cái mũ", tier: "chuan" },
+            { a: "Ba lê", b: "Hip Hop", tier: "chuan" },
+            { a: "Con vẹt", b: "Con quạ", tier: "chuan" },
+            { a: "Con dơi", b: "Cú mèo", tier: "chuan" },
+            { a: "Ngọn nến", b: "Đèn lồng", tier: "c4" },
+            { a: "Thư viện", b: "Trường đại học", tier: "c4" },
+            { a: "Bảo tàng", b: "Phòng trưng bày", tier: "c4" },
+            { a: "Đài phát thanh", b: "Podcast", tier: "c4" },
+            { a: "Báo mạng", b: "Tờ báo", tier: "chuan" },
+            { a: "Bút máy", b: "Tờ giấy", tier: "chuan" },
+            { a: "Quần vợt", b: "Cầu lông", tier: "chuan" },
+            { a: "Trượt tuyết", b: "Tuyết", tier: "chuan" },
+            { a: "Bơi lội", b: "Lặn biển", tier: "chuan" },
+            { a: "Chạy bộ", b: "Đi dạo", tier: "chuan" },
+            { a: "Thang máy", b: "Thang cuốn", tier: "chuan" },
+            { a: "Phà", b: "Du thuyền", tier: "chuan" },
+            { a: "Bản đồ", b: "Hệ thống định vị", tier: "chuan" },
+            { a: "Thuyền buồm", b: "Du thuyền", tier: "chuan" },
+            { a: "Sao băng", b: "Vệ tinh", tier: "chuan" },
+            { a: "Hành tinh", b: "Ngôi sao", tier: "chuan" },
+            { a: "Động đất", b: "Sóng thần", tier: "chuan" },
+            { a: "Sứa", b: "Bạch tuộc", tier: "chuan" },
+            { a: "Chó sói", b: "Con cáo", tier: "chuan" },
+            { a: "Chim ưng", b: "Kền kền", tier: "chuan" },
+            { a: "Thằn lằn", b: "Tắc kè", tier: "chuan" },
+            { a: "Elvis Presley", b: "The Beatles", tier: "chuan" },
+            { a: "Leonardo da Vinci", b: "Michelangelo", tier: "chuan" },
+            { a: "Napoleon", b: "Julius Caesar", tier: "chuan" },
+            { a: "Mario", b: "Luigi", tier: "chuan" },
+            { a: "Sonic", b: "Tails", tier: "chuan" },
+            { a: "Pac-Man", b: "Tetris", tier: "chuan" },
+            { a: "Fortnite", b: "Minecraft", tier: "chuan" },
+            { a: "Call of Duty", b: "Battlefield", tier: "chuan" },
+            { a: "Game of Thrones", b: "Chúa tể những chiếc nhẫn", tier: "chuan" },
+            { a: "Star Wars", b: "Star Trek", tier: "chuan" },
+            { a: "Harry Potter", b: "Percy Jackson", tier: "chuan" },
+            { a: "Dracula", b: "Frankenstein", tier: "chuan" },
+            { a: "James Bond", b: "Đặc vụ", tier: "chuan" },
+            { a: "Homer Simpson", b: "Peter Griffin", tier: "chuan" },
+            { a: "SpongeBob", b: "Patrick", tier: "chuan" },
+            { a: "Godzilla", b: "King Kong", tier: "chuan" },
+            { a: "Lego", b: "Playmobil", tier: "chuan" },
+            { a: "UNO", b: "Cờ tỷ phú", tier: "chuan" },
+            { a: "Catan", b: "Risk", tier: "chuan" },
+            { a: "Blackjack", b: "Xì phé", tier: "chuan" },
+            { a: "Bingo", b: "Roulette", tier: "chuan" },
+            { a: "New York", b: "Los Angeles", tier: "chuan" },
+            { a: "Paris", b: "London", tier: "chuan" },
+            { a: "Rome", b: "Athens", tier: "chuan" },
+            { a: "Sydney", b: "Melbourne", tier: "chuan" },
+            { a: "Rio de Janeiro", b: "Buenos Aires", tier: "chuan" },
+            { a: "Đỉnh Everest", b: "Nepal", tier: "chuan" },
+            { a: "Amazon", b: "Sông Nile", tier: "chuan" },
+            { a: "Grand Canyon", b: "Thác Niagara", tier: "chuan" },
+            { a: "Taj Mahal", b: "Vạn Lý Trường Thành", tier: "chuan" },
+            { a: "Tháp Eiffel", b: "Tượng Nữ thần Tự do", tier: "chuan" },
+            { a: "Big Ben", b: "Tháp nghiêng Pisa", tier: "chuan" },
+            { a: "Thế vận hội", b: "World Cup", tier: "chuan" },
+            { a: "NBA", b: "NFL", tier: "chuan" },
+            { a: "Đánh gôn", b: "Bóng chày", tier: "chuan" },
+            { a: "UFC", b: "WWE", tier: "chuan" },
+            { a: "Twitch", b: "Netflix", tier: "chuan" },
+            { a: "Twitter", b: "Facebook", tier: "chuan" },
+            { a: "SpaceX", b: "Tesla", tier: "chuan" },
+            { a: "Burger King", b: "McDonald’s", tier: "chuan" },
+            { a: "Sony", b: "Samsung", tier: "chuan" },
+            { a: "Mercedes", b: "BMW", tier: "chuan" },
+            { a: "Đại học Harvard", b: "Đại học MIT", tier: "chuan" },
+            { a: "Đại học Oxford", b: "Trường cấp 3", tier: "chuan" },
+            { a: "CIA", b: "FBI", tier: "chuan" },
+            { a: "Hitler", b: "Stalin", tier: "chuan" },
+            { a: "Tesla", b: "Porsche", tier: "chuan" },
+            { a: "iPhone", b: "Samsung", tier: "chuan" },
+            { a: "PlayStation", b: "Xbox", tier: "chuan" },
+            { a: "Windows", b: "MacOS", tier: "chuan" },
+            { a: "YouTube", b: "TikTok", tier: "chuan" },
+            { a: "Twitch", b: "Kick", tier: "chuan" },
+            { a: "Spotify", b: "Apple Music", tier: "chuan" },
+            { a: "Reddit", b: "Discord", tier: "chuan" },
+            { a: "Instagram", b: "Snapchat", tier: "chuan" },
+            { a: "ChatGPT", b: "Gemini", tier: "chuan" },
+            { a: "Đồng hồ", b: "Đồng hồ mặt trời", tier: "c4" },
+            { a: "Máy tính xách tay", b: "Máy tính để bàn", tier: "c4" },
+            { a: "Cá mập", b: "Cá heo", tier: "chuan" },
+            { a: "Chim cánh cụt", b: "Hải âu", tier: "chuan" },
+            { a: "Mặt trăng", b: "Hành tinh", tier: "chuan" },
+            { a: "Sao chổi", b: "Tiểu hành tinh", tier: "chuan" },
+            { a: "Cây cầu", b: "Đường hầm", tier: "c4" },
+            { a: "Xe buýt", b: "Tàu điện", tier: "chuan" },
+            { a: "Tàu hỏa", b: "Tàu một ray", tier: "chuan" },
+            { a: "Con thuyền", b: "Tàu ngầm", tier: "chuan" },
+            { a: "Cuốn sổ", b: "Nhật ký", tier: "chuan" },
+            { a: "Cái thìa", b: "Cái nĩa", tier: "chuan" },
+            { a: "Cái đĩa", b: "Cái bát", tier: "chuan" },
+            { a: "Đài phun nước", b: "Thác nước", tier: "chuan" },
+            { a: "Hồ nước", b: "Ao nước", tier: "chuan" },
+            { a: "Hươu cao cổ", b: "Ngựa vằn", tier: "chuan" },
+            { a: "Con voi", b: "Tê giác", tier: "chuan" },
+            { a: "Con hàu", b: "Ngao", tier: "chuan" },
+            { a: "Vàng", b: "Bạc", tier: "chuan" },
+            { a: "Bạch kim", b: "Vàng", tier: "chuan" },
+            { a: "Vải bò", b: "Vải nhung", tier: "chuan" },
+            { a: "Áo khoác", b: "Áo choàng", tier: "chuan" },
+            { a: "Khăn quàng", b: "Cà vạt", tier: "chuan" },
+            { a: "Ủng", b: "Giày thể thao", tier: "chuan" },
+            { a: "Mũ bảo hiểm", b: "Cái mũ", tier: "chuan" },
+            { a: "Vòng cổ", b: "Vòng tay", tier: "chuan" },
+            { a: "Nhẫn", b: "Hoa tai", tier: "chuan" },
+            { a: "Mi cờ rô", b: "Cái loa", tier: "chuan" },
+            { a: "Tivi", b: "Đài phát thanh", tier: "chuan" },
+            { a: "Máy chiếu", b: "Màn hình", tier: "c4" },
+            { a: "Máy tính", b: "Máy đánh chữ", tier: "chuan" },
+            { a: "Đèn pin", b: "Đèn lồng", tier: "chuan" },
+            { a: "Cái lều", b: "Nhà gỗ", tier: "chuan" },
+            { a: "La bàn", b: "Bản đồ", tier: "chuan" },
+            { a: "Thẻ lên máy bay", b: "Căn cước công dân", tier: "chuan" },
+            { a: "Vé", b: "Hóa đơn", tier: "chuan" },
+            { a: "Hộ chiếu", b: "Vé máy bay", tier: "chuan" },
+            { a: "Tàu điện ngầm", b: "Taxi", tier: "chuan" },
+            { a: "Bầu trời", b: "Máy bay phản lực", tier: "chuan" },
+            { a: "Xe máy", b: "Xe tay ga", tier: "chuan" },
+            { a: "Ván lướt sóng", b: "Ván trượt", tier: "chuan" },
+            { a: "Bóng chày", b: "Bóng đá", tier: "chuan" },
+            { a: "Bóng chuyền", b: "Bóng rổ", tier: "chuan" },
+            { a: "Bóng bàn", b: "Cầu lông", tier: "chuan" },
+            { a: "Tiệm bánh", b: "Người bán thịt", tier: "chuan" },
+            { a: "Câu đố", b: "Ô chữ", tier: "c4" },
+            { a: "Thẻ bài", b: "Xúc xắc", tier: "c4" },
+            { a: "Ném bowling", b: "Đánh gôn", tier: "chuan" },
+            { a: "Chạy việt dã", b: "Chạy nước rút", tier: "chuan" },
+            { a: "Đấu kiếm", b: "Bắn cung", tier: "c4" },
+            { a: "Quyền anh", b: "Võ karate", tier: "chuan" },
+            { a: "Khúc côn cầu", b: "Bóng đá", tier: "chuan" },
+            { a: "Buổi hòa nhạc", b: "Lễ hội", tier: "chuan" },
+            { a: "Tiểu thuyết", b: "Bài thơ", tier: "chuan" },
+            { a: "Từ điển", b: "Bách khoa toàn thư", tier: "chuan" },
+            { a: "Dược sĩ", b: "Bác sĩ", tier: "c4" },
+            { a: "Kỹ sư", b: "Kiến trúc sư", tier: "c4" },
+            { a: "Lính cứu hỏa", b: "Cảnh sát", tier: "c4" },
+            { a: "Nước Đức", b: "Nước Pháp", tier: "chuan" },
+            { a: "Phi công", b: "Phi hành gia", tier: "chuan" },
+            { a: "Thẩm phán", b: "Hình phạt", tier: "c4" },
+            { a: "Thợ làm bánh", b: "Đầu bếp", tier: "c4" },
+            { a: "Nông dân", b: "Ngư dân", tier: "c4" },
+            { a: "Thợ rèn", b: "Thợ mộc", tier: "c4" },
+            { a: "Thiên đường", b: "Địa ngục", tier: "c4" },
+            { a: "Bầu trời", b: "Đám mây", tier: "chuan" },
+            { a: "Nhật Bản", b: "Trung Quốc", tier: "chuan" },
+            { a: "Nước Đức", b: "Bia", tier: "chuan" },
+            { a: "Bộ phim", b: "Diễn viên", tier: "chuan" },
+            { a: "Màn hình", b: "Tivi", tier: "chuan" },
+            { a: "Nước Pháp", b: "Tháp Eiffel", tier: "chuan" },
+            { a: "Thần sấm", b: "Tia chớp", tier: "chuan" },
+            { a: "Obi Wan", b: "Thần lực", tier: "chuan" },
+            { a: "Đĩa bay", b: "Thiết bị bay không người lái", tier: "chuan" },
+            { a: "Chúa trời", b: "Thiên đường", tier: "chuan" },
+            { a: "Bánh bột ngô", b: "Bánh xèo Mexico", tier: "chuan" },
+            { a: "Bánh mì Pháp", b: "Bánh mì Ý", tier: "chuan" },
+            { a: "Bánh mì kẹp xúc xích", b: "Xúc xích Đức", tier: "chuan" },
+            { a: "Nước tăng lực", b: "Nước ngọt", tier: "chuan" },
+            { a: "Nước cốt dừa", b: "Sữa đậu nành", tier: "chuan" },
+            { a: "Picasso", b: "Van Gogh", tier: "chuan" },
+            { a: "Mozart", b: "Beethoven", tier: "chuan" },
+            { a: "Messi", b: "Ronaldo", tier: "chuan" },
+            { a: "Bayern Munich", b: "Real Madrid", tier: "chuan" },
+            { a: "Ferrari", b: "Lamborghini", tier: "chuan" },
+            { a: "Coca-Cola", b: "Pepsi", tier: "chuan" },
+            { a: "Con chuột", b: "Bàn phím", tier: "chuan" },
+            { a: "Tivi", b: "Máy tính xách tay", tier: "chuan" },
+            { a: "Tủ quần áo", b: "Tủ kính", tier: "chuan" },
+            { a: "Máy sưởi", b: "Máy sấy tóc", tier: "chuan" },
+            { a: "Cái đèn", b: "Ngọn nến", tier: "chuan" },
+            { a: "Cái gối", b: "Cái chăn", tier: "chuan" },
+            { a: "Mi cờ rô", b: "Máy ảnh", tier: "c4" },
+            { a: "Lò nướng", b: "Lò vi sóng", tier: "c4" },
+            { a: "Cái chảo", b: "Cái nồi", tier: "c4" },
+            { a: "Máy tính bảng", b: "Điện thoại thông minh", tier: "c4" },
+            { a: "Cầu thang", b: "Thang máy", tier: "c4" },
+            { a: "Nhạc Techno", b: "Nhạc Rap", tier: "chuan" },
+            { a: "Nhạc Rock", b: "Nhạc Pop", tier: "chuan" },
+            { a: "Cửa sổ", b: "Cái cửa", tier: "chuan" },
+            { a: "Lò nướng", b: "Hệ thống sưởi", tier: "chuan" },
+            { a: "Đồng hồ đeo tay", b: "Đồng hồ báo thức", tier: "chuan" },
+            { a: "Giường ngủ", b: "Ghế sô pha", tier: "chuan" },
+            { a: "Quyển sách", b: "Tờ báo", tier: "chuan" },
+            { a: "Khu rừng", b: "Công viên", tier: "chuan" },
+            { a: "Rạp chiếu phim", b: "Sân bowling", tier: "chuan" },
+            { a: "Netflix", b: "Rạp chiếu phim", tier: "chuan" },
+            { a: "Hồ bơi", b: "Bãi biển", tier: "chuan" },
+            { a: "Cái ly", b: "Cái cốc", tier: "chuan" },
+            { a: "Công việc", b: "Sở thích", tier: "chuan" },
+            { a: "Chúa Giê-su", b: "Ông già Noel", tier: "chuan" },
+            { a: "Áo lót", b: "Bikini", tier: "chuan" },
+            { a: "Sơn Tùng M-TP", b: "Jack", tier: "chuan" },
+            { a: "Độ Mixi", b: "PewPew", tier: "chuan" },
+            { a: "Trấn Thành", b: "Trường Giang", tier: "chuan" },
+            { a: "Hồ Ngọc Hà", b: "Mỹ Tâm", tier: "chuan" },
+            { a: "Đen Vâu", b: "Binz", tier: "chuan" },
+            { a: "MONO", b: "HIEUTHUHAI", tier: "chuan" },
+            { a: "Lê Dương Bảo Lâm", b: "Kiều Minh Tuấn", tier: "chuan" },
+            { a: "Ninh Dương Lan Ngọc", b: "Thúy Ngân", tier: "chuan" },
+            { a: "Suboi", b: "JustaTee", tier: "chuan" },
+            { a: "Tóc Tiên", b: "Bảo Anh", tier: "chuan" },
+            { a: "Đàm Vĩnh Hưng", b: "Tuấn Hưng", tier: "chuan" },
+            { a: "Jisoo", b: "Jennie", tier: "chuan" },
+            { a: "Rosé", b: "Lisa", tier: "chuan" },
+            { a: "Faker", b: "SofM", tier: "chuan" },
+            { a: "Tinder", b: "Bumble", tier: "chuan" },
+            { a: "Zalo", b: "Messenger", tier: "chuan" },
+            { a: "Shopee", b: "Lazada", tier: "chuan" },
+            { a: "Grab", b: "Be", tier: "chuan" },
+            { a: "Macbook", b: "Windows", tier: "chuan" },
+            { a: "Tai nghe có dây", b: "Tai nghe không dây", tier: "c4" },
+            { a: "Bàn phím cơ", b: "Bàn phím thường", tier: "c4" },
+            { a: "Chuột không dây", b: "Chuột có dây", tier: "c4" },
+            { a: "Mạng Wifi", b: "Mạng 4G", tier: "c4" },
+            { a: "ZaloPay", b: "MoMo", tier: "chuan" },
+            { a: "Vợ", b: "Người yêu", tier: "chuan" },
+            { a: "Chồng", b: "Bạn trai", tier: "chuan" },
+            { a: "Em gái mưa", b: "Bạn thân", tier: "chuan" },
+            { a: "Người yêu cũ", b: "Tình đầu", tier: "chuan" },
+            { a: "Tình đơn phương", b: "Tình sét đánh", tier: "chuan" },
+            { a: "Độc thân", b: "Thất tình", tier: "chuan" },
+            { a: "Trà xanh", b: "Tiểu tam", tier: "chuan" },
+            { a: "Trapboy", b: "Fuckboy", tier: "chuan" },
+            { a: "Bố chồng", b: "Bố vợ", tier: "chuan" },
+            { a: "Mẹ chồng", b: "Mẹ vợ", tier: "chuan" },
+            { a: "Tuần trăng mật", b: "Đêm tân hôn", tier: "chuan" },
+            { a: "Đám cưới", b: "Đám hỏi", tier: "chuan" },
+            { a: "Cắm sừng", b: "Bắt cá hai tay", tier: "chuan" },
+            { a: "Bạn thân", b: "Đồng nghiệp", tier: "chuan" },
+            { a: "Phông bạt", b: "Sống ảo", tier: "chuan" },
+            { a: "Bún đậu mắm tôm", b: "Bún chả", tier: "chuan" },
+            { a: "Phở bò", b: "Bún bò", tier: "chuan" },
+            { a: "Cơm tấm", b: "Cơm rang", tier: "chuan" },
+            { a: "Bánh mì", b: "Bánh bao", tier: "chuan" },
+            { a: "Trà sữa", b: "Trà chanh", tier: "chuan" },
+            { a: "Cà phê sữa", b: "Bạc xỉu", tier: "chuan" },
+            { a: "Lẩu Thái", b: "Lẩu hải sản", tier: "chuan" },
+            { a: "Thịt nướng", b: "Gà rán", tier: "chuan" },
+            { a: "Nem rán", b: "Gỏi cuốn", tier: "chuan" },
+            { a: "Bánh xèo", b: "Bánh khọt", tier: "chuan" },
+            { a: "Nước ép cam", b: "Sinh tố xoài", tier: "chuan" },
+            { a: "Coca", b: "Pepsi", tier: "chuan" },
+            { a: "Mì tôm", b: "Phở gói", tier: "chuan" },
+            { a: "Sầu riêng", b: "Mít", tier: "chuan" },
+            { a: "Trứng vịt lộn", b: "Trứng cút lộn", tier: "chuan" },
+            { a: "Hành lá", b: "Rau mùi", tier: "chuan" },
+            { a: "Trứng rán", b: "Trứng luộc", tier: "chuan" },
+            { a: "Tương ớt", b: "Tương cà", tier: "chuan" },
+            { a: "Bún riêu", b: "Bún ốc", tier: "chuan" },
+            { a: "Bánh chưng", b: "Bánh tét", tier: "chuan" },
+            { a: "Xôi đậu xanh", b: "Xôi gấc", tier: "chuan" },
+            { a: "Cơm rang", b: "Cơm trộn", tier: "chuan" },
+            { a: "Nước mắm", b: "Nước tương", tier: "chuan" },
+            { a: "Sữa tươi", b: "Sữa đặc", tier: "chuan" },
+            { a: "Cà phê đen", b: "Cà phê sữa", tier: "chuan" },
+            { a: "Rượu", b: "Bia", tier: "chuan" },
+            { a: "Chanh leo", b: "Cam vắt", tier: "chuan" },
+            { a: "Bánh quy", b: "Bánh xốp", tier: "chuan" },
+            { a: "Bánh sinh nhật", b: "Bánh trung thu", tier: "chuan" },
+            { a: "Muối vừng", b: "Muối tiêu", tier: "chuan" },
+            { a: "Cháo sườn", b: "Cháo trai", tier: "chuan" },
+            { a: "Nước lọc", b: "Nước khoáng", tier: "chuan" },
+            { a: "Sinh tố", b: "Nước ép", tier: "chuan" },
+            { a: "Liên Minh", b: "Liên Quân", tier: "chuan" },
+            { a: "PUBG", b: "Free Fire", tier: "chuan" },
+            { a: "Tốc Chiến", b: "Mobile Legends", tier: "chuan" },
+            { a: "CSGO", b: "Valorant", tier: "chuan" },
+            { a: "FO4", b: "PES", tier: "chuan" },
+            { a: "Cờ vua", b: "Cờ tướng", tier: "chuan" },
+            { a: "Ma sói", b: "Mèo nổ", tier: "chuan" },
+            { a: "Tiến lên", b: "Phỏm", tier: "chuan" },
+            { a: "Cờ tỷ phú", b: "Cờ cá ngựa", tier: "chuan" },
+            { a: "Chạy bộ", b: "Đi bộ", tier: "chuan" },
+            { a: "Giảng viên", b: "Giáo viên", tier: "chuan" },
+            { a: "Lớp trưởng", b: "Lớp phó", tier: "chuan" },
+            { a: "Sinh viên", b: "Học sinh", tier: "chuan" },
+            { a: "Ký túc xá", b: "Nhà trọ", tier: "chuan" },
+            { a: "Kiểm tra miệng", b: "Thi học kỳ", tier: "chuan" },
+            { a: "Giám thị", b: "Bảo vệ", tier: "chuan" },
+            { a: "Bác sĩ", b: "Y tá", tier: "chuan" },
+            { a: "Công an", b: "Bộ đội", tier: "c4" },
+            { a: "Lập trình viên", b: "Thiết kế", tier: "c4" },
+            { a: "Ca sĩ", b: "Diễn viên", tier: "c4" },
+            { a: "Nhà văn", b: "Nhà báo", tier: "c4" },
+            { a: "Kế toán", b: "Thu ngân", tier: "c4" },
+            { a: "Streamer", b: "Youtuber", tier: "c4" },
+            { a: "Thợ cắt tóc", b: "Thợ trang điểm", tier: "c4" },
+            { a: "Thợ xây", b: "Thợ mộc", tier: "c4" },
+            { a: "Nhạc sĩ", b: "Họa sĩ", tier: "c4" },
+            { a: "Đầu bếp", b: "Bồi bàn", tier: "c4" },
+            { a: "Giám đốc", b: "Thư ký", tier: "c4" },
+            { a: "Phi công", b: "Thủy thủ", tier: "c4" },
+            { a: "Lao công", b: "Bảo vệ", tier: "chuan" },
+            { a: "Luật sư", b: "Thẩm phán", tier: "chuan" },
+            { a: "Áo phông", b: "Áo sơ mi", tier: "chuan" },
+            { a: "Quần đùi", b: "Quần lót", tier: "chuan" },
+            { a: "Giày thể thao", b: "Giày da", tier: "chuan" },
+            { a: "Dép tông", b: "Dép tổ ong", tier: "chuan" },
+            { a: "Bàn chải", b: "Khăn mặt", tier: "chuan" },
+            { a: "Sữa tắm", b: "Dầu gội", tier: "chuan" },
+            { a: "Bút bi", b: "Bút chì", tier: "chuan" },
+            { a: "Son lì", b: "Son dưỡng", tier: "chuan" },
+            { a: "Kem chống nắng", b: "Sữa rửa mặt", tier: "chuan" },
+            { a: "Tủ lạnh", b: "Điều hòa", tier: "chuan" },
+            { a: "Xe máy", b: "Xe đạp điện", tier: "chuan" },
+            { a: "Ô tô", b: "Taxi", tier: "chuan" },
+            { a: "Mũ bảo hiểm", b: "Mũ lưỡi trai", tier: "chuan" },
+            { a: "Chăn", b: "Gối", tier: "chuan" },
+            { a: "Quạt trần", b: "Quạt cây", tier: "chuan" },
+            { a: "Bếp ga", b: "Bếp từ", tier: "chuan" },
+            { a: "Ấm siêu tốc", b: "Phích nước", tier: "chuan" },
+            { a: "Bát", b: "Đĩa", tier: "chuan" },
+            { a: "Đũa", b: "Thìa", tier: "chuan" },
+            { a: "Nồi", b: "Chảo", tier: "chuan" },
+            { a: "Chổi đót", b: "Cây lau nhà", tier: "chuan" },
+            { a: "Thước kẻ", b: "Compa", tier: "chuan" },
+            { a: "Cục tẩy", b: "Bút xóa", tier: "chuan" },
+            { a: "Băng dính", b: "Hồ dán", tier: "chuan" },
+            { a: "Kéo", b: "Dao rọc giấy", tier: "chuan" },
+            { a: "Lược", b: "Gương", tier: "chuan" },
+            { a: "Màn", b: "Đệm", tier: "chuan" },
+            { a: "Cờ đỏ", b: "Cờ xanh", tier: "chuan" },
+            { a: "Hướng nội", b: "Hướng ngoại", tier: "chuan" },
+            { a: "Bóc phốt", b: "Hóng biến", tier: "chuan" },
+            { a: "Thao túng tâm lý", b: "Tẩy não", tier: "chuan" },
+            { a: "Suy nghĩ nhiều", b: "Đau đầu", tier: "chuan" },
+            { a: "Báo thủ", b: "Trẻ trâu", tier: "chuan" },
+            { a: "Phông bạt", b: "Lùa gà", tier: "chuan" },
+            { a: "Xà lơ", b: "Vô tri", tier: "chuan" },
+            { a: "Mỏ hỗn", b: "Thảo mai", tier: "chuan" },
+            { a: "Đu thần tượng", b: "Đẩy thuyền", tier: "chuan" },
+            { a: "Cà khịa", b: "Đá đểu", tier: "chuan" },
+            { a: "Lụy tình", b: "Trai ngoan", tier: "chuan" },
+            { a: "Cẩu lương", b: "Trà xanh", tier: "chuan" },
+            { a: "Bùng kèo", b: "Cao su", tier: "chuan" },
+            { a: "Kể khổ", b: "Làm mình làm mẩy", tier: "chuan" },
+            { a: "Hà Nội", b: "Sài Gòn", tier: "chuan" },
+            { a: "Đà Lạt", b: "Sapa", tier: "chuan" },
+            { a: "Vịnh Hạ Long", b: "Tràng An", tier: "chuan" },
+            { a: "Hồ Gươm", b: "Nguyễn Huệ", tier: "chuan" },
+            { a: "Cầu Vàng", b: "Cầu Rồng", tier: "chuan" },
+            { a: "Chợ Bến Thành", b: "Chợ Đồng Xuân", tier: "chuan" },
+            { a: "Hồ Tây", b: "Hồ Gươm", tier: "chuan" },
+            { a: "Lăng Bác", b: "Văn Miếu", tier: "chuan" },
+            { a: "Phú Quốc", b: "Nha Trang", tier: "chuan" },
+            { a: "Tạ Hiện", b: "Bùi Viện", tier: "chuan" },
+            { a: "Chợ đêm", b: "Siêu thị", tier: "chuan" },
+            { a: "Quán nét", b: "Quán bida", tier: "chuan" },
+            { a: "Rap Việt", b: "Anh Trai Say Hi", tier: "chuan" },
+            { a: "Táo Quân", b: "Thách Thức Danh Hài", tier: "chuan" },
+            { a: "Doraemon", b: "Nobita", tier: "chuan" },
+            { a: "Conan", b: "Kaito Kid", tier: "chuan" },
+            { a: "Tom", b: "Oggy", tier: "chuan" },
+            { a: "Siêu nhân Gao", b: "Siêu nhân Nhện", tier: "chuan" },
+            { a: "Iron Man", b: "Batman", tier: "chuan" },
+            { a: "Thanos", b: "Deadpool", tier: "chuan" },
+            { a: "Bát Giới", b: "Ngộ Không", tier: "chuan" },
+            { a: "Lão Hạc", b: "Cậu Vàng", tier: "chuan" },
+            { a: "Elsa", b: "Rapunzel", tier: "chuan" },
+            { a: "Running Man", b: "Hai Ngày Một Đêm", tier: "chuan" },
+            { a: "Chó Corgi", b: "Chó Husky", tier: "chuan" },
+            { a: "Mèo Anh", b: "Mèo mướp", tier: "chuan" },
+            { a: "Cua đồng", b: "Ghẹ biển", tier: "chuan" },
+            { a: "Cá mập", b: "Cá voi", tier: "chuan" },
+            { a: "Đại bàng", b: "Cú mèo", tier: "chuan" },
+            { a: "Khỉ", b: "Vượn", tier: "chuan" },
+            { a: "Rắn", b: "Trăn", tier: "chuan" },
+            { a: "Muỗi", b: "Ruồi", tier: "chuan" },
+            { a: "Gián", b: "Chuột", tier: "chuan" },
+            { a: "Cây đào", b: "Cây mai", tier: "chuan" },
+            { a: "Quả sầu riêng", b: "Quả mít", tier: "chuan" },
+            { a: "Quả chanh", b: "Quả sấu", tier: "chuan" },
+            { a: "Củ sắn", b: "Củ đậu", tier: "chuan" },
+            { a: "Rau muống", b: "Bắp cải", tier: "chuan" },
+            { a: "Hoa hồng", b: "Hoa cúc", tier: "chuan" },
+            { a: "Xương rồng", b: "Nha đam", tier: "chuan" },
+            { a: "Cáo", b: "Chồn", tier: "chuan" },
+            { a: "Rùa", b: "Ốc sên", tier: "chuan" },
+            { a: "Cá sấu", b: "Cá heo", tier: "chuan" },
+            { a: "Tôm", b: "Cua", tier: "chuan" },
+            { a: "Bạch tuộc", b: "Mực", tier: "chuan" },
+            { a: "Sư tử", b: "Hổ", tier: "chuan" },
+            { a: "Gà trống", b: "Gà mái", tier: "chuan" },
+            { a: "Bò", b: "Trâu", tier: "chuan" },
+            { a: "Bướm", b: "Ong", tier: "chuan" },
+            { a: "Chim sẻ", b: "Đại bàng", tier: "chuan" },
+            { a: "Cây đa", b: "Cây bàng", tier: "chuan" },
+            { a: "Hoa sen", b: "Hoa súng", tier: "chuan" },
+            { a: "Hoa lan", b: "Hoa mai", tier: "chuan" },
+            { a: "Cỏ ba lá", b: "Cỏ bốn lá", tier: "chuan" },
+            { a: "Đánh răng", b: "Súc miệng", tier: "chuan" },
+            { a: "Tắm đứng", b: "Tắm bồn", tier: "chuan" },
+            { a: "Gội đầu", b: "Cắt tóc", tier: "chuan" },
+            { a: "Ngủ nướng", b: "Thức khuya", tier: "chuan" },
+            { a: "Quét nhà", b: "Lau nhà", tier: "chuan" },
+            { a: "Giặt tay", b: "Giặt máy", tier: "chuan" },
+            { a: "Cạo râu", b: "Nhổ râu", tier: "chuan" },
+            { a: "Đi siêu thị", b: "Đi chợ", tier: "chuan" },
+            { a: "Chuyển khoản", b: "Rút tiền", tier: "chuan" },
+            { a: "Hát karaoke", b: "Đi bar", tier: "chuan" },
+            { a: "Khóc thầm", b: "Cười to", tier: "chuan" },
+            { a: "Tắc đường", b: "Vượt đèn đỏ", tier: "chuan" },
+            { a: "Đọc sách", b: "Nghe nhạc", tier: "chuan" },
+            { a: "Đặt đồ ăn", b: "Tự nấu", tier: "chuan" },
+            { a: "Khóc", b: "Cười", tier: "chuan" },
+            { a: "Thức", b: "Ngủ", tier: "chuan" },
+            { a: "Bơi", b: "Lặn", tier: "chuan" },
+            { a: "Ăn", b: "Uống", tier: "chuan" },
+            { a: "Đọc", b: "Viết", tier: "chuan" },
+            { a: "Mua", b: "Bán", tier: "chuan" },
+            { a: "Đóng", b: "Mở", tier: "chuan" },
+            { a: "Kéo", b: "Đẩy", tier: "chuan" },
+            { a: "Hát", b: "Múa", tier: "chuan" },
+            { a: "Đấm", b: "Đá", tier: "chuan" },
+            { a: "Nhéo", b: "Cấu", tier: "chuan" },
+            { a: "Nhai", b: "Nuốt", tier: "chuan" },
+            { a: "Thở", b: "Nín thở", tier: "chuan" },
+            { a: "Ngáp", b: "Hắt xì", tier: "chuan" },
+            { a: "Khóc nấc", b: "Cười mỉm", tier: "chuan" },
+            { a: "Ngày", b: "Đêm", tier: "chuan" },
+            { a: "Sáng", b: "Tối", tier: "chuan" },
+            { a: "Hoàng hôn", b: "Bình minh", tier: "chuan" },
+            { a: "Xuân", b: "Thu", tier: "chuan" },
+            { a: "Hạ", b: "Đông", tier: "chuan" },
+            { a: "Nắng", b: "Mưa", tier: "chuan" },
+            { a: "Gió", b: "Bão", tier: "chuan" },
+            { a: "Sấm", b: "Sét", tier: "chuan" },
+            { a: "Sông", b: "Suối", tier: "chuan" },
+            { a: "Biển", b: "Hồ", tier: "chuan" },
+            { a: "Núi", b: "Đồi", tier: "chuan" },
+            { a: "Rừng", b: "Sa mạc", tier: "chuan" },
+            { a: "Đường nhựa", b: "Đường đất", tier: "chuan" },
+            { a: "Cầu", b: "Hầm", tier: "chuan" },
+            { a: "Nông thôn", b: "Thành phố", tier: "chuan" },
+            { a: "Tay", b: "Chân", tier: "chuan" },
+            { a: "Mắt", b: "Mũi", tier: "chuan" },
+            { a: "Miệng", b: "Môi", tier: "chuan" },
+            { a: "Răng", b: "Lưỡi", tier: "chuan" },
+            { a: "Tóc", b: "Râu", tier: "chuan" },
+            { a: "Bụng", b: "Lưng", tier: "chuan" },
+            { a: "Ngón tay", b: "Ngón chân", tier: "chuan" },
+            { a: "Gucci", b: "Dior", tier: "chuan" },
+            { a: "Apple", b: "Samsung", tier: "chuan" },
+            { a: "Honda", b: "Yamaha", tier: "chuan" },
+            { a: "Grab", b: "Uber", tier: "chuan" },
+            { a: "Google", b: "Yahoo", tier: "chuan" },
+            { a: "Chuột máy tính", b: "Bàn phím", tier: "chuan" },
+            { a: "Đen", b: "Trắng", tier: "chuan" },
+            { a: "Vua", b: "Nữ hoàng", tier: "chuan" },
+            { a: "Marvel", b: "DC", tier: "chuan" },
+            { a: "Cao thủ", b: "Thách đấu", tier: "chuan" },
+            { a: "Thích", b: "Chia sẻ", tier: "chuan" },
+            { a: "Tải xuống", b: "Tải lên", tier: "chuan" },
+            { a: "Trực tuyến", b: "Ngoại tuyến", tier: "chuan" },
+            { a: "Nhập", b: "Phím cách", tier: "chuan" },
+            { a: "Xóa", b: "Xóa lùi", tier: "chuan" },
+            { a: "Sao chép", b: "Dán", tier: "chuan" },
+            { a: "Zoom", b: "Skype", tier: "chuan" },
+            { a: "Word", b: "Excel", tier: "chuan" },
+            { a: "Hộp thư", b: "Bình luận", tier: "chuan" },
+            { a: "Theo dõi", b: "Đăng ký", tier: "chuan" },
+            { a: "Tắt tiếng", b: "Chặn", tier: "chuan" },
+            { a: "Chọc phá", b: "Tin rác", tier: "chuan" },
+            { a: "Story", b: "Reels", tier: "chuan" },
+            { a: "Podcast", b: "Vlog", tier: "chuan" },
+            { a: "Superman", b: "Spiderman", tier: "chuan" },
+            { a: "Bắt đầu", b: "Dừng", tier: "chuan" },
+            { a: "Người thắng", b: "Người thua", tier: "chuan" },
+            { a: "Tàu hỏa", b: "Tàu thủy", tier: "chuan" },
+            { a: "Xe cứu thương", b: "Xe cứu hỏa", tier: "chuan" },
+            { a: "Xe tải", b: "Xe bồn", tier: "chuan" },
+            { a: "Gương chiếu hậu", b: "Kính chắn gió", tier: "chuan" },
+            { a: "Vô lăng", b: "Tay lái", tier: "chuan" },
+            { a: "Phà", b: "Đò", tier: "chuan" },
+            { a: "Xe buýt", b: "Xe khách", tier: "chuan" },
+            { a: "Du thuyền", b: "Ca nô", tier: "chuan" },
+            { a: "Tàu ngầm", b: "Tàu sân bay", tier: "c4" },
+            { a: "Đường sắt", b: "Đường thủy", tier: "c4" },
+            { a: "Biển báo giao thông", b: "Đèn giao thông", tier: "c4" },
+            { a: "Tủ quần áo", b: "Tủ giày", tier: "c4" },
+            { a: "Bàn ăn", b: "Bàn làm việc", tier: "c4" },
+            { a: "Ghế sofa", b: "Ghế đẩu", tier: "c4" },
+            { a: "Đèn chùm", b: "Đèn tuýp", tier: "c4" },
+            { a: "Máy hút bụi", b: "Robot lau nhà", tier: "c4" },
+            { a: "Nồi chiên không dầu", b: "Nồi áp suất", tier: "c4" },
+            { a: "Bếp than", b: "Bếp củi", tier: "c4" },
+            { a: "Máy rửa bát", b: "Máy sấy quần áo", tier: "c4" },
+            { a: "Nệm cao su", b: "Nệm lò xo", tier: "c4" },
+            { a: "Rèm cửa", b: "Cửa cuốn", tier: "c4" },
+            { a: "Chìa khóa", b: "Ổ khóa", tier: "c4" },
+            { a: "Sao chổi", b: "Sao băng", tier: "c4" },
+            { a: "Mặt trời", b: "Trái đất", tier: "c4" },
+            { a: "Hố đen", b: "Dải ngân hà", tier: "c4" },
+            { a: "Nhật thực", b: "Nguyệt thực", tier: "c4" },
+            { a: "Bão cát", b: "Bão tuyết", tier: "c4" },
+            { a: "Mây", b: "Sương mù", tier: "c4" },
+            { a: "Cầu vồng", b: "Cực quang", tier: "c4" },
+            { a: "Hạn hán", b: "Lũ lụt", tier: "c4" },
+            { a: "Băng trôi", b: "Núi lửa", tier: "c4" },
+            { a: "Giọt sương", b: "Giọt mưa", tier: "c4" },
+            { a: "Bột ngọt", b: "Bột nêm", tier: "c4" },
+            { a: "Hành khô", b: "Tỏi khô", tier: "chuan" },
+            { a: "Ớt tươi", b: "Mù tạt", tier: "chuan" },
+            { a: "Dấm", b: "Chanh", tier: "chuan" },
+            { a: "Sữa chua", b: "Váng sữa", tier: "chuan" },
+            { a: "Trân châu đen", b: "Trân châu trắng", tier: "chuan" },
+            { a: "Thạch dừa", b: "Thạch rau câu", tier: "chuan" },
+            { a: "Nước mắm", b: "Mắm tôm", tier: "chuan" },
+            { a: "Dầu ăn", b: "Dầu hào", tier: "chuan" },
+            { a: "Gừng", b: "Sả", tier: "chuan" },
+            { a: "Chó sói", b: "Cáo", tier: "chuan" },
+            { a: "Gấu trúc", b: "Gấu Bắc Cực", tier: "chuan" },
+            { a: "Hươu cao cổ", b: "Đà điểu", tier: "chuan" },
+            { a: "Tê giác", b: "Hà mã", tier: "chuan" },
+            { a: "Chim công", b: "Chim phượng", tier: "chuan" },
+            { a: "Gà lôi", b: "Gà tây", tier: "chuan" },
+            { a: "Chuồn chuồn", b: "Đom đóm", tier: "chuan" },
+            { a: "Kiến", b: "Mối", tier: "chuan" },
+            { a: "Rết", b: "Cuốn chiếu", tier: "chuan" },
+            { a: "Mực ống", b: "Mực lá", tier: "chuan" },
+            { a: "Tôm hùm", b: "Cá mập", tier: "chuan" },
+            { a: "Nai", b: "Bò tót", tier: "chuan" },
+            { a: "Áo khoác", b: "Áo len", tier: "chuan" },
+            { a: "Quần lửng", b: "Quần ngố", tier: "chuan" },
+            { a: "Váy liền", b: "Chân váy", tier: "chuan" },
+            { a: "Dây chuyền", b: "Hoa tai", tier: "chuan" },
+            { a: "Túi xách", b: "Balo", tier: "chuan" },
+            { a: "Ví da", b: "Bóp đựng tiền", tier: "chuan" },
+            { a: "Khăn quàng", b: "Găng tay", tier: "chuan" },
+            { a: "Áo mưa", b: "Ô che nắng", tier: "chuan" },
+            { a: "Dây giày", b: "Lót giày", tier: "chuan" },
+            { a: "Thắt lưng", b: "Dây nịt", tier: "chuan" },
+            { a: "Thợ hàn", b: "Thợ tiện", tier: "c4" },
+            { a: "Kế toán", b: "Kiểm toán", tier: "c4" },
+            { a: "Nhân sự", b: "Hành chính", tier: "c4" },
+            { a: "Tiếp viên hàng không", b: "Lễ tân", tier: "c4" },
+            { a: "Thợ điện", b: "Thợ nước", tier: "c4" },
+            { a: "Biên tập viên", b: "MC truyền hình", tier: "c4" },
+            { a: "Chuyên viên", b: "Giám đốc", tier: "c4" },
+            { a: "Đạo diễn", b: "Quay phim", tier: "c4" },
+            { a: "Tự tin", b: "Tự ti", tier: "chuan" },
+            { a: "Buồn chán", b: "Cô đơn", tier: "chuan" },
+            { a: "Giận dữ", b: "Sợ hãi", tier: "chuan" },
+            { a: "Ghen tị", b: "Ngưỡng mộ", tier: "chuan" },
+            { a: "Lo lắng", b: "Hồi hộp", tier: "chuan" },
+            { a: "Đau đầu", b: "Đau bụng", tier: "chuan" },
+            { a: "Chóng mặt", b: "Buồn nôn", tier: "chuan" },
+            { a: "Say rượu", b: "Say xe", tier: "chuan" },
+            { a: "Hạnh phúc", b: "Mãn nguyện", tier: "chuan" },
+            { a: "Con trai", b: "Con gái", tier: "de" },
+            { a: "Đàn ông", b: "Phụ nữ", tier: "de" },
+            { a: "Nước", b: "Lửa", tier: "de" },
+            { a: "Băng", b: "Tuyết", tier: "de" },
+            { a: "Điện thoại", b: "Máy tính xách tay", tier: "de" },
+            { a: "Đỏ", b: "Xanh dương", tier: "de" },
+            { a: "Trái", b: "Phải", tier: "de" },
+            { a: "Lên", b: "Xuống", tier: "de" },
+            { a: "Tốt", b: "Xấu", tier: "de" },
+            { a: "Vui", b: "Buồn", tier: "de" },
+            { a: "Buổi sáng", b: "Buổi tối", tier: "de" },
+            { a: "Mùa hè", b: "Mùa đông", tier: "de" },
+            { a: "Giáo viên", b: "Học sinh", tier: "de" },
+            { a: "Độc thân", b: "Đã kết hôn", tier: "de" },
+            { a: "Xin chào", b: "Tạm biệt", tier: "de" },
+            { a: "Có", b: "Không", tier: "de" },
+            { a: "Đúng", b: "Sai", tier: "de" },
+            { a: "Tòa tháp", b: "Tòa nhà", tier: "chuan" },
+            { a: "Biệt thự", b: "Lâu đài", tier: "c4" },
+            { a: "Đình làng", b: "Đền thờ", tier: "c4" },
+            { a: "Miếu", b: "Chùa", tier: "c4" },
+            { a: "Cửa sổ", b: "Cửa chính", tier: "c4" },
+            { a: "Ban công", b: "Sân thượng", tier: "c4" },
+            { a: "Tầng hầm", b: "Tầng trệt", tier: "c4" },
+            { a: "Tường", b: "Vách ngăn", tier: "c4" },
+            { a: "Cột điện", b: "Cột cờ", tier: "c4" },
+            { a: "Bãi đỗ xe", b: "Trạm xăng", tier: "c4" },
+            { a: "Công viên", b: "Vườn hoa", tier: "c4" },
+            { a: "Nghĩa trang", b: "Bệnh viện", tier: "c4" },
+            { a: "Sân bay", b: "Bến xe", tier: "c4" },
+            { a: "Búa", b: "Đinh", tier: "c4" },
+            { a: "Kìm", b: "Cờ lê", tier: "c4" },
+            { a: "Tua vít", b: "Ốc vít", tier: "c4" },
+            { a: "Cưa", b: "Rựa", tier: "c4" },
+            { a: "Xẻng", b: "Cuốc", tier: "c4" },
+            { a: "Cân", b: "Thước", tier: "chuan" },
+            { a: "Chổi", b: "Đồ hót rác", tier: "c4" },
+            { a: "Bơm tiêm", b: "Nhíp", tier: "c4" },
+            { a: "Kim khâu", b: "Chỉ khâu", tier: "c4" },
+            { a: "Súng", b: "Đạn", tier: "c4" },
+            { a: "Kiếm", b: "Khiên", tier: "c4" },
+            { a: "Cung", b: "Tên", tier: "c4" },
+            { a: "Pháo", b: "Lựu đạn", tier: "c4" },
+            { a: "Trò chơi ngoại tuyến", b: "Trò chơi trực tuyến", tier: "chuan" },
+            { a: "Chuột máy tính", b: "Tay cầm", tier: "chuan" },
+            { a: "Sát thủ", b: "Đấu sĩ", tier: "chuan" },
+            { a: "Xạ thủ", b: "Pháp sư", tier: "chuan" },
+            { a: "Rừng", b: "Đi mid", tier: "chuan" },
+            { a: "Quái vật", b: "Trùm", tier: "chuan" },
+            { a: "Hồi máu", b: "Tăng giáp", tier: "chuan" },
+            { a: "Bắn tỉa", b: "Cận chiến", tier: "chuan" },
+            { a: "Bàn phím", b: "Màn hình", tier: "chuan" },
+            { a: "Tai nghe", b: "Loa vi tính", tier: "chuan" },
+            { a: "Điểm kinh nghiệm", b: "Cấp độ", tier: "chuan" },
+            { a: "Thắng", b: "Thua", tier: "chuan" },
+            { a: "Trống đồng", b: "Cồng chiêng", tier: "chuan" },
+            { a: "Áo dài", b: "Áo bà ba", tier: "chuan" },
+            { a: "Nón lá", b: "Nón quai thao", tier: "chuan" },
+            { a: "Cải lương", b: "Chèo", tier: "chuan" },
+            { a: "Tuồng", b: "Đờn ca tài tử", tier: "chuan" },
+            { a: "Ca dao", b: "Tục ngữ", tier: "chuan" },
+            { a: "Thần thoại", b: "Cổ tích", tier: "chuan" },
+            { a: "Múa rối nước", b: "Múa lân", tier: "chuan" },
+            { a: "Tre", b: "Trúc", tier: "chuan" },
+            { a: "Hoa sen", b: "Hoa mai", tier: "chuan" },
+            { a: "Long", b: "Phụng", tier: "chuan" },
+            { a: "Quy", b: "Lân", tier: "chuan" },
+            { a: "Quạt giấy", b: "Quạt nan", tier: "chuan" },
+            { a: "Sốt", b: "Cảm lạnh", tier: "chuan" },
+            { a: "Ho", b: "Hắt hơi", tier: "chuan" },
+            { a: "Dị ứng", b: "Ngộ độc", tier: "chuan" },
+            { a: "Thuốc Tây", b: "Thuốc Nam", tier: "chuan" },
+            { a: "Tiêm", b: "Uống thuốc", tier: "chuan" },
+            { a: "Khám bệnh", b: "Phẫu thuật", tier: "chuan" },
+            { a: "Máu", b: "Nước biển", tier: "chuan" },
+            { a: "Băng gạc", b: "Thuốc sát trùng", tier: "chuan" },
+            { a: "Khẩu trang", b: "Mặt nạ y tế", tier: "chuan" },
+            { a: "Cặp nhiệt độ", b: "Ống nghe", tier: "chuan" },
+            { a: "Sự thật", b: "Dối trá", tier: "chuan" },
+            { a: "Quá khứ", b: "Tương lai", tier: "chuan" },
+            { a: "Hòa bình", b: "Chiến tranh", tier: "chuan" },
+            { a: "Hữu hình", b: "Vô hình", tier: "chuan" },
+            { a: "Thành công", b: "Thất bại", tier: "chuan" },
+            { a: "Dũng cảm", b: "Hèn nhát", tier: "chuan" },
+            { a: "Thông minh", b: "Ngốc nghếch", tier: "chuan" },
+            { a: "Đẹp", b: "Xấu", tier: "chuan" },
+            { a: "Nhanh", b: "Chậm", tier: "chuan" },
+            { a: "Cao", b: "Thấp", tier: "chuan" },
+            { a: "Dài", b: "Ngắn", tier: "chuan" },
+            { a: "Cứng", b: "Mềm", tier: "chuan" },
+            { a: "Nặng", b: "Nhẹ", tier: "chuan" },
+            { a: "Khô", b: "Ướt", tier: "chuan" },
+            { a: "Bắc Cực", b: "Nam Cực", tier: "chuan" },
+            { a: "Châu Á", b: "Châu Âu", tier: "chuan" },
+            { a: "Vĩ tuyến", b: "Kinh tuyến", tier: "chuan" },
+            { a: "Quần đảo", b: "Bán đảo", tier: "chuan" },
+            { a: "Đầm lầy", b: "Rừng ngập mặn", tier: "chuan" },
+            { a: "Đồng bằng", b: "Cao nguyên", tier: "chuan" },
+            { a: "Hang động", b: "Vách đá", tier: "chuan" },
+            { a: "Không khí", b: "Nước", tier: "chuan" },
+            { a: "Khí quyển", b: "Tầng ôzôn", tier: "chuan" },
+            { a: "Ô nhiễm", b: "Tái chế", tier: "chuan" },
+            { a: "Nóng", b: "Lạnh", tier: "de" },
+            { a: "Lớn", b: "Nhỏ", tier: "de" },
+            { a: "Sạch", b: "Bẩn", tier: "de" },
+            { a: "Giàu", b: "Nghèo", tier: "de" },
+            { a: "Cũ", b: "Mới", tier: "de" },
+            { a: "Trống", b: "Đầy", tier: "de" },
+            { a: "Đơn giản", b: "Phức tạp", tier: "de" },
+            { a: "Rẻ", b: "Đắt", tier: "de" },
+            { a: "Yêu", b: "Ghét", tier: "de" },
+            { a: "Đi bộ", b: "Chạy", tier: "de" },
+            { a: "Đứng", b: "Ngồi", tier: "de" },
+            { a: "Chơi", b: "Làm việc", tier: "de" },
+            { a: "Nói", b: "Lắng nghe", tier: "de" },
+            { a: "Cho", b: "Lấy", tier: "de" },
+            { a: "Dạy", b: "Học", tier: "de" },
+            { a: "Đến", b: "Rời đi", tier: "de" },
+            { a: "Hỏi", b: "Trả lời", tier: "de" },
+            { a: "Làm vỡ", b: "Sửa", tier: "de" },
+            { a: "Bắt", b: "Ném", tier: "de" },
+            { a: "Tìm", b: "Thua", tier: "de" },
+            { a: "Lớn lên", b: "Co lại", tier: "de" },
+            { a: "Giấu", b: "Tìm kiếm", tier: "de" },
+            { a: "Hát", b: "Nhảy múa", tier: "de" },
+            { a: "Mỉm cười", b: "Nhăn mặt", tier: "de" },
+            { a: "Chấp nhận", b: "Từ chối", tier: "de" },
+            { a: "Đồng ý", b: "Không đồng ý", tier: "de" },
+            { a: "Bắt đầu", b: "Kết thúc", tier: "de" },
+            { a: "Xây dựng", b: "Phá hủy", tier: "de" },
+            { a: "Bắt", b: "Trượt", tier: "de" },
+            { a: "Tạo ra", b: "Phá hỏng", tier: "de" },
+            { a: "Tận hưởng", b: "Chịu đựng", tier: "de" },
+            { a: "Quên", b: "Nhớ", tier: "de" },
+            { a: "Phớt lờ", b: "Nhận ra", tier: "de" },
+            { a: "Tham gia", b: "Rời đi", tier: "de" },
+            { a: "Giữ", b: "Chia sẻ", tier: "de" },
+            { a: "Đạt", b: "Trượt", tier: "de" },
+            { a: "Tiết kiệm", b: "Chi tiêu", tier: "de" },
+            { a: "Hiện ra", b: "Giấu", tier: "de" },
+            { a: "Tin tưởng", b: "Nghi ngờ", tier: "de" },
+            { a: "Tấn công", b: "Phòng thủ", tier: "de" },
+            { a: "Kết hợp", b: "Tách rời", tier: "de" },
+            { a: "Trừng phạt", b: "Khen thưởng", tier: "de" },
+            { a: "Toán học", b: "Vật lý", tier: "chuan" },
+            { a: "Hóa học", b: "Sinh học", tier: "chuan" },
+            { a: "Lịch sử", b: "Địa lý", tier: "chuan" },
+            { a: "Ngữ văn", b: "Tiếng Anh", tier: "chuan" },
+            { a: "Thể dục", b: "Quốc phòng", tier: "chuan" },
+            { a: "Bảng đen", b: "Phấn trắng", tier: "chuan" },
+            { a: "Bút dạ", b: "Phấn", tier: "chuan" },
+            { a: "Sách giáo khoa", b: "Vở bài tập", tier: "chuan" },
+            { a: "Giấy thi", b: "Giấy nháp", tier: "chuan" },
+            { a: "Học thêm", b: "Học bù", tier: "chuan" },
+            { a: "Thi giữa kỳ", b: "Thi cuối kỳ", tier: "chuan" },
+            { a: "Trượt môn", b: "Học lại", tier: "chuan" },
+            { a: "Bút mực", b: "Bút chì", tier: "chuan" },
+            { a: "Điểm mười", b: "Điểm liệt", tier: "chuan" },
+            { a: "Họp phụ huynh", b: "Sổ liên lạc", tier: "chuan" },
+            { a: "Màu đỏ", b: "Màu hồng", tier: "chuan" },
+            { a: "Màu xanh lá", b: "Màu xanh biển", tier: "chuan" },
+            { a: "Màu đen", b: "Màu trắng", tier: "chuan" },
+            { a: "Màu vàng", b: "Màu cam", tier: "chuan" },
+            { a: "Màu tím", b: "Màu nâu", tier: "chuan" },
+            { a: "Hình tròn", b: "Hình cầu", tier: "chuan" },
+            { a: "Hình vuông", b: "Hình chữ nhật", tier: "chuan" },
+            { a: "Hình tam giác", b: "Hình chóp", tier: "chuan" },
+            { a: "Đường thẳng", b: "Đường cong", tier: "chuan" },
+            { a: "Lập phương", b: "Trụ", tier: "chuan" },
+            { a: "Đàn Guitar", b: "Đàn Ukulele", tier: "chuan" },
+            { a: "Đàn Piano", b: "Đàn Organ", tier: "chuan" },
+            { a: "Sáo", b: "Tiêu", tier: "chuan" },
+            { a: "Trống", b: "Cồng chiêng", tier: "chuan" },
+            { a: "Nhạc Bolero", b: "Nhạc Trữ tình", tier: "chuan" },
+            { a: "Nhạc Trẻ", b: "Nhạc Rap", tier: "chuan" },
+            { a: "Mi cờ rô", b: "Loa", tier: "chuan" },
+            { a: "Ca từ", b: "Giai điệu", tier: "chuan" },
+            { a: "Nốt nhạc", b: "Khuông nhạc", tier: "chuan" },
+            { a: "Nhạc công", b: "Ca sĩ", tier: "chuan" },
+            { a: "Rồng", b: "Phượng hoàng", tier: "chuan" },
+            { a: "Kỳ lân", b: "Nhân mã", tier: "chuan" },
+            { a: "Tiên cá", b: "Phù thủy", tier: "chuan" },
+            { a: "Ma cà rồng", b: "Người sói", tier: "chuan" },
+            { a: "Yêu tinh", b: "Ác quỷ", tier: "chuan" },
+            { a: "Quái vật", b: "Thần linh", tier: "chuan" },
+            { a: "Người ngoài hành tinh", b: "Đĩa bay", tier: "chuan" },
+            { a: "Siêu anh hùng", b: "Ác nhân", tier: "chuan" },
+            { a: "Ma quỷ", b: "Thần tiên", tier: "chuan" },
+            { a: "Thiên thần", b: "Ác quỷ", tier: "chuan" },
+            { a: "Huy chương vàng", b: "Huy chương bạc", tier: "chuan" },
+            { a: "Trọng tài", b: "Huấn luyện viên", tier: "chuan" },
+            { a: "Sân cỏ", b: "Sân đất nện", tier: "chuan" },
+            { a: "Vợt cầu lông", b: "Vợt tennis", tier: "chuan" },
+            { a: "Quả bóng", b: "Quả cầu", tier: "chuan" },
+            { a: "Khởi động", b: "Giãn cơ", tier: "chuan" },
+            { a: "Thẻ vàng", b: "Thẻ đỏ", tier: "chuan" },
+            { a: "Việt vị", b: "Ném biên", tier: "chuan" },
+            { a: "Sút phạt", b: "Đánh đầu", tier: "chuan" },
+            { a: "Khán đài", b: "Sân vận động", tier: "chuan" },
+            { a: "Vận động viên", b: "Khán giả", tier: "chuan" },
+            { a: "Sữa tắm", b: "Xà bông", tier: "chuan" },
+            { a: "Dầu gội", b: "Kem xả", tier: "chuan" },
+            { a: "Kem đánh răng", b: "Nước súc miệng", tier: "chuan" },
+            { a: "Son môi", b: "Má hồng", tier: "chuan" },
+            { a: "Kem nền", b: "Phấn phủ", tier: "chuan" },
+            { a: "Tẩy da chết", b: "Nước hoa hồng", tier: "chuan" },
+            { a: "Mặt nạ", b: "Kem dưỡng da", tier: "chuan" },
+            { a: "Dao cạo râu", b: "Nhíp", tier: "chuan" },
+            { a: "Dũa móng tay", b: "Kéo cắt móng", tier: "chuan" },
+            { a: "Bông ngoáy tai", b: "Bông tẩy trang", tier: "chuan" },
+            { a: "Tin nhắn", b: "Cuộc gọi", tier: "chuan" },
+            { a: "Mật khẩu", b: "Tài khoản", tier: "chuan" },
+            { a: "Cáp sạc", b: "Sạc dự phòng", tier: "chuan" },
+            { a: "Ốp lưng", b: "Kính cường lực", tier: "chuan" },
+            { a: "Wifi", b: "Điểm phát sóng", tier: "chuan" },
+            { a: "Bàn phím ảo", b: "Màn hình cảm ứng", tier: "chuan" },
+            { a: "Củ sạc", b: "Dây sạc", tier: "chuan" },
+            { a: "Phát trực tiếp", b: "Quay video", tier: "chuan" },
+            { a: "Thả tim", b: "Thả phẫn nộ", tier: "chuan" },
+            { a: "Nhắn tin", b: "Gọi video", tier: "chuan" },
+            { a: "Bạn bè", b: "Người theo dõi", tier: "chuan" },
+            { a: "Mã bảo mật", b: "Sinh trắc học", tier: "chuan" },
+            { a: "Đường phèn", b: "Đường trắng", tier: "chuan" },
+            { a: "Muối hột", b: "Muối tinh", tier: "chuan" },
+            { a: "Rau muống", b: "Rau lang", tier: "chuan" },
+            { a: "Cà chua", b: "Cà rốt", tier: "chuan" },
+            { a: "Thịt lợn", b: "Thịt bò", tier: "chuan" },
+            { a: "Thịt gà", b: "Thịt vịt", tier: "chuan" },
+            { a: "Tôm hùm", b: "Cua hoàng đế", tier: "chuan" },
+            { a: "Cá hồi", b: "Cá ngừ", tier: "chuan" },
+            { a: "Hành tím", b: "Hành lá", tier: "chuan" },
+            { a: "Xì dầu", b: "Mù tạt", tier: "chuan" },
+            { a: "Táo", b: "Cam", tier: "de" },
+            { a: "Chuối", b: "Dưa", tier: "de" },
+            { a: "Sữa", b: "Nước", tier: "de" },
+            { a: "Bánh mì", b: "Cơm", tier: "de" },
+            { a: "Thịt", b: "Cá", tier: "de" },
+            { a: "Gà", b: "Thịt bò", tier: "de" },
+            { a: "Xa lát", b: "Súp", tier: "de" },
+            { a: "Áo sơ mi", b: "Quần dài", tier: "de" },
+            { a: "Mũ", b: "Mũ lưỡi trai", tier: "de" },
+            { a: "Giày", b: "Tất", tier: "de" },
+            { a: "Phòng", b: "Cửa", tier: "de" },
+            { a: "Cửa sổ", b: "Tường", tier: "de" },
+            { a: "Giường", b: "Ghế sô pha", tier: "de" },
+            { a: "Ghế", b: "Bàn", tier: "de" },
+            { a: "Bàn làm việc", b: "Đèn", tier: "de" },
+            { a: "Bút", b: "Bút chì", tier: "de" },
+            { a: "Sách", b: "Giấy", tier: "de" },
+            { a: "Trường học", b: "Lớp học", tier: "de" },
+            { a: "Tàu hỏa", b: "Máy bay", tier: "de" },
+            { a: "Thuyền", b: "Tàu thủy", tier: "de" },
+            { a: "Mặt trời", b: "Star", tier: "de" },
+            { a: "Mưa", b: "Tuyết", tier: "de" },
+            { a: "Núi", b: "Sông", tier: "de" },
+            { a: "Đại dương", b: "Biển", tier: "de" },
+            { a: "Cây", b: "Hoa", tier: "de" },
+            { a: "Rừng", b: "Rừng rậm", tier: "de" },
+            { a: "Thỏ", b: "Chuột hamster", tier: "de" },
+            { a: "Gấu", b: "Gấu trúc", tier: "de" },
+            { a: "Chim", b: "Vịt", tier: "de" },
+            { a: "Chú", b: "Cô", tier: "de" },
+            { a: "Anh trai", b: "Chị gái", tier: "de" },
+            { a: "Bố", b: "Mẹ", tier: "de" },
+            { a: "Bác sĩ", b: "Nha sĩ", tier: "de" },
+            { a: "Nông dân", b: "Thợ xây", tier: "de" },
+            { a: "Vàng", b: "Diamond", tier: "de" },
+            { a: "Mùa xuân", b: "Mùa thu", tier: "de" },
+            { a: "Tuần", b: "Tháng", tier: "de" },
+            { a: "Năm", b: "Thập kỷ", tier: "de" },
+            { a: "Ngày", b: "Giờ", tier: "de" },
+            { a: "Phút", b: "Giây", tier: "de" },
+            { a: "Hình tròn", b: "Hình vuông", tier: "de" },
+            { a: "Hình tam giác", b: "Hình chữ nhật", tier: "de" },
+            { a: "Âm nhạc", b: "Phim", tier: "de" },
+            { a: "Video", b: "Âm thanh", tier: "de" },
+            { a: "Máy ảnh", b: "Loa", tier: "de" },
+            { a: "Ngọt", b: "Chua", tier: "de" },
+            { a: "Đắng", b: "Cay", tier: "de" },
+            { a: "Bữa sáng", b: "Bữa tối", tier: "de" },
+            { a: "Bữa trưa", b: "Bữa ăn nhẹ", tier: "de" },
+            { a: "Nĩa", b: "Thìa", tier: "de" },
+            { a: "Giám đốc", b: "Tổng tài", tier: "chuan" },
+            { a: "Quản lý", b: "Tổ trưởng", tier: "chuan" },
+            { a: "Thư ký", b: "Trợ lý", tier: "chuan" },
+            { a: "Nhân viên", b: "Chuyên viên", tier: "chuan" },
+            { a: "Thực tập sinh", b: "Thử việc", tier: "chuan" },
+            { a: "Tiền mặt", b: "Chuyển khoản", tier: "chuan" },
+            { a: "Thẻ tín dụng", b: "Thẻ ghi nợ", tier: "chuan" },
+            { a: "Sổ đỏ", b: "Sổ hồng", tier: "chuan" },
+            { a: "Đất nền", b: "Căn hộ", tier: "chuan" },
+            { a: "Tiền lương", b: "Tiền thưởng", tier: "chuan" },
+            { a: "Khởi nghiệp", b: "Làm thuê", tier: "chuan" },
+            { a: "Mã bảo mật", b: "Mật khẩu", tier: "chuan" },
+            { a: "Vân tay", b: "Nhận diện khuôn mặt", tier: "chuan" },
+            { a: "Ghim giấy", b: "Kẹp bướm", tier: "chuan" },
+            { a: "Bảng trắng", b: "Bảng từ", tier: "chuan" },
+            { a: "Phòng khách", b: "Phòng ngủ", tier: "chuan" },
+            { a: "Phòng bếp", b: "Phòng tắm", tier: "chuan" },
+            { a: "Nhà đất", b: "Chung cư", tier: "chuan" },
+            { a: "Nhà trọ", b: "Khách sạn", tier: "chuan" },
+            { a: "Trần nhà", b: "Sàn nhà", tier: "chuan" },
+            { a: "Cửa sổ", b: "Cửa ra vào", tier: "chuan" },
+            { a: "Mái ngói", b: "Mái tôn", tier: "chuan" },
+            { a: "Sân trước", b: "Vườn sau", tier: "chuan" },
+            { a: "Hàng rào", b: "Bức tường", tier: "chuan" },
+            { a: "Giếng nước", b: "Bể nước", tier: "chuan" },
+            { a: "Anh họ", b: "Em họ", tier: "chuan" },
+            { a: "Chú", b: "Bác", tier: "chuan" },
+            { a: "Cô", b: "Dì", tier: "chuan" },
+            { a: "Cậu", b: "Mợ", tier: "chuan" },
+            { a: "Bố dượng", b: "Mẹ kế", tier: "chuan" },
+            { a: "Cháu đích tôn", b: "Cháu ngoại", tier: "chuan" },
+            { a: "Con nuôi", b: "Con ruột", tier: "chuan" },
+            { a: "Chị dâu", b: "Em chồng", tier: "chuan" },
+            { a: "Anh rể", b: "Em vợ", tier: "chuan" },
+            { a: "Ông nội", b: "Ông ngoại", tier: "chuan" },
+            { a: "Bánh bột lọc", b: "Bánh nậm", tier: "chuan" },
+            { a: "Bánh cuốn", b: "Bánh ướt", tier: "chuan" },
+            { a: "Bánh canh", b: "Bánh canh cua", tier: "chuan" },
+            { a: "Miến lươn", b: "Miến ngan", tier: "chuan" },
+            { a: "Cháo lươn", b: "Cháo vịt", tier: "chuan" },
+            { a: "Lẩu ếch", b: "Lẩu bò", tier: "chuan" },
+            { a: "Trà đào", b: "Trà quất", tier: "chuan" },
+            { a: "Trà sen", b: "Trà lài", tier: "chuan" },
+            { a: "Xúc xích", b: "Lạp xưởng", tier: "chuan" },
+            { a: "Chả lụa", b: "Nem chua", tier: "chuan" },
+            { a: "Gà luộc", b: "Gà ủ muối", tier: "chuan" },
+            { a: "Bò bít tết", b: "Bò lúc lắc", tier: "chuan" },
+            { a: "Bánh flan", b: "Rau câu", tier: "chuan" },
+            { a: "Sữa bắp", b: "Sữa đậu nành", tier: "chuan" },
+            { a: "Nước mắm", b: "Mắm nêm", tier: "chuan" },
+            { a: "Xe đạp điện", b: "Xe máy điện", tier: "chuan" },
+            { a: "Xe giường nằm", b: "Xe ghế ngồi", tier: "chuan" },
+            { a: "Đường cao tốc", b: "Đường quốc lộ", tier: "chuan" },
+            { a: "Tàu điện ngầm", b: "Cáp treo", tier: "chuan" },
+            { a: "Đèn xanh", b: "Đèn vàng", tier: "chuan" },
+            { a: "Phanh xe", b: "Chân ga", tier: "chuan" },
+            { a: "Cầu vượt", b: "Hầm chui", tier: "chuan" },
+            { a: "Ngã ba", b: "Ngã tư", tier: "chuan" },
+            { a: "Vòng xuyến", b: "Bùng binh", tier: "chuan" },
+            { a: "Bến tàu", b: "Sân bay", tier: "chuan" },
+            { a: "Hổ", b: "Báo", tier: "chuan" },
+            { a: "Báo đốm", b: "Báo hoa mai", tier: "chuan" },
+            { a: "Ngựa vằn", b: "Ngựa hoang", tier: "chuan" },
+            { a: "Lợn rừng", b: "Lợn nhà", tier: "chuan" },
+            { a: "Ếch", b: "Nhái", tier: "chuan" },
+            { a: "Cóc", b: "Ễnh ương", tier: "chuan" },
+            { a: "Châu chấu", b: "Cào cào", tier: "chuan" },
+            { a: "Bọ cạp", b: "Rết", tier: "chuan" },
+            { a: "Chim sâu", b: "Chim sẻ", tier: "chuan" },
+            { a: "Nói dối", b: "Lừa gạt", tier: "chuan" },
+            { a: "Khóc lóc", b: "Mếu máo", tier: "chuan" },
+            { a: "Cười mỉm", b: "Cười mỉa", tier: "chuan" },
+            { a: "Đánh đập", b: "Hành hung", tier: "chuan" },
+            { a: "Chạy trốn", b: "Lẩn tránh", tier: "chuan" },
+            { a: "Khen ngợi", b: "Nịnh hót", tier: "chuan" },
+            { a: "Chỉ trích", b: "Chửi bới", tier: "chuan" },
+            { a: "Nhìn lén", b: "Lườm nguýt", tier: "chuan" },
+            { a: "Giấu giếm", b: "Che đậy", tier: "chuan" },
+            { a: "Xin lỗi", b: "Bào chữa", tier: "chuan" },
+            { a: "Từ chối", b: "Phủ nhận", tier: "chuan" },
+            { a: "Đồng ý", b: "Chấp nhận", tier: "chuan" },
+            { a: "Khuyên tai", b: "Dây chuyền", tier: "chuan" },
+            { a: "Lắc tay", b: "Vòng chân", tier: "chuan" },
+            { a: "Đồng hồ cơ", b: "Đồng hồ điện tử", tier: "chuan" },
+            { a: "Túi chéo", b: "Túi tote", tier: "chuan" },
+            { a: "Kính râm", b: "Kính viễn vọng", tier: "chuan" },
+            { a: "Nơ cài tóc", b: "Băng đô", tier: "chuan" },
+            { a: "Gọng kính", b: "Mắt kính", tier: "chuan" },
+            { a: "Khăn tay", b: "Khăn quàng cổ", tier: "chuan" },
+            { a: "Thành phố", b: "Thị trấn", tier: "chuan" },
+            { a: "Làng", b: "Nông thôn", tier: "chuan" },
+            { a: "Đường phố", b: "Road", tier: "chuan" },
+            { a: "Sông", b: "Lake", tier: "chuan" },
+            { a: "Đại dương", b: "Beach", tier: "chuan" },
+            { a: "Rừng", b: "Wood", tier: "chuan" },
+            { a: "Núi", b: "Hill", tier: "chuan" },
+            { a: "Táo", b: "Pear", tier: "chuan" },
+            { a: "Lemon", b: "Lime", tier: "chuan" },
+            { a: "Sugar", b: "Salt", tier: "chuan" },
+            { a: "Bánh mì", b: "Cake", tier: "chuan" },
+            { a: "Sữa", b: "Juice", tier: "chuan" },
+            { a: "Thịt", b: "Pork", tier: "chuan" },
+            { a: "Thịt bò", b: "Steak", tier: "chuan" },
+            { a: "Chim", b: "Đại bàng", tier: "chuan" },
+            { a: "Gấu", b: "Chó sói", tier: "chuan" },
+            { a: "Cá", b: "Cá mập", tier: "chuan" },
+            { a: "Rắn", b: "Giun", tier: "chuan" },
+            { a: "Mùa xuân", b: "Mùa hè", tier: "chuan" },
+            { a: "Đêm", b: "Nửa đêm", tier: "chuan" },
+            { a: "Đồng hồ", b: "Điện thoại", tier: "chuan" },
+            { a: "Máy ảnh", b: "Máy quay", tier: "c4" },
+            { a: "Ống kính", b: "Kính lọc", tier: "c4" },
+            { a: "Đèn flash", b: "Hắt sáng", tier: "c4" },
+            { a: "Chân máy", b: "Gậy tự sướng", tier: "c4" },
+            { a: "Thẻ nhớ", b: "Ổ cứng", tier: "c4" },
+            { a: "Sạc dự phòng", b: "Củ sạc", tier: "c4" },
+            { a: "Tai nghe", b: "Loa bluetooth", tier: "c4" },
+            { a: "Quạt máy", b: "Điều hòa", tier: "c4" },
+            { a: "Máy sấy", b: "Máy ép tóc", tier: "c4" },
+            { a: "Bàn ủi", b: "Cây ủi hơi nước", tier: "chuan" },
+            { a: "Máy giặt", b: "Máy sấy quần áo", tier: "chuan" },
+            { a: "Tủ lạnh", b: "Tủ đông", tier: "chuan" },
+            { a: "Bếp điện", b: "Bếp hồng ngoại", tier: "chuan" },
+            { a: "Nồi cơm điện", b: "Nồi áp suất", tier: "c4" },
+            { a: "Bình nóng lạnh", b: "Máy nước nóng", tier: "chuan" },
+            { a: "Máy lọc nước", b: "Cây nước nóng lạnh", tier: "c4" },
+            { a: "Máy hút mùi", b: "Quạt thông gió", tier: "c4" },
+            { a: "Áo sơ mi", b: "Áo thun", tier: "chuan" },
+            { a: "Quần jean", b: "Quần âu", tier: "chuan" },
+            { a: "Áo khoác", b: "Áo phao", tier: "chuan" },
+            { a: "Váy ngắn", b: "Đầm dài", tier: "chuan" },
+            { a: "Giày tây", b: "Giày lười", tier: "chuan" },
+            { a: "Dép lê", b: "Giày xăng đan", tier: "chuan" },
+            { a: "Mũ len", b: "Mũ phớt", tier: "chuan" },
+            { a: "Khăn len", b: "Khăn lụa", tier: "chuan" },
+            { a: "Ví tiền", b: "Cặp sách", tier: "chuan" },
+            { a: "Cà phê", b: "Trà sữa", tier: "chuan" },
+            { a: "Nước ngọt", b: "Nước khoáng", tier: "chuan" },
+            { a: "Kem", b: "Sữa chua", tier: "chuan" },
+            { a: "Bánh ngọt", b: "Bánh mặn", tier: "chuan" },
+            { a: "Kẹo dẻo", b: "Kẹo cứng", tier: "chuan" },
+            { a: "Hạt hướng dương", b: "Hạt điều", tier: "chuan" },
+            { a: "Bánh tráng", b: "Bánh đa", tier: "chuan" },
+            { a: "Mì tôm", b: "Phở bò", tier: "chuan" },
+            { a: "Con chó", b: "Con mèo", tier: "chuan" },
+            { a: "Con gà", b: "Con vịt", tier: "chuan" },
+            { a: "Con lợn", b: "Con bò", tier: "chuan" },
+            { a: "Con hổ", b: "Con báo", tier: "chuan" },
+            { a: "Con ngựa", b: "Con lừa", tier: "chuan" },
+            { a: "Con cừu", b: "Con dê", tier: "chuan" },
+            { a: "Con thỏ", b: "Con chuột", tier: "chuan" },
+            { a: "Con khỉ", b: "Con vượn", tier: "chuan" },
+            { a: "Con rắn", b: "Con trăn", tier: "chuan" },
+            { a: "Con cá", b: "Con tôm", tier: "chuan" },
+            { a: "Tàu hỏa", b: "Tàu điện", tier: "chuan" },
+            { a: "Thuyền", b: "Ghe", tier: "chuan" },
+            { a: "Xe tải", b: "Xe khách", tier: "chuan" },
+            { a: "Xe cứu thương", b: "Xe cảnh sát", tier: "chuan" },
+            { a: "Xe lăn", b: "Xe đẩy", tier: "chuan" },
+            { a: "Tẩy", b: "Gọt bút chì", tier: "chuan" },
+            { a: "Cặp sách", b: "Ba lô", tier: "chuan" },
+            { a: "Vở viết", b: "Sách giáo khoa", tier: "chuan" },
+            { a: "Bảng đen", b: "Phấn viết", tier: "chuan" },
+            { a: "Bút lông", b: "Bảng trắng", tier: "chuan" },
+            { a: "Ghế học sinh", b: "Bàn học", tier: "chuan" },
+            { a: "Giấy kiểm tra", b: "Giấy nháp", tier: "chuan" },
+            { a: "Hộp bút", b: "Cặp đựng tài liệu", tier: "chuan" },
+            { a: "Máy tính", b: "Máy tính xách tay", tier: "chuan" },
+            { a: "Điện thoại", b: "Máy tính bảng", tier: "chuan" },
+            { a: "Máy in", b: "Máy quét", tier: "chuan" },
+            { a: "Chuột máy tính", b: "Bàn di chuột", tier: "chuan" },
+            { a: "Pin", b: "Bộ sạc", tier: "chuan" },
+            { a: "Dây cáp", b: "Bộ chuyển đổi", tier: "chuan" },
+            { a: "Bộ định tuyến", b: "Bộ phát mạng", tier: "chuan" },
+            { a: "Thư mục", b: "Tệp", tier: "chuan" },
+            { a: "Giấy", b: "Bút", tier: "chuan" },
+            { a: "Bàn làm việc", b: "Ghế", tier: "chuan" },
+            { a: "Phòng", b: "Sảnh", tier: "chuan" },
+            { a: "Cửa", b: "Cửa sổ", tier: "chuan" },
+            { a: "Tường", b: "Sàn nhà", tier: "chuan" },
+            { a: "Mái nhà", b: "Trần nhà", tier: "chuan" },
+            { a: "Vườn", b: "Sân", tier: "chuan" },
+            { a: "Đường phố", b: "Đại lộ", tier: "chuan" },
+            { a: "Cầu", b: "Đường hầm", tier: "chuan" },
+            { a: "Thành phố", b: "Làng", tier: "chuan" },
+            { a: "Quốc gia", b: "Châu lục", tier: "chuan" },
+            { a: "Núi", b: "Thung lũng", tier: "chuan" },
+            { a: "Đảo", b: "Bán đảo", tier: "chuan" },
+            { a: "Núi lửa", b: "Động đất", tier: "chuan" },
+            { a: "Thời tiết", b: "Khí hậu", tier: "chuan" },
+        ].map((item, id) => ({ a: item.a, b: item.b, tier: item.tier, id }));
 
         const COOLDOWN_LIMIT = Math.min(100, rawWordDatabase.length - 10);
 
         /* --- 7. START GAME --- */
         function startGame() {
+            if (!document.getElementById('setup-screen').classList.contains('active')) return;
             requestFullScreen(); 
             let numSpies = parseInt(document.getElementById('input-spies').value) || 0, numKids = parseInt(document.getElementById('input-kids').value) || 0;
             if (playerNamesInput.length < 4) { showModal("<div style='text-align:center'>Cần tối thiểu 4 người để lập chuyên án!</div>", "alert"); return; }
@@ -1646,6 +2359,7 @@
         }
 
         function beginRoleDistribution() {
+            if (!document.getElementById('game-summary-screen').classList.contains('active')) return;
             const config = pendingGameConfig;
             themeBgm.pause();
             clearInterval(timerInterval);
@@ -1674,6 +2388,9 @@
             document.getElementById('defuse-pin-input').value = "";
             document.getElementById('defuse-word-input').value = "";
             document.getElementById('defuse-error-1').style.display = 'none';
+            document.getElementById('defuse-error-2').style.display = 'none';
+            defusePinAttemptsLeft = 3;
+            document.getElementById('defuse-pin-attempts').innerText = 'Số lần thử còn lại: 3';
 
             renderPills(); playCaseIntro();
         }
@@ -1733,7 +2450,7 @@
             if (c4PermanentlyLocked) {
                 button.disabled = true;
                 button.innerText = 'C4 VÔ HIỆU';
-                status.innerText = 'CHUYÊN GIA ĐÃ BỊ LOẠI — KHÔNG CÒN AI CÓ THỂ GỠ BOM';
+                status.innerText = 'C4 ĐÃ BỊ KHÓA VĨNH VIỄN';
             } else if (!c4Unlocked) {
                 button.disabled = true;
                 button.innerText = 'GỠ BOM [KHÓA]';
@@ -1747,6 +2464,14 @@
                 button.innerText = 'GỠ BOM [X]';
                 status.innerText = 'C4 ĐÃ MỞ — CHỈ CHUYÊN GIA CÓ PIN';
             }
+        }
+
+        function shuffleArray(arr) {
+            for (let i = arr.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [arr[i], arr[j]] = [arr[j], arr[i]];
+            }
+            return arr;
         }
 
         function generateWordsAndRoles(civs, spies, kids) {
@@ -1789,7 +2514,7 @@
                 }
             }
             
-            unassignedRoles.sort(() => Math.random() - 0.5);
+            shuffleArray(unassignedRoles);
         }
 
         function rerollWords() {
@@ -1847,23 +2572,11 @@
 
             setTimeout(() => {
                 const pulledRole = unassignedRoles[roleIndex];
-                players[currentPlayerIndex].role = pulledRole.role; 
-                players[currentPlayerIndex].word = pulledRole.word;
-                players[currentPlayerIndex].isDefuser = pulledRole.isDefuser;
-
-                const box = document.getElementById('word-reveal-box'), hint = document.getElementById('role-hint');
-                document.getElementById('secret-word').innerText = pulledRole.word;
-                hint.style.display = 'none'; box.style.borderColor = '#fff';
-
-                if (pulledRole.role === 'SieuTrom') {
-                    box.style.borderColor = '#209cee'; document.getElementById('secret-word').innerText = "???";
-                    hint.style.display = 'block'; hint.innerHTML = "(Bạn là <b style='color:#209cee'>SIÊU TRỘM</b>! Hãy khéo léo ngụy trang!)";
-                } else if (pulledRole.isDefuser) {
-                    hint.style.display = 'block'; 
-                    hint.innerHTML = `(Bạn là <b style='color:#f7d51d'>CHUYÊN GIA GỠ BOM</b>! Mã bảo mật: <b style='color:#e74c3c'>[${defuserPinCode}]</b>)`;
-                }
-                
-                box.style.display = 'block'; document.getElementById('next-player-btn').style.display = 'inline-block';
+                const player = players[currentPlayerIndex];
+                player.role = pulledRole.role; 
+                player.word = pulledRole.word;
+                player.isDefuser = pulledRole.isDefuser;
+                renderSecretReveal(player);
             }, 300); 
         }
 
@@ -1910,15 +2623,14 @@
             document.getElementById('review-btn-container').style.display = 'block';
         }
 
-        function showRevealedWordForReview() {
-            document.getElementById('review-btn-container').style.display = 'none';
-            const player = players[currentPlayerIndex];
+        function renderSecretReveal(player) {
             const box = document.getElementById('word-reveal-box'), hint = document.getElementById('role-hint');
-            document.getElementById('secret-word').innerText = player.word;
+            const secretEl = document.getElementById('secret-word');
             hint.style.display = 'none'; box.style.borderColor = '#fff';
-            
+            secretEl.innerText = player.word;
+
             if (player.role === 'SieuTrom') {
-                box.style.borderColor = '#209cee'; document.getElementById('secret-word').innerText = "???";
+                box.style.borderColor = '#209cee'; secretEl.innerText = "???";
                 hint.style.display = 'block'; hint.innerHTML = "(Bạn là <b style='color:#209cee'>SIÊU TRỘM</b>! Hãy khéo léo ngụy trang!)";
             } else if (player.isDefuser) {
                 hint.style.display = 'block'; 
@@ -1926,6 +2638,11 @@
             }
             
             box.style.display = 'block'; document.getElementById('next-player-btn').style.display = 'inline-block';
+        }
+
+        function showRevealedWordForReview() {
+            document.getElementById('review-btn-container').style.display = 'none';
+            renderSecretReveal(players[currentPlayerIndex]);
         }
 
         function renderSurvivors() {
@@ -1967,7 +2684,7 @@
                 if (p.isAlive) {
                     status.innerText = isSpeaker ? 'ĐANG PHÁT BIỂU' : 'ĐANG ĐIỀU TRA';
                     roleReveal.innerText = 'DANH TÍNH CHƯA RÕ';
-                    card.onclick = () => { showModal(`<div style='text-align:center'>Phát lệnh bắt giữ <b style='color:#f7d51d'>[${p.id}]</b>?</div>`, "confirm", () => eliminatePlayer(i)); };
+                    card.onclick = () => { showModal(`<div style='text-align:center'>Phát lệnh bắt giữ <b style='color:#f7d51d'>[${esc(p.id)}]</b>?</div>`, "confirm", () => eliminatePlayer(i)); };
                 } else {
                     roleReveal.innerText = revealedRole.label;
                     status.innerText = p.isDefuser ? 'CHUYÊN GIA GỠ BOM ĐÃ HY SINH' : 'HỒ SƠ ĐÃ ĐÓNG';
@@ -1979,6 +2696,7 @@
                 drawPixelArt(portrait, p.isAlive ? spriteSuspect : revealedSprite, 4);
             });
             renderSurvivors(); 
+            requestWakeLock();
             
             if (isDefuserMode) {
                 document.getElementById('bomb-container').style.display = 'flex';
@@ -1996,7 +2714,7 @@
         function openDefuseModal() {
             if (!isDefuserMode || !c4Unlocked || c4PermanentlyLocked || defuseAttemptUsed) {
                 const reason = c4PermanentlyLocked
-                    ? 'Chuyên gia gỡ bom đã bị loại. C4 không thể vô hiệu hóa.'
+                    ? 'C4 đã bị khóa vĩnh viễn. Không thể vô hiệu hóa.'
                     : !c4Unlocked
                         ? 'Chưa có lần bắt giữ nào. C4 vẫn đang khóa.'
                         : 'Lần cắt dây duy nhất đã được dùng.';
@@ -2006,7 +2724,10 @@
             document.getElementById('defuse-step-1').style.display = 'block';
             document.getElementById('defuse-step-2').style.display = 'none';
             document.getElementById('defuse-pin-input').value = "";
+            document.getElementById('defuse-word-input').value = "";
             document.getElementById('defuse-error-1').style.display = 'none';
+            document.getElementById('defuse-error-2').style.display = 'none';
+            document.getElementById('defuse-pin-attempts').innerText = `Số lần thử còn lại: ${defusePinAttemptsLeft}`;
             document.getElementById('defuse-modal-overlay').style.display = 'flex';
         }
 
@@ -2015,20 +2736,37 @@
         }
 
         function checkDefusePin() {
-            let pinInput = document.getElementById('defuse-pin-input').value.trim();
+            const pinInput = document.getElementById('defuse-pin-input').value.trim();
             if (pinInput === defuserPinCode) {
                 SFX.defuse();
                 document.getElementById('defuse-step-1').style.display = 'none';
                 document.getElementById('defuse-step-2').style.display = 'block';
-            } else {
-                SFX.eliminate();
-                document.getElementById('defuse-error-1').style.display = 'block';
+                return;
             }
+            SFX.eliminate();
+            buzz([120, 50, 120]);
+            defusePinAttemptsLeft--;
+            if (defusePinAttemptsLeft <= 0) {
+                c4PermanentlyLocked = true;
+                c4Unlocked = false;
+                closeDefuseModal();
+                updateC4AccessUI();
+                showModal("<div style='text-align:center'>Nhập sai mã PIN 3 lần!<br><b style='color:#e74c3c'>Hệ thống tự khóa C4 vĩnh viễn.</b></div>", 'alert');
+                return;
+            }
+            document.getElementById('defuse-error-1').style.display = 'block';
+            document.getElementById('defuse-pin-attempts').innerText = `Số lần thử còn lại: ${defusePinAttemptsLeft}`;
         }
 
         function submitDefuseWord() {
             if (!isDefuserMode || !c4Unlocked || c4PermanentlyLocked || defuseAttemptUsed) return;
             let wordInput = document.getElementById('defuse-word-input').value.trim().toLowerCase();
+            document.getElementById('defuse-error-2').style.display = 'none';
+            if (!wordInput) {
+                SFX.eliminate();
+                document.getElementById('defuse-error-2').style.display = 'block';
+                return;
+            }
             let actualSpyWord = spyWordToGuess.toLowerCase();
             defuseAttemptUsed = true;
             updateC4AccessUI();
@@ -2047,12 +2785,14 @@
             
             if (wordInput === actualSpyWord) {
                 SFX.defuse();
+                buzz([120, 60, 120]);
                 drawPixelArt('mascot-display', spriteDetective, 12);
                 msg.innerHTML = `Mật mã nhập vào chính xác!<br><b style='color:#27ae60; font-size: 28px;' class='text-pop'>ĐÃ VÔ HIỆU HÓA BOM</b>`;
                 currentWinner = 'DefusalWin';
                 setTimeout(() => { document.getElementById('btn-to-victory').style.display = 'inline-block'; }, 1000);
             } else {
                 SFX.shatter();
+                buzz([400]);
                 drawPixelArt('mascot-display', spriteSpy, 12);
                 msg.innerHTML = `Mật mã SAI!<br><b style='color:#e74c3c; font-size: 28px;' class='text-pop'>ĐÃ CẮT NHẦM DÂY... BÙM!</b>`;
                 currentWinner = 'DefusalFail';
@@ -2063,12 +2803,14 @@
         /* --- PHÁN QUYẾT TRUYỀN THỐNG --- */
         function eliminatePlayer(index) {
             SFX.eliminate();
+            buzz([70, 40, 70]);
             const player = players[index];
             lastElimination = {
                 playerIndex: index,
                 previousSpeakerIndex: currentSpeakerIndex,
                 c4Unlocked,
-                c4PermanentlyLocked
+                c4PermanentlyLocked,
+                pinAttempts: defusePinAttemptsLeft
             };
             roundHistory.push({ playerId: player.id, role: player.role });
             player.isAlive = false;
@@ -2112,7 +2854,7 @@
                 ? `<br><span style='color:#e74c3c' class='text-pop'>CHUYÊN GIA GỠ BOM ĐÃ HY SINH — C4 VÔ HIỆU</span>`
                 : '';
                 
-            msg.innerHTML = `Nghi phạm <b style='color:#fff' class='text-pop'>${player.id}</b> đã bị khống chế!<br>Khám xét ra thân phận:<br><b style='color:${color}; font-size: 28px;' class='text-pop'>${roleName}</b>${c4Note}`;
+            msg.innerHTML = `Nghi phạm <b style='color:#fff' class='text-pop'>${esc(player.id)}</b> đã bị khống chế!<br>Khám xét ra thân phận:<br><b style='color:${color}; font-size: 28px;' class='text-pop'>${roleName}</b>${c4Note}`;
             if (player.role === 'SieuTrom') mwGuess.style.display = 'block'; else checkGameStatus(); 
         }
 
@@ -2159,11 +2901,12 @@
 
         function undoLastElimination() {
             if (!lastElimination) return;
-            const { playerIndex, previousSpeakerIndex, c4Unlocked: previousC4Unlocked, c4PermanentlyLocked: previousC4Lock } = lastElimination;
+            const { playerIndex, previousSpeakerIndex, c4Unlocked: previousC4Unlocked, c4PermanentlyLocked: previousC4Lock, pinAttempts: previousPinAttempts } = lastElimination;
             players[playerIndex].isAlive = true;
             currentSpeakerIndex = previousSpeakerIndex;
             c4Unlocked = previousC4Unlocked;
             c4PermanentlyLocked = previousC4Lock;
+            defusePinAttemptsLeft = typeof previousPinAttempts === 'number' ? previousPinAttempts : 3;
             roundHistory.pop();
             lastElimination = null;
             document.getElementById('undo-elimination-btn').style.display = 'none';
@@ -2171,6 +2914,8 @@
         }
 
         function showVictoryScreen() {
+            releaseWakeLock();
+            buzz(currentWinner === 'DefusalWin' || currentWinner === 'Dan' ? [90, 60, 90, 60, 180] : [320]);
             switchScreen('victory-screen');
             renderCaseIdentity();
             const title = document.getElementById('victory-faction-name');
@@ -2240,10 +2985,10 @@
             const eliminationHistory = document.getElementById('victory-elimination-history');
             roleHistory.innerHTML = players.map(player => {
                 const role = getRolePresentation(player.role);
-                return `<div style="display:flex; justify-content:space-between; gap:15px; padding:6px 0; border-bottom:1px dashed #555;"><span style="color:#fff;">${player.id}</span><b style="color:${role.color};">${role.label}</b></div>`;
+                return `<div style="display:flex; justify-content:space-between; gap:15px; padding:6px 0; border-bottom:1px dashed #555;"><span style="color:#fff;">${esc(player.id)}</span><b style="color:${role.color};">${role.label}</b></div>`;
             }).join('');
             eliminationHistory.innerHTML = roundHistory.length
-                ? `<p style="color:#f7d51d; margin:0 0 8px;">DIỄN BIẾN BẮT GIỮ</p>${roundHistory.map((item, index) => { const role = getRolePresentation(item.role); return `<div>${index + 1}. ${item.playerId} — <b style="color:${role.color};">${role.label}</b></div>`; }).join('')}`
+                ? `<p style="color:#f7d51d; margin:0 0 8px;">DIỄN BIẾN BẮT GIỮ</p>${roundHistory.map((item, index) => { const role = getRolePresentation(item.role); return `<div>${index + 1}. ${esc(item.playerId)} — <b style="color:${role.color};">${role.label}</b></div>`; }).join('')}`
                 : '<p style="margin:0;">Chưa có nghi phạm nào bị bắt giữ.</p>';
         }
 
@@ -2253,10 +2998,10 @@
                 let pts = 0;
                 if (winnerLabel === 'TimeOut' || winnerLabel === 'DefusalFail') {
                     if (p.role === 'GianDiep') pts = currentScoreSettings.spyWin;
-                    else pts = currentScoreSettings.timeOutPenalty !== undefined ? currentScoreSettings.timeOutPenalty : 0;
+                    else pts = currentScoreSettings.timeOutPenalty;
                 }
                 else if (winnerLabel === 'DefusalWin') {
-                    if (p.isDefuser) pts = currentScoreSettings.defuseWin !== undefined ? currentScoreSettings.defuseWin : 10;
+                    if (p.role === 'Dan' && p.isDefuser) pts = currentScoreSettings.defuseWin;
                     else if (p.role === 'Dan') pts = p.isAlive ? currentScoreSettings.danAlive : currentScoreSettings.danDead;
                 }
                 else if (winnerLabel === 'Dan' && p.role === 'Dan') pts = p.isAlive ? currentScoreSettings.danAlive : currentScoreSettings.danDead; 
@@ -2345,7 +3090,7 @@
                     let color = p.added > 0 ? '#f7d51d' : '#e74c3c';
                     let addedHtml = p.added !== 0 ? `<span class="added-score" style="color:${color}; margin-left:10px; font-size:22px;">${sign}${p.added}</span>` : '';
                     tbody.innerHTML += `<tr id="row-${index}">
-                        <td class="text-pop">${p.name}</td>
+                        <td class="text-pop">${esc(p.name)}</td>
                         <td class="text-pop"><span id="score-${index}" style="color:#3498db">${p.old}</span>${addedHtml}</td>
                     </tr>`;
                 });
@@ -2369,7 +3114,7 @@
                         tbody.innerHTML = '';
                         oldScoreArray.forEach(p => {
                             tbody.innerHTML += `<tr>
-                                <td class="text-pop">${p.name}</td>
+                                <td class="text-pop">${esc(p.name)}</td>
                                 <td style="color:#3498db" class="text-pop">${p.new}</td>
                             </tr>`;
                         });
@@ -2388,7 +3133,7 @@
                 document.getElementById('btn-menu').style.display = 'block';
                 oldScoreArray.sort((a, b) => b.new - a.new);
                 oldScoreArray.forEach(p => {
-                    tbody.innerHTML += `<tr><td class="text-pop">${p.name}</td><td style="color:#3498db" class="text-pop">${p.new}</td></tr>`;
+                    tbody.innerHTML += `<tr><td class="text-pop">${esc(p.name)}</td><td style="color:#3498db" class="text-pop">${p.new}</td></tr>`;
                 });
             }
         }
