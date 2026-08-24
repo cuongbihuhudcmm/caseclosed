@@ -253,6 +253,7 @@
             .retro-bg::after, .cyber-dust-1, .cyber-dust-2, .cyber-dust-3 { animation: none !important; }
             .scanlines { display: none; }
             .anim-bounce, .anim-shake, .anim-wave, .anim-float, .blinker, .pixel-arrow, .reveal-mascot { animation: none !important; }
+            .rule-header .case-classified-stamp, #rule-slide-content.rule-slide-anim { animation: none !important; }
             .pixel-moon, .title-beam::before, #confetti-layer span { animation: none !important; }
             body.victory-party #confetti-layer { display: none; }
             #intro-screen { transition: none; }
@@ -343,6 +344,47 @@
         @media screen and (max-width: 430px) {
             .main-title { font-size: 33px; letter-spacing: 3px; }
             .pill-grid { gap: 18px; }
+        }
+
+        /* --- MODAL LUAT CHOI SINH DONG --- */
+        .rule-header {
+            display: flex; align-items: center; justify-content: space-between; gap: 10px;
+            margin-bottom: 12px; padding-bottom: 10px; border-bottom: 2px dashed #555;
+        }
+        .rule-header h3 { margin: 0; color: #f7d51d; font-size: 24px; letter-spacing: 2px; text-shadow: 2px 2px 0 #000; }
+        .rule-file-no { color: #95a5a6; font-size: 14px; letter-spacing: 1px; white-space: nowrap; }
+        .rule-header .case-classified-stamp {
+            font-size: 14px; padding: 2px 6px; border-width: 2px;
+            animation: blinkerAnim 1.6s steps(2) infinite;
+        }
+        #rule-slider-container { position: relative; }
+        #rule-slider-container::before, #rule-slider-container::after {
+            content: ''; position: absolute; width: 70px; height: 16px; top: -8px;
+            background: rgba(247, 213, 29, .26); border: 1px solid rgba(247, 213, 29, .45);
+        }
+        #rule-slider-container::before { left: 14px; transform: rotate(-4deg); }
+        #rule-slider-container::after { right: 14px; transform: rotate(3deg); }
+        #rule-slide-content.rule-slide-anim { animation: ruleSlideIn .28s steps(4); }
+        @keyframes ruleSlideIn { 0% { opacity: 0; transform: translateX(26px); } 100% { opacity: 1; transform: translateX(0); } }
+        .rule-art-row { display: flex; justify-content: center; align-items: flex-end; gap: 16px; margin: 4px 0 14px; }
+        .rule-role-card {
+            border: 2px solid #555; border-left: 6px solid #555;
+            background: rgba(0, 0, 0, .55); padding: 8px 10px; margin-bottom: 10px;
+        }
+        .rule-role-card b { font-size: 20px; }
+        .rule-role-card span { display: block; color: #ddd; font-size: 17px; line-height: 1.45; margin-top: 3px; }
+        .rule-point-row {
+            display: flex; justify-content: space-between; align-items: center; gap: 10px;
+            padding: 6px 8px; border-bottom: 1px dashed #444;
+        }
+        .rule-point-row span { color: #ddd; font-size: 18px; }
+        .rule-point-row b { font-size: 20px; text-shadow: 1px 1px 0 #000; white-space: nowrap; }
+        #rule-progress { display: flex; gap: 6px; justify-content: center; }
+        #rule-progress i { width: 12px; height: 12px; background: #2a2a2a; border: 2px solid #555; }
+        #rule-progress i.on { background: #f7d51d; border-color: #f7d51d; box-shadow: 0 0 6px rgba(247, 213, 29, .55); }
+        @media screen and (max-width: 430px) {
+            .rule-header h3 { font-size: 19px; }
+            .rule-file-no { display: none; }
         }
     </style>
 </head>
@@ -915,66 +957,95 @@
         const ruleSlides = [
             `
             <h3 style="color:#f7d51d; text-align:center; font-size:24px; text-shadow:2px 2px 0 #000; border-bottom: 2px dashed #555; padding-bottom: 10px;">1. TỔNG QUAN CHUYÊN ÁN</h3>
+            <div class="rule-art-row"><canvas id="rule-art-bubble" class="pixel-canvas"></canvas></div>
             <p style="color:#fff;">Bạn và nhóm đang tham gia một cuộc họp kín. Hệ thống sẽ phát cho mỗi người 1 <b>Hồ sơ mật</b> chứa 1 Mật Lệnh (Từ khóa).</p>
-            <p style="color:#ddd;">- Mỗi vòng, từng người sẽ dùng <b>1 câu/cụm từ ngắn gọn</b> để miêu tả Mật Lệnh của mình.</p>
-            <p style="color:#ddd;">- <b>Lưu ý:</b> Không được nói quá rõ (kẻ thù sẽ biết), cũng không được quá chung chung (đồng đội sẽ nghi ngờ).</p>
+            <p style="color:#ddd;">► Mỗi vòng, từng người sẽ dùng <b>1 câu/cụm từ ngắn gọn</b> để miêu tả Mật Lệnh của mình.</p>
+            <p style="color:#ddd;">► <b>Lưu ý:</b> Không được nói quá rõ (kẻ thù sẽ biết), cũng không được quá chung chung (đồng đội sẽ nghi ngờ).</p>
             <p style="color:#fff;">Sau khi miêu tả xong, cả nhóm sẽ <b>thảo luận và biểu quyết</b> để tìm ra kẻ tình nghi và loại bỏ kẻ đó.</p>
             `,
             `
             <h3 style="color:#f7d51d; text-align:center; font-size:24px; text-shadow:2px 2px 0 #000; border-bottom: 2px dashed #555; padding-bottom: 10px;">2. CÁC THẾ LỰC TÌNH BÁO</h3>
-            <p><b style="color:#3498db">THÁM TỬ (DÂN LÀNG)</b><br>
-            <span style="color:#ddd; font-size: 18px;">Chiếm số đông. Cùng nhận được chung 1 Từ khóa. Nắm giữ chính nghĩa. Phải tìm và loại trừ mọi kẻ xâm nhập để chiến thắng.</span></p>
-            
-            <p><b style="color:#e76e55">ÁO ĐEN (GIÁN ĐIỆP)</b><br>
-            <span style="color:#ddd; font-size: 18px;">Nhận được 1 Từ khóa <b>khác biệt nhưng rất giống</b> với Thám tử. Nhiệm vụ: Phải diễn sâu để trà trộn. Thắng khi sống sót đến lúc số lượng phe mình ngang bằng Thám tử.</span></p>
-            
-            <p><b style="color:#209cee">SIÊU TRỘM (MŨ TRẮNG)</b><br>
-            <span style="color:#ddd; font-size: 18px;">Không nhận được từ khóa nào! Bạn phải "hóng hớt" để bịa ra câu miêu tả. Có khả năng <b>Lật Kèo</b> chiến thắng độc lập nếu bị bắt nhưng đoán trúng Mật lệnh của Thám tử.</span></p>
+            <div class="rule-art-row">
+                <canvas id="rule-art-dan" class="pixel-canvas glow-detective"></canvas>
+                <canvas id="rule-art-spy" class="pixel-canvas glow-spy"></canvas>
+                <canvas id="rule-art-kid" class="pixel-canvas glow-kid"></canvas>
+            </div>
+            <div class="rule-role-card" style="border-left-color:#3498db;"><b style="color:#3498db;">THÁM TỬ (DÂN LÀNG)</b><span>Chiếm số đông. Cùng nhận chung 1 Từ khóa. Phải tìm và loại trừ mọi kẻ xâm nhập để chiến thắng.</span></div>
+            <div class="rule-role-card" style="border-left-color:#e76e55;"><b style="color:#e76e55;">ÁO ĐEN (GIÁN ĐIỆP)</b><span>Nhận Từ khóa <b>khác biệt nhưng rất giống</b> với Thám tử. Phải diễn sâu để trà trộn. Thắng khi sống sót đến lúc số lượng ngang bằng Thám tử.</span></div>
+            <div class="rule-role-card" style="border-left-color:#209cee;"><b style="color:#209cee;">SIÊU TRỘM (MŨ TRẮNG)</b><span>Không nhận từ khóa nào! Phải "hóng hớt" để bịa câu miêu tả. Có thể <b>Lật Kèo</b> thắng độc lập nếu bị bắt nhưng đoán trúng Mật lệnh của Thám tử.</span></div>
             `,
             `
             <h3 style="color:#f7d51d; text-align:center; font-size:24px; text-shadow:2px 2px 0 #000; border-bottom: 2px dashed #555; padding-bottom: 10px;">3. CƠ CHẾ BOM HẸN GIỜ (C4)</h3>
+            <div class="rule-art-row"><canvas id="rule-art-boom" class="pixel-canvas"></canvas></div>
             <p style="color:#fff; font-size: 18px;">Khi quản trò kích hoạt C4, ván game sẽ biến thành cuộc chiến sinh tồn:</p>
             <p style="color:#e74c3c; font-size: 18px; text-shadow: none;">Bộ từ C4 là mức <b>SIÊU KHÓ</b>: hai mật lệnh gần như đồng nhất, chỉ khác nhau từng sắc thái!</p>
-            <p style="color:#ddd; font-size: 18px;">- Hệ thống sẽ cấp một <b>Mã PIN (4 số)</b> cho 1 Thám Tử (Chuyên gia thật) VÀ 1 Áo Đen (Kẻ mạo danh). Cả 2 đều không biết thân phận thật của mình lúc bốc bài!</p>
-            <p style="color:#ddd; font-size: 18px;">- Đồng hồ đếm ngược bắt đầu khi vòng điều tra mở ra. <b>C4 chỉ được mở khóa</b> sau khi có 1 người bị bắt giữ thành công.</p>
-            <p style="color:#ddd; font-size: 18px;">- Nhóm phải cãi nhau xem ai là người giữ mã PIN thật. Người cầm máy sẽ nhập PIN, sau đó nhập <b>TỪ KHÓA CỦA ÁO ĐEN</b> để gỡ bom.</p>
-            <p style="color:#e74c3c; font-size: 18px; text-shadow: none;">- Chỉ có 1 lần cắt dây! Thám tử nhập đúng: Thắng ngay lập tức. Hết giờ hoặc Áo đen cố tình nhập sai: Bom nổ, Áo đen thắng!</p>
+            <p style="color:#ddd; font-size: 18px;">► Hệ thống cấp một <b>Mã PIN (4 số)</b> cho 1 Thám Tử (Chuyên gia thật) VÀ 1 Áo Đen (Kẻ mạo danh). Cả 2 đều không biết thân phận thật của mình lúc bốc bài!</p>
+            <p style="color:#ddd; font-size: 18px;">► Đồng hồ đếm ngược bắt đầu khi vòng điều tra mở ra. <b>C4 chỉ được mở khóa</b> sau khi có 1 người bị bắt giữ thành công.</p>
+            <p style="color:#ddd; font-size: 18px;">► Nhóm phải cãi nhau xem ai giữ mã PIN thật. Người cầm máy nhập PIN, sau đó nhập <b>TỪ KHÓA CỦA ÁO ĐEN</b> để gỡ bom.</p>
+            <p style="color:#e74c3c; font-size: 18px; text-shadow: none;">► Chỉ có 1 lần cắt dây! Nhập đúng: Thám tử thắng ngay. Hết giờ hoặc nhập sai: Bom nổ, Áo đen thắng!</p>
             `,
             `
             <h3 style="color:#f7d51d; text-align:center; font-size:24px; text-shadow:2px 2px 0 #000; border-bottom: 2px dashed #555; padding-bottom: 10px;">4. HỆ THỐNG ĐIỂM THƯỞNG</h3>
-            <p style="color:#fff; font-size: 18px;">Trò chơi tự động cộng điểm qua các ván để vinh danh người xuất sắc nhất:</p>
-            <ul style="color:#ddd; font-size: 18px; padding-left: 20px;">
-                <li><b style="color:#3498db">Thám tử:</b> Còn sống (+3 điểm), Hi sinh (+2 điểm).</li>
-                <li><b style="color:#e76e55">Áo đen:</b> Chiến thắng (+5 điểm).</li>
-                <li><b style="color:#209cee">Siêu trộm:</b> Sống sót cuối cùng (+6 điểm), Đoán trúng từ lật kèo (+10 điểm).</li>
-                <li><b style="color:#f7d51d">MVP Gỡ Bom:</b> Cắt dây thành công (+10 điểm).</li>
-                <li><b style="color:#e74c3c">Bom nổ/Cắt sai:</b> Áo Đen nhận điểm thắng; các phe còn lại bị 0 điểm (quản trò có thể chỉnh thành điểm trừ).</li>
-            </ul>
+            <div class="rule-art-row"><canvas id="rule-art-trophy" class="pixel-canvas"></canvas></div>
+            <p style="color:#fff; font-size: 18px;">Điểm được cộng tự động qua các ván (giá trị mặc định — quản trò có thể chỉnh):</p>
+            <div class="rule-point-row"><span style="color:#3498db;">Thám tử còn sống</span><b style="color:#3498db;">+3đ</b></div>
+            <div class="rule-point-row"><span style="color:#3498db;">Thám tử hi sinh</span><b style="color:#3498db;">+2đ</b></div>
+            <div class="rule-point-row"><span style="color:#e76e55;">Áo đen chiến thắng</span><b style="color:#e76e55;">+5đ</b></div>
+            <div class="rule-point-row"><span style="color:#209cee;">Siêu trộm sống sót</span><b style="color:#209cee;">+6đ</b></div>
+            <div class="rule-point-row"><span style="color:#209cee;">Siêu trộm lật kèo</span><b style="color:#209cee;">+10đ</b></div>
+            <div class="rule-point-row"><span style="color:#f7d51d;">MVP gỡ bom thành công</span><b style="color:#f7d51d;">+10đ</b></div>
+            <div class="rule-point-row"><span style="color:#e74c3c;">Bom nổ: Áo đen ăn điểm, phe khác</span><b style="color:#e74c3c;">0đ</b></div>
             `
         ];
 
         let currentRuleSlide = 0;
+
+        function drawRuleSlideArt() {
+            if (currentRuleSlide === 0) drawPixelArt('rule-art-bubble', spriteBubble, 5);
+            else if (currentRuleSlide === 1) {
+                drawPixelArt('rule-art-dan', spriteDetective, 4);
+                drawPixelArt('rule-art-spy', spriteSpy, 4);
+                drawPixelArt('rule-art-kid', spriteKid, 4);
+            }
+            else if (currentRuleSlide === 2) drawPixelArt('rule-art-boom', spriteDynamite, 3);
+            else if (currentRuleSlide === 3) drawPixelArt('rule-art-trophy', spriteTrophy, 4);
+        }
 
         function changeRuleSlide(dir) {
             currentRuleSlide += dir;
             if(currentRuleSlide < 0) currentRuleSlide = 0;
             if(currentRuleSlide >= ruleSlides.length) currentRuleSlide = ruleSlides.length - 1;
             
-            document.getElementById('rule-slide-content').innerHTML = ruleSlides[currentRuleSlide];
+            const content = document.getElementById('rule-slide-content');
+            content.innerHTML = ruleSlides[currentRuleSlide];
+            drawRuleSlideArt();
+            content.classList.remove('rule-slide-anim');
+            void content.offsetWidth;
+            content.classList.add('rule-slide-anim');
+            
             document.getElementById('rule-prev-btn').style.visibility = (currentRuleSlide === 0) ? 'hidden' : 'visible';
             document.getElementById('rule-next-btn').style.visibility = (currentRuleSlide === ruleSlides.length - 1) ? 'hidden' : 'visible';
-            document.getElementById('rule-page-indicator').innerText = (currentRuleSlide + 1) + " / " + ruleSlides.length;
+            document.getElementById('rule-page-indicator').innerText = 'TRANG ' + (currentRuleSlide + 1) + ' / ' + ruleSlides.length;
+            document.querySelectorAll('#rule-progress i').forEach((dot, i) => dot.classList.toggle('on', i === currentRuleSlide));
         }
 
         function showRules() {
             currentRuleSlide = 0;
             let html = `
+                <div class="rule-header">
+                    <span class="case-classified-stamp">TUYỆT MẬT</span>
+                    <h3>HỒ SƠ HƯỚNG DẪN</h3>
+                    <span class="rule-file-no">FILE #CC-101</span>
+                </div>
                 <div id="rule-slider-container" style="min-height: 250px; max-height: 55vh; overflow-y: auto; text-align: left; padding: 15px; background: rgba(0,0,0,0.8); border: 4px solid #333; box-shadow: inset 4px 4px 0 #000;">
                     <div id="rule-slide-content" style="font-size: 20px; line-height: 1.6;" class="text-pop"></div>
                 </div>
-                <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 20px;">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 20px; gap: 12px;">
                     <button id="rule-prev-btn" class="nes-btn is-primary" onclick="changeRuleSlide(-1)" style="padding: 5px 15px;">&lt;</button>
-                    <span id="rule-page-indicator" style="color: #f7d51d; font-size: 20px;" class="text-pop"></span>
+                    <div style="display:flex; flex-direction:column; align-items:center; gap:8px;">
+                        <div id="rule-progress"><i></i><i></i><i></i><i></i></div>
+                        <span id="rule-page-indicator" style="color: #f7d51d; font-size: 18px; letter-spacing: 2px;" class="text-pop"></span>
+                    </div>
                     <button id="rule-next-btn" class="nes-btn is-primary" onclick="changeRuleSlide(1)" style="padding: 5px 15px;">&gt;</button>
                 </div>
             `;
@@ -1007,6 +1078,29 @@
             "0440000440"];
         const spriteBee = ["0005550055500","0055555055555","0005550005550","0000AAAAAAA00","000AA6666AA00","000AAAAAAAA00","000AA6666AA00","0000AAAAAAA00","000000AA00000","0000006600000","0000000600000"];
         const spritePill = ["0000000000", "0066666600", "0688855560", "0688855560", "0066666600", "0000000000"];
+        const spriteBubble = [
+            "0555555550",
+            "5444444445",
+            "54A44A4445",
+            "5444444445",
+            "5444444445",
+            "0544444440",
+            "0054444400",
+            "0005444000",
+            "0000500000"
+        ];
+        const spriteTrophy = [
+            "AA0000000AA",
+            "0A0000000A0",
+            "00AAAAAAAA0",
+            "000AAAAAA00",
+            "000AAAAAA00",
+            "0000AAAA000",
+            "00000AA0000",
+            "00000AA0000",
+            "0000AAAA000",
+            "000AAAAAA00"
+        ];
         
         const spriteDynamite = [
             "000000070000000077000700000000000000000000",
