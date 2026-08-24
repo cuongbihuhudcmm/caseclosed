@@ -255,6 +255,14 @@
             .anim-bounce, .anim-shake, .anim-wave, .anim-float, .blinker, .pixel-arrow, .reveal-mascot { animation: none !important; }
             #intro-screen { transition: none; }
         }
+
+        #recent-players-wrap { margin-bottom: 15px; padding: 10px; background: rgba(0,0,0,0.45); border: 2px dashed #555; }
+        #recent-players-wrap > p { color: #f7d51d; font-size: 15px; letter-spacing: 1px; margin: 0 0 8px; text-align: left; }
+        #recent-players { display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; }
+        .recent-player-chip {
+            max-width: 150px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+            font-size: 17px; padding: 4px 12px;
+        }
     </style>
 </head>
 <body>
@@ -376,6 +384,11 @@
             <div class="nes-field" style="display: flex; gap: 10px; margin-bottom: 15px;">
                 <input type="text" id="player-name" class="nes-input is-dark" placeholder="Tên thám tử..." onkeypress="handleEnter(event)">
                 <button type="button" class="nes-btn is-primary" style="padding: 10px 20px;" onclick="addPlayerName()">+</button>
+            </div>
+
+            <div id="recent-players-wrap" style="display: none;">
+                <p>CHỌN NHANH ĐẶC VỤ CŨ:</p>
+                <div id="recent-players"></div>
             </div>
             
             <p style="font-size: 16px; color: #ddd; text-align: left; margin-bottom: 5px;" class="text-pop">* Xếp vị trí ngồi theo vòng tròn:</p>
@@ -1072,6 +1085,7 @@
         function switchScreen(screenId) { 
             document.querySelectorAll('.screen').forEach(s => s.classList.remove('active')); 
             document.getElementById(screenId).classList.add('active'); 
+            if (screenId === 'setup-screen') updateRecentPlayers();
         }
         
         function startNewSession() { 
@@ -1162,14 +1176,49 @@
         }
 
         function handleEnter(e) { if(e.key === 'Enter') addPlayerName(); }
+
+        function collectKnownPlayers() {
+            const freq = new Map();
+            Object.values(readSessions()).forEach((s) => {
+                const list = Array.isArray(s.players) ? s.players : [];
+                list.forEach((n) => {
+                    const cur = freq.get(n) || { name: n, count: 0 };
+                    cur.count++;
+                    freq.set(n, cur);
+                });
+            });
+            return [...freq.values()].sort((a, b) => b.count - a.count || a.name.localeCompare(b.name, 'vi')).slice(0, 24);
+        }
+
+        function updateRecentPlayers() {
+            const wrap = document.getElementById('recent-players-wrap');
+            const box = document.getElementById('recent-players');
+            if (!wrap || !box) return;
+            box.innerHTML = '';
+            const known = collectKnownPlayers().filter(p => !playerNamesInput.includes(p.name));
+            if (known.length === 0) { wrap.style.display = 'none'; return; }
+            wrap.style.display = 'block';
+            known.forEach(p => {
+                const btn = document.createElement('button');
+                btn.type = 'button';
+                btn.className = 'nes-btn recent-player-chip';
+                btn.textContent = p.name;
+                btn.onclick = () => {
+                    document.getElementById('player-name').value = p.name;
+                    addPlayerName();
+                };
+                box.appendChild(btn);
+            });
+        }
+
         function addPlayerName() {
             const name = document.getElementById('player-name').value.trim();
             if(name && !playerNamesInput.includes(name)) {
                 playerNamesInput.push(name); globalScores[name] = globalScores[name] || 0; 
-                document.getElementById('player-name').value = ""; updateNameList(); updateRoleCount(); saveData();
+                document.getElementById('player-name').value = ""; updateNameList(); updateRoleCount(); updateRecentPlayers(); saveData();
             }
         }
-        function removePlayer(index) { delete globalScores[playerNamesInput[index]]; playerNamesInput.splice(index, 1); updateNameList(); updateRoleCount(); saveData(); }
+        function removePlayer(index) { delete globalScores[playerNamesInput[index]]; playerNamesInput.splice(index, 1); updateNameList(); updateRoleCount(); updateRecentPlayers(); saveData(); }
         
         function movePlayerUp(index) {
             if(index > 0) {
