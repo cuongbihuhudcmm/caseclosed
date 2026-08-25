@@ -410,7 +410,7 @@
             background: radial-gradient(ellipse at center, transparent 55%, rgba(0, 0, 0, .38) 100%); }
         .cs-bar { position: absolute; left: 0; right: 0; height: 6.5vh; background: #000; z-index: 45; }
         .cs-bar-t { top: 0; } .cs-bar-b { bottom: 0; }
-        .cs-dip { position: absolute; inset: 0; background: #000; opacity: 0; pointer-events: none; z-index: 44; transition: opacity .13s; }
+        .cs-dip { position: absolute; inset: 0; background: #000; opacity: 0; pointer-events: none; z-index: 44; transition: opacity .2s ease-out; }
         .cs-dip.on { opacity: 1; }
         .chase-skip { position: absolute; bottom: 1.6%; right: 4%; color: #767684; font-size: 15px; letter-spacing: 2px; z-index: 50; }
         .cs-moon { position: absolute; top: 9%; right: 9%; width: 80px; height: 80px; border-radius: 50%;
@@ -426,7 +426,7 @@
         @keyframes csDoorBurst { to { transform: rotate(-78deg) translate(-30px, -8px); opacity: .75; } }
         .cs1-kaito { position: absolute; right: 34%; bottom: calc(24% + 6px); }
         #cs1.active .cs1-kaito { animation: csBounce .6s steps(3) infinite alternate; }
-        .cs1-gem { position: absolute; right: 31%; bottom: calc(24% + 76px);
+        .cs1-gem { position: absolute; right: 33.8%; bottom: calc(24% + 70px);
             filter: drop-shadow(0 0 6px rgba(90, 170, 255, .8)) drop-shadow(0 0 14px rgba(90, 170, 255, .45)); }
         #cs1.active .cs1-gem { animation: csGemToss 1.3s ease-in-out infinite alternate; }
         @keyframes csGemToss { from { transform: translateY(0); } to { transform: translateY(-30px); } }
@@ -633,6 +633,167 @@
             color: #d8b83a; font-size: 25px; letter-spacing: 6px; opacity: 0; }
         .cs5-sub.show { opacity: 1; animation: blinkerAnim 1.1s steps(2) infinite; }
 
+        /* --- CAMERA CUONG PHIM: MO RUT GOC NHIN THEO CANH --- */
+        .cs-world { position: absolute; inset: 0; will-change: transform; }
+        #chase-screen.active .cs-bar-t { animation: csBarInT .5s steps(5) both; }
+        #chase-screen.active .cs-bar-b { animation: csBarInB .5s steps(5) both; }
+        @keyframes csBarInT { from { transform: translateY(-101%); } to { transform: none; } }
+        @keyframes csBarInB { from { transform: translateY(101%); } to { transform: none; } }
+
+        /* CS1 — san mai: push-in cham, cat can canh bon ao den pha cua */
+        #cs1.active .cs-world { animation:
+            camPushIn 2.3s steps(7) forwards,
+            camSnapDoor .34s steps(4) 2.44s forwards; }
+        @keyframes camPushIn {
+            from { transform: scale(1.03) translate(0.6%, 0.4%); }
+            to   { transform: scale(1.13) translate(-0.9%, 0.9%); } }
+        @keyframes camSnapDoor {
+            from { transform: scale(1.13) translate(-0.9%, 0.9%); }
+            to   { transform: scale(1.38) translate(-24%, 5%); } }
+
+        /* CS2 — dan vut: camera lia theo dan, nang len khi kid tung minh */
+        #cs2.active .cs-world { animation:
+            camWhipPan 1.15s steps(5) forwards,
+            camTiltUp 1s steps(4) 2.72s forwards; }
+        @keyframes camWhipPan {
+            from { transform: scale(1.08) rotate(-1.3deg) translateX(2.2%); }
+            to   { transform: scale(1.08) rotate(-1.3deg) translateX(-1.8%); } }
+        @keyframes camTiltUp {
+            from { transform: scale(1.08) rotate(-1.3deg) translateX(-1.8%); }
+            to   { transform: scale(1.14) rotate(0.7deg) translate(-1%, -3.4%); } }
+
+        /* CS3 — goc thap dang nang: hem tu cao xuong mat dat, roi lia nhe theo tau hoa */
+        #cs3.active .cs-world { transform-origin: 50% 85%; animation:
+            camLowAngle 1.25s steps(6) forwards,
+            camPanTrain .9s steps(4) 2.8s forwards; }
+        @keyframes camLowAngle {
+            from { transform: scale(1.17) translateY(4.5%); }
+            to   { transform: scale(1.02) translateY(0.4%); } }
+        @keyframes camPanTrain {
+            from { transform: scale(1.02) translateY(0.4%); }
+            to   { transform: scale(1.02) translateX(-2.2%) translateY(0.4%); } }
+
+        /* CS4 — chay bo tren mai tau: tracking ngang lien huc */
+        #cs4.active .cs-world { animation: camTrackRun 1.5s steps(6) infinite alternate; }
+        @keyframes camTrackRun {
+            from { transform: scale(1.07) rotate(0.5deg) translateX(1.3%); }
+            to   { transform: scale(1.09) rotate(-0.4deg) translateX(-1.3%); } }
+
+        /* CS5 — nghich dao Nga Lan: dutch tilt lien tuc, don trum luc tru dien */
+        #cs5.active .cs-world { transform-origin: 60% 40%; animation:
+            camDutchDrift 3.9s steps(9) forwards,
+            camPunchImpact .5s steps(3) 3.95s forwards; }
+        @keyframes camDutchDrift {
+            from { transform: scale(1.07) rotate(-2deg) translate(1%, 0.6%); }
+            to   { transform: scale(1.1) rotate(-1.2deg) translate(-1.2%, -0.8%); } }
+        @keyframes camPunchImpact {
+            from { transform: scale(1.1) rotate(-1.2deg) translate(-1.2%, -0.8%); }
+            to   { transform: scale(1.28) rotate(-2.6deg) translate(-2%, 1.4%); } }
+
+        /* CS6 — tam bia: ha zoom tu tu de tua tieu de */
+        #cs6.active .cs-world { animation: camSettleOut 3.2s steps(10) forwards; }
+        @keyframes camSettleOut { from { transform: scale(1.18); } to { transform: scale(1); } }
+
+        /* --- CUT-IN ANIME: MAT + SUNG BAI + POV MONOCLE --- */
+        .cs-cutin { position: absolute; inset: 0; z-index: 43; display: flex; align-items: center; justify-content: center;
+            opacity: 0; visibility: hidden; pointer-events: none; background: #07070d; overflow: hidden; }
+        .cs-cutin.show { visibility: visible; animation: cutinPop .9s steps(8) forwards; }
+        @keyframes cutinPop { 0% { opacity: 0; transform: scale(1.28); } 12% { opacity: 1; } 24% { transform: scale(1); } 82% { opacity: 1; transform: scale(1); } 100% { opacity: 0; transform: scale(1.05); } }
+        .anime-lines { position: absolute; inset: -24%;
+            background: repeating-conic-gradient(from 0deg at 50% 50%, rgba(210, 220, 255, .1) 0deg 2.4deg, transparent 2.4deg 7.2deg);
+            animation: linesSpin 2.6s linear infinite; }
+        .anime-lines.rev { animation-direction: reverse; }
+        @keyframes linesSpin { to { transform: rotate(360deg); } }
+        .monocle-ring { position: absolute; left: 50%; top: 50%; width: 200px; height: 200px;
+            transform: translate(-57%, -55%); border: 6px solid #dfe6ff; border-radius: 50%;
+            box-shadow: 0 0 20px rgba(190, 215, 255, .5), inset 0 0 16px rgba(190, 215, 255, .28); }
+        .eye-glint { position: absolute; left: -32%; top: 40%; width: 36%; height: 9%; opacity: 0;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, .95), transparent); transform: rotate(-24deg); }
+        .cs-cutin.show .eye-glint { animation: eyeGlint .5s steps(4) .18s 2; }
+        @keyframes eyeGlint { 0% { opacity: 0; transform: rotate(-24deg) translateX(-60%); } 30% { opacity: .95; } 100% { opacity: 0; transform: rotate(-24deg) translateX(430%); } }
+        .eye-star { position: absolute; left: 50%; top: 50%; width: 26px; height: 26px; background: #fff; opacity: 0;
+            clip-path: polygon(50% 0, 62% 38%, 100% 50%, 62% 62%, 50% 100%, 38% 62%, 0 50%, 38% 38%); }
+        .cs-cutin.show .eye-star { animation: starBlink .28s steps(2) .2s 3; }
+        @keyframes starBlink { 0%, 100% { opacity: 0; transform: scale(.4) rotate(0); } 50% { opacity: 1; transform: scale(1.1) rotate(20deg); } }
+        /* Bien the Áo đen — mat quyen rua do */
+        #cutin-eye.evil { background: #0d0507; }
+        #cutin-eye.evil .monocle-ring { display: none; }
+        #cutin-eye.evil .anime-lines { background: repeating-conic-gradient(from 0deg at 50% 50%, rgba(255, 60, 40, .13) 0deg 2.4deg, transparent 2.4deg 7.2deg); }
+        #cutin-eye.evil .eye-star { background: #ff5340; }
+
+        #cutin-gun .gun-wrap { position: absolute; right: 13%; bottom: 15%; transform: rotate(-24deg); }
+        .gun-flash { position: absolute; right: -54px; top: -16px; width: 92px; height: 62px; background: #ffe27a; opacity: 0;
+            clip-path: polygon(0 50%, 28% 0, 34% 38%, 55% 8%, 58% 40%, 100% 30%, 66% 55%, 100% 78%, 58% 66%, 52% 100%, 36% 62%, 22% 88%); }
+        #cutin-gun.show .gun-flash { animation: gunFlash .5s steps(2) .12s 2; }
+        @keyframes gunFlash { 0%, 100% { opacity: 0; transform: scale(.5); } 50% { opacity: 1; transform: scale(1); } }
+        .cutin-card { position: absolute; right: 17%; bottom: 56%; opacity: 0; }
+        #cutin-gun.show .cutin-card.cc1 { animation: ccFly .55s steps(6) .2s forwards; }
+        #cutin-gun.show .cutin-card.cc2 { animation: ccFly .55s steps(6) .34s forwards; }
+        @keyframes ccFly { 0% { opacity: 1; transform: translate(0, 0) rotate(0); } 100% { opacity: 1; transform: translate(-48vw, -30vh) rotate(-560deg); } }
+
+        /* POV thu nhat qua monocle cua Kid */
+        .cs-pov { position: absolute; inset: 0; z-index: 43; opacity: 0; visibility: hidden; pointer-events: none;
+            background: linear-gradient(#0a0f22, #101830 60%, #1a2340); overflow: hidden; }
+        .cs-pov.show { visibility: visible; animation: povIn 1.05s steps(7) forwards; }
+        @keyframes povIn { 0% { opacity: 0; } 12% { opacity: 1; } 86% { opacity: 1; } 100% { opacity: 0; } }
+        .pov-ground { position: absolute; left: 0; right: 0; bottom: 0; height: 32%;
+            background: repeating-linear-gradient(90deg, #141a2e 0 46px, #0d1224 46px 92px);
+            animation: povGround .38s linear infinite; }
+        @keyframes povGround { to { background-position: -92px 0; } }
+        .pov-streaks { position: absolute; inset: 0; }
+        .pov-streaks i { position: absolute; right: -130px; width: 96px; height: 3px;
+            background: linear-gradient(90deg, transparent, rgba(210, 225, 255, .75), transparent); animation: povStreak .5s linear infinite; }
+        .pov-streaks i:nth-child(1) { top: 26%; }
+        .pov-streaks i:nth-child(2) { top: 38%; width: 140px; animation-delay: .1s; animation-duration: .42s; }
+        .pov-streaks i:nth-child(3) { top: 52%; animation-delay: .22s; }
+        .pov-streaks i:nth-child(4) { top: 64%; width: 120px; animation-delay: .05s; animation-duration: .44s; }
+        .pov-streaks i:nth-child(5) { top: 76%; animation-delay: .3s; }
+        @keyframes povStreak { to { transform: translateX(-130vw); } }
+        .pov-glove { position: absolute; bottom: -4px; }
+        .pov-glove.l { left: 9%; transform: rotate(16deg); }
+        .pov-glove.r { right: 9%; transform: scaleX(-1) rotate(16deg); }
+        .cs-pov.show .pov-glove canvas { animation: gloveGrip .4s steps(2) infinite alternate; }
+        @keyframes gloveGrip { to { transform: translateY(-7px); } }
+        .pov-ring { position: absolute; left: 50%; top: 46%; width: 118vmin; height: 118vmin;
+            transform: translate(-50%, -50%); border: 5px solid rgba(223, 230, 255, .5); border-radius: 50%;
+            box-shadow: 0 0 28px rgba(190, 215, 255, .25); }
+        .pov-mask { position: absolute; inset: 0;
+            background: radial-gradient(circle at 50% 46%, transparent 50%, rgba(4, 4, 10, .94) 55%); }
+
+        /* --- POLISH TUNG CANH --- */
+        .cs1-spark { position: absolute; right: 32.4%; bottom: calc(24% + 98px); width: 14px; height: 14px; background: #fff; opacity: 0;
+            clip-path: polygon(50% 0, 62% 38%, 100% 50%, 62% 62%, 50% 100%, 38% 62%, 0 50%, 38% 38%); }
+        #cs1.active .cs1-spark { animation: starBlink .3s steps(2) 1.25s 2; }
+        #cs1.active .cs-moon { animation: moonPulse 2.2s steps(4) infinite; }
+        @keyframes moonPulse { 0%, 100% { box-shadow: 0 0 42px 12px rgba(244, 236, 205, .22), inset -8px -6px 0 rgba(31, 28, 22, .16); } 50% { box-shadow: 0 0 58px 18px rgba(244, 236, 205, .32), inset -8px -6px 0 rgba(31, 28, 22, .16); } }
+
+        .cs-shell { position: absolute; left: 14%; top: 44%; width: 5px; height: 3px; background: #f7d51d; opacity: 0; }
+        #cs2.active .cs-sh1 { animation: csShell .5s steps(4) .62s 2; }
+        #cs2.active .cs-sh2 { animation: csShell .5s steps(4) .8s 2; }
+        @keyframes csShell { 0% { opacity: 1; transform: translate(0, 0); } 55% { opacity: 1; transform: translate(16px, -14px) rotate(200deg); } 100% { opacity: 0; transform: translate(24px, 8px) rotate(340deg); } }
+        .cs2-card { position: absolute; left: 52%; top: 34%; opacity: 0; }
+        #cs2.active .cs2-c1 { animation: cs2CardFly .6s steps(7) 2.78s forwards; }
+        #cs2.active .cs2-c2 { animation: cs2CardFly .6s steps(7) 2.9s forwards; }
+        #cs2.active .cs2-c3 { animation: cs2CardFly .6s steps(7) 3.02s forwards; }
+        @keyframes cs2CardFly { 0% { opacity: 1; transform: translate(0, 0) rotate(0); } 100% { opacity: 1; transform: translate(-46vw, 15vh) rotate(-620deg); } }
+        #cs2.active .cs2-b1 { animation: csFlinch .35s steps(2) 3.38s; }
+        #cs2.active .cs2-b2 { animation: csFlinch .35s steps(2) 3.5s; }
+        #cs2.active .cs2-b3 { animation: csFlinch .35s steps(2) 3.62s; }
+        @keyframes csFlinch { 0%, 100% { transform: none; } 40% { transform: translate(-7px, 2px) rotate(-6deg); } }
+
+        .cs-streak { position: absolute; right: -100px; width: 66px; height: 3px; opacity: 0;
+            background: linear-gradient(90deg, transparent, rgba(220, 230, 255, .6), transparent); }
+        #cs4.active .cs-st1 { top: 38%; animation: csStreak .55s linear infinite; }
+        #cs4.active .cs-st2 { top: 47%; width: 92px; animation: csStreak .45s linear .12s infinite; }
+        #cs4.active .cs-st3 { top: 55%; animation: csStreak .6s linear .25s infinite; }
+        @keyframes csStreak { 0% { opacity: .7; transform: translateX(0); } 100% { opacity: .7; transform: translateX(-122vw); } }
+
+        .cs-beacon { position: absolute; left: 36px; top: -22px; width: 14px; height: 5px; background: #e74c3c; z-index: 2;
+            box-shadow: 0 0 10px 3px rgba(231, 76, 60, .7); }
+        #cs5.active .cs-beacon { animation: csBeacon .34s steps(1) infinite; }
+        @keyframes csBeacon { 0%, 49% { background: #e74c3c; box-shadow: 0 0 10px 3px rgba(231, 76, 60, .7); } 50%, 100% { background: #3498db; box-shadow: 0 0 10px 3px rgba(52, 152, 219, .7); } }
+
+
 
         /* --- CHON CHE DO --- */
         .mode-cards { display: flex; gap: 20px; justify-content: center; flex-wrap: wrap; max-width: 760px; margin: 36px auto 0; padding: 0 10px; }
@@ -663,12 +824,10 @@
         #og-timer-fill { height: 100%; width: 100%; background: #27ae60; }
         #og-timer-fill.warn { background: #e74c3c; }
         #og-turn-banner { text-align: center; color: #f7d51d; font-size: clamp(18px, 4vw, 26px); min-height: 32px; text-shadow: 2px 2px 0 #000; padding: 0 8px; }
-        #og-chat-box {
-            max-width: 780px; margin: 10px auto; height: 38vh; min-height: 200px;
-            overflow-y: auto; background: rgba(0, 0, 0, .6); border: 4px solid #333;
-            padding: 10px; display: flex; flex-direction: column; gap: 8px;
-        }
-        .og-msg { background: rgba(255, 255, 255, .05); padding: 7px 10px; border-left: 4px solid #555; font-size: 19px; line-height: 1.4; overflow-wrap: anywhere; }
+        #og-chat-box { max-width: 100%; height: 20vh; min-height: 130px; overflow-y: auto;
+            background: rgba(0, 0, 0, .55); border: 3px solid #333; padding: 8px;
+            display: flex; flex-direction: column; gap: 6px; }
+        .og-msg { background: rgba(255, 255, 255, .05); padding: 5px 9px; border-left: 4px solid #555; font-size: 17px; line-height: 1.4; overflow-wrap: anywhere; }
         .og-msg b { color: #3498db; }
         .og-msg.kind-desc { border-left-color: #f7d51d; background: rgba(247, 213, 29, .09); }
         .og-msg.kind-desc b { color: #f7d51d; }
@@ -970,6 +1129,7 @@
     <!-- CẮT CẢNH MỞ MÀN: VỤ TRỘM DƯỚI TRĂNG -->
     <div id="chase-screen">
         <div class="cs-scene" id="cs1">
+         <div class="cs-world">
             <div class="cs-skyline-jag" style="bottom:24%;"><div class="cs-windows" style="opacity:.8;"></div></div>
             
             <div class="cs-lightning"></div>
@@ -978,11 +1138,14 @@
             <div class="cs-roofdoor"></div>
             <canvas id="cs1-kaito" class="pixel-canvas cs1-kaito"></canvas>
             <canvas id="cs1-gem" class="pixel-canvas cs1-gem"></canvas>
+            <div class="cs1-spark"></div>
             <canvas id="cs1-b1" class="pixel-canvas cs1-black cs1-b1"></canvas>
             <canvas id="cs1-b2" class="pixel-canvas cs1-black cs1-b2"></canvas>
             <canvas id="cs1-b3" class="pixel-canvas cs1-black cs1-b3"></canvas>
+         </div>
         </div>
         <div class="cs-scene" id="cs2">
+         <div class="cs-world">
             <div class="cs-skyline-jag"><div class="cs-windows" style="opacity:.8;"></div></div>
             
             <div class="cs-moon" style="top:7%; right:10%; width:64px; height:64px;"></div>
@@ -993,6 +1156,11 @@
             <div class="cs-bullet cs-bu1"></div>
             <div class="cs-bullet cs-bu2"></div>
             <div class="cs-bullet cs-bu3"></div>
+            <div class="cs-shell cs-sh1"></div>
+            <div class="cs-shell cs-sh2"></div>
+            <canvas id="cs2-c1" class="pixel-canvas cs2-card cs2-c1"></canvas>
+            <canvas id="cs2-c2" class="pixel-canvas cs2-card cs2-c2"></canvas>
+            <canvas id="cs2-c3" class="pixel-canvas cs2-card cs2-c3"></canvas>
             <div class="cs2-swing">
                 <div class="cs2-rope"></div>
                 <div class="cs2-fly">
@@ -1000,8 +1168,10 @@
                     <canvas id="cs2-kaito" class="pixel-canvas"></canvas>
                 </div>
             </div>
+         </div>
         </div>
         <div class="cs-scene" id="cs3">
+         <div class="cs-world">
             <div class="cs-skyline-jag" style="height:34%;"><div class="cs-windows" style="opacity:.8;"></div></div>
             
             <div class="cs-street"></div>
@@ -1017,8 +1187,10 @@
             <div class="cs-impact cs3-impact"></div>
             <div class="cs3-fall" id="cs3-fall"><canvas id="cs3-kaitofall" class="pixel-canvas"></canvas></div>
             <div class="cs3-train" id="cs3-train"><div class="cs-train-windows"></div></div>
+         </div>
         </div>
         <div class="cs-scene" id="cs4">
+         <div class="cs-world">
             <div class="cs-skyline-jag" style="height:36%;"><div class="cs-windows" style="opacity:.8;"></div></div>
             
             <div class="cs-citylights"></div>
@@ -1028,13 +1200,18 @@
             <div class="cs-sign cs-sg3"></div>
             <div class="cs-dust cs-du1"></div>
             <div class="cs-dust cs-du2"></div>
+            <div class="cs-streak cs-st1"></div>
+            <div class="cs-streak cs-st2"></div>
+            <div class="cs-streak cs-st3"></div>
             <canvas id="cs4-kaito" class="pixel-canvas cs4-kaito"></canvas>
             <div class="cs4-dan-unit">
                 <canvas id="cs4-dan" class="pixel-canvas"></canvas>
                 <div class="cs-skate"><div class="cs-flame"></div></div>
             </div>
+         </div>
         </div>
         <div class="cs-scene" id="cs5">
+         <div class="cs-world">
             <div class="cs-skyline-jag" style="height:30%;"><div class="cs-windows" style="opacity:.8;"></div></div>
             
             <div class="cs-citylights"></div>
@@ -1042,6 +1219,7 @@
             <div class="cs-overpass"></div>
             <div class="cs-car">
                 <div class="cs-car-top"></div>
+                <div class="cs-beacon"></div>
                 <canvas id="cs5-b1" class="pixel-canvas cs5-bg1"></canvas>
                 <canvas id="cs5-b2" class="pixel-canvas cs5-bg2"></canvas>
                 <div class="cs-wheel cs-w1"></div>
@@ -1071,14 +1249,17 @@
             <div class="cs-helismoke"></div>
             <div class="cs-tunnel cs-tunnel-l"></div>
             <div class="cs-tunnel cs-tunnel-r"></div>
+         </div>
         </div>
         <div class="cs-scene" id="cs6">
+         <div class="cs-world">
             <div class="cs-mag"></div>
             <div class="cs-card"></div>
             <div id="cs6-particles"></div>
             <div class="cs-ring" id="cs6-ring"></div>
             <div class="cs5-title" id="cs6-title"><span class="t1">CASE</span><span class="t2">CLOSED</span></div>
             <div class="cs5-sub blinker" id="cs6-sub">PRESS START</div>
+         </div>
         </div>
         <div class="cs-vignette"></div>
         <div class="cs-bar cs-bar-t"></div>
@@ -1107,10 +1288,18 @@
         </div>
     </div>
 
-    <!-- ONLINE: MENU -->
+        <!-- ONLINE: MENU -->
     <div id="online-menu-screen" class="screen">
-        <h2 class="arcade-title" style="color:#f7d51d; text-shadow:4px 4px #e76e55;">CHƠI ONLINE</h2>
-        <div class="nes-container is-dark with-title" style="max-width:460px; margin:30px auto;">
+        <div style="text-align:center; margin-top:3vh;">
+            <div style="display:flex; justify-content:center; gap:26px;">
+                <canvas id="om-dan" class="pixel-canvas anim-wave glow-detective"></canvas>
+                <canvas id="om-spy" class="pixel-canvas anim-wave glow-spy" style="animation-delay:.15s;"></canvas>
+                <canvas id="om-kid" class="pixel-canvas anim-wave glow-kid" style="animation-delay:.3s;"></canvas>
+            </div>
+            <h2 class="arcade-title" style="color:#f7d51d; font-size:44px; text-shadow:4px 4px 0 #e76e55, 2px 2px 0 #000; margin:16px 0 0;">CHƠI ONLINE</h2>
+            <p class="subtitle-text">PHÒNG CHUYÊN ÁN TỪ XA</p>
+        </div>
+        <div class="nes-container is-dark with-title" style="max-width:460px; margin:24px auto;">
             <p class="title text-pop">ĐĂNG NHẬP ĐẶC VỤ</p>
             <input type="text" id="online-name" class="nes-input is-dark" style="width:100%; margin-bottom:16px;" placeholder="Tên đặc vụ (tối đa 16 ký tự)" maxlength="16">
             <button type="button" class="nes-btn is-primary main-action-btn" style="width:100%; padding:12px;" onclick="hostCreateRoom()">TẠO PHÒNG MỚI</button>
@@ -1125,31 +1314,32 @@
 
     <!-- ONLINE: LOBBY -->
     <div id="online-lobby-screen" class="screen">
-        <h2 class="arcade-title" style="color:#f7d51d;">PHÒNG CHỜ</h2>
+        <h2 style="color:#f7d51d; text-shadow:4px 4px #e76e55; margin-bottom:5px;" class="arcade-title">THIẾT LẬP LỰC LƯỢNG</h2>
+        <div class="case-file-bar" style="margin-bottom:12px;"><span class="case-file-bar__number" style="color:#f7d51d;">PHÒNG</span><span class="case-file-bar__title" id="lobby-code-title">-----</span><span class="case-classified-stamp">CHỜ PHONG TỎA</span></div>
         <div class="room-code-box">
-            <span style="color:#ddd;">MÃ PHÒNG:</span><b id="lobby-code">-----</b>
+            <span style="color:#ddd;">MÃ:</span><b id="lobby-code">-----</b>
             <button type="button" class="nes-btn is-warning" style="font-size:14px; padding:6px 10px;" onclick="copyOnlineInvite()">SAO CHÉP LINK MỜI</button>
         </div>
         <div class="nes-container is-dark with-title" style="max-width:520px; margin:0 auto 16px;">
             <p class="title text-pop">Đặc Vụ (<span id="lobby-count">1</span>/12)</p>
-            <ul id="lobby-players"></ul>
+            <ul id="lobby-players" style="list-style:none; padding:0; margin:0;"></ul>
         </div>
         <div class="nes-container is-dark" id="lobby-host-config" style="max-width:520px; margin:0 auto 16px; display:none;">
             <div style="text-align:left; margin-bottom:12px; padding:10px; border:2px solid #e74c3c; background:#000;">
                 <label style="color:#fff; font-size:16px; display:block; cursor:pointer;">
                     <input type="checkbox" id="lobby-c4" style="transform:scale(1.3); margin-right:6px;" onchange="document.getElementById('lobby-c4-time').style.opacity=this.checked?'1':'.45'">
-                    <span style="color:#e74c3c;">Kích hoạt bom C4 (siêu khó)</span>
+                    <span style="color:#e74c3c;">Kích hoạt chế độ C4</span>
                 </label>
-                <div id="lobby-c4-time" style="margin-top:8px; opacity:.45;">
-                    <span style="color:#e74c3c; font-size:16px;">Thời gian (phút):</span>
-                    <input type="number" id="lobby-c4-min" class="nes-input is-dark" value="5" min="1" max="60" style="width:80px; display:inline-block;">
+                <div id="lobby-c4-time" style="margin-top:8px; padding-top:8px; border-top:1px dashed #555; opacity:.45;">
+                    <span style="color:#e74c3c; font-size:17px;" class="text-pop">Thời gian C4 (phút): </span>
+                    <input type="number" id="lobby-c4-min" class="nes-input is-dark" value="5" min="1" max="60" style="width:80px; display:inline-block; text-align:center;">
                 </div>
             </div>
             <div style="display:flex; gap:12px; margin-bottom:12px;">
-                <label style="flex:1; color:#e76e55;">Áo đen:<input type="number" id="lobby-spies" class="nes-input is-dark" value="1" min="1" style="width:100%;"></label>
-                <label style="flex:1; color:#209cee;">Siêu trộm:<input type="number" id="lobby-kids" class="nes-input is-dark" value="1" min="0" style="width:100%;"></label>
+                <label style="flex:1; text-align:left; color:#e76e55;" class="text-pop">Áo đen:<input type="number" id="lobby-spies" class="nes-input is-dark" value="1" min="1" style="width:100%;"></label>
+                <label style="flex:1; text-align:left; color:#209cee;" class="text-pop">Siêu trộm:<input type="number" id="lobby-kids" class="nes-input is-dark" value="1" min="0" style="width:100%;"></label>
             </div>
-            <label style="color:#ddd;">Thời lượng thảo luận:
+            <label style="color:#ddd; display:block; text-align:left;">Thời lượng thảo luận:
                 <select id="lobby-discuss" class="nes-input is-dark" style="width:100%;">
                     <option value="60">60 giây</option>
                     <option value="120" selected>120 giây</option>
@@ -1158,41 +1348,56 @@
             </label>
         </div>
         <div style="max-width:520px; margin:0 auto;">
-            <button type="button" id="lobby-start" class="nes-btn is-success main-action-btn" style="width:100%; padding:14px; display:none;" onclick="hostStartGame()">PHÁT MẬT LỆNH</button>
+            <button type="button" id="lobby-start" class="nes-btn is-success" style="width:100%; padding:12px; display:none;" onclick="hostStartGame()">PHÁT MẬT LỆNH</button>
             <p id="lobby-waiting" class="blinker" style="text-align:center; color:#27ae60; display:none;">Chờ chủ phòng phát mật lệnh...</p>
             <button type="button" class="nes-btn" style="width:100%; margin-top:12px;" onclick="onlineExit()">Rời Phòng</button>
         </div>
     </div>
 
-    <!-- ONLINE: NHẬN VAI -->
+    <!-- ONLINE: NHẬN VAI (MOTIF VIEN APTX) -->
     <div id="online-reveal-screen" class="screen">
         <div class="case-file-bar"><span class="case-file-bar__number case-number">CASE #---</span><span class="case-file-bar__title case-title">HỒ SƠ MẬT</span><span class="case-classified-stamp">TUYỆT MẬT</span></div>
-        <h2 style="color:#f7d51d;" class="text-pop arcade-title">HỒ SƠ CỦA BẠN</h2>
-        <div class="nes-container is-dark" style="max-width:460px; margin:20px auto; text-align:center; border:4px solid #fff;">
-            <p id="oreveal-word" style="font-size:40px; color:#f7d51d; font-weight:bold; margin:0;" class="text-pop">???</p>
+        <p id="oreveal-instruction" style="text-align:center; font-size:18px; color:#ddd;" class="text-pop">Uống 1 viên APTX-4869 để nhận hồ sơ mật!</p>
+        <div class="pill-wrapper"><div id="oreveal-pillboard" class="pill-grid"></div></div>
+        <div style="text-align:center; margin:18px 0;">
+            <h3 id="oreveal-turn" style="color:#f7d51d; margin:0; font-size:28px; text-transform:uppercase;" class="text-pop arcade-title"></h3>
+        </div>
+        <div id="oreveal-box" class="nes-container is-dark" style="display:none; max-width:460px; margin:0 auto; text-align:center; border:4px solid #fff;">
+            <p id="oreveal-word" style="font-size:38px; color:#f7d51d; font-weight:bold; margin:0;" class="text-pop">???</p>
             <p id="oreveal-hint" style="color:#ddd; font-size:18px;"></p>
         </div>
-        <div style="max-width:460px; margin:0 auto;">
-            <button type="button" id="oreveal-ready-btn" class="nes-btn is-primary" style="width:100%; padding:12px;" onclick="onlineReady()">TÔI ĐÃ GHI NHỚ — SẴN SÀNG</button>
+        <div style="max-width:460px; margin:14px auto 0;">
+            <button type="button" id="oreveal-ready-btn" class="nes-btn is-primary" style="width:100%; padding:12px; display:none;" onclick="onlineReady()">Đã Ghi Nhớ — SẴN SÀNG</button>
         </div>
     </div>
 
-    <!-- ONLINE: MÀN CHÍNH (MIÊU TẢ / CHAT / BỎ PHIẾU) -->
+    <!-- ONLINE: MÀN CHÍNH (BẢNG SUY LUẬN + BỘ ĐÀM) -->
     <div id="online-game-screen" class="screen">
         <div class="case-file-bar"><span class="case-file-bar__number case-number">CASE #---</span><span class="case-file-bar__title case-title">HỒ SƠ MẬT</span><span class="case-file-bar__state" id="og-phase-label">CHỜ</span></div>
         <div class="og-timer-wrap"><div id="og-timer-fill"></div></div>
         <div id="og-turn-banner" class="text-pop"></div>
-        <div id="og-vote-area" style="display:none;">
-            <p style="text-align:center; color:#f7d51d;" class="text-pop">BỎ PHIẾU BÍ MẬT — chạm nghi phạm</p>
-            <div id="og-vote-grid" class="suspect-grid" style="margin-bottom:12px;"></div>
-            <div style="text-align:center; margin-bottom:12px;"><button type="button" class="nes-btn" onclick="sendOnlineVote('skip')">VỢNG (không bỏ phiếu)</button></div>
+        <div class="deduction-board">
+            <div class="deduction-board__header">
+                <div><p class="deduction-board__title text-pop">BẢNG SUY LUẬN</p><span style="color:#e2d2a0; font-size:15px;" id="og-board-note">Chạm hồ sơ nghi phạm để phát lệnh bắt giữ.</span></div>
+                <div style="text-align:right;"><span class="case-classified-stamp">NGHI PHẠM</span><br><button type="button" class="nes-btn is-warning" style="font-size:14px; padding:5px 9px; margin-top:8px;" onclick="showMyOnlineRole()">HỒ SƠ CỦA TÔI</button></div>
+            </div>
+            <div id="og-suspect-grid" class="suspect-grid"></div>
         </div>
-        <div id="og-chat-box"></div>
-        <div id="og-input-row">
-            <input type="text" id="og-input" class="nes-input is-dark" style="flex:1;" placeholder="..." maxlength="200" onkeypress="if(event.key==='Enter') sendOnlineInput()">
-            <button type="button" id="og-send" class="nes-btn is-error" onclick="sendOnlineInput()">GỬI</button>
+        <div style="margin-top:14px; text-align:center;">
+            <p style="color:#f7d51d; font-size:18px; margin-bottom:10px; border-bottom:4px solid #555; display:inline-block; padding-bottom:4px;" class="text-pop">[ TÌNH TRẠNG SINH TỒN ]</p>
+            <div id="og-survivors" style="display:flex; flex-wrap:wrap; gap:12px; justify-content:center; align-items:flex-end; min-height:50px;"></div>
         </div>
-        <div style="text-align:center; margin-top:10px;"><button type="button" class="nes-btn is-primary" style="font-size:15px; padding:6px 12px;" onclick="showMyOnlineRole()">HỒ SƠ CỦA TÔI</button></div>
+        <div id="og-vote-extra" style="display:none; text-align:center; margin-top:10px;">
+            <button type="button" class="nes-btn" onclick="sendOnlineVote('skip')">VỢNG (không bỏ phiếu)</button>
+        </div>
+        <div class="nes-container is-dark with-title" style="max-width:780px; margin:16px auto 0; padding:14px;">
+            <p class="title text-pop" style="font-size:18px;">BỘ ĐÀM THOẠI</p>
+            <div id="og-chat-box"></div>
+            <div id="og-input-row" style="display:flex; gap:10px; margin-top:10px;">
+                <input type="text" id="og-input" class="nes-input is-dark" style="flex:1;" placeholder="..." maxlength="200" onkeypress="if(event.key==='Enter') sendOnlineInput()">
+                <button type="button" id="og-send" class="nes-btn is-error" onclick="sendOnlineInput()">GỬI</button>
+            </div>
+        </div>
         <div id="og-host-controls" style="display:flex; gap:10px; margin-top:12px;"></div>
     </div>
 
@@ -1202,15 +1407,24 @@
         <div class="truth-banner">SỰ THẬT CHỈ CÓ MỘT</div>
         <div class="nes-container is-dark" style="max-width:640px; margin:0 auto; text-align:center;">
             <h3 id="ov-faction" class="text-pop" style="font-size:30px; margin:10px 0;"></h3>
-            <p id="ov-words" style="color:#ddd; font-size:18px;"></p>
-            <div class="online-victory-list" id="ov-roles"></div>
-            <div class="online-victory-list" id="ov-points"></div>
+            <div id="ov-mascots" style="display:flex; justify-content:center; gap:20px; margin:16px 0; min-height:70px;"></div>
+            <div class="nes-container is-dark" style="margin:14px 0; padding:16px; border-color:#f7d51d;">
+                <p style="color:#3498db; margin:0 0 10px;" class="text-pop">Mật lệnh Thám Tử:<br><b id="ov-word-civ" style="font-size:28px; color:#fff;"></b></p>
+                <p style="color:#e76e55; margin:0;" class="text-pop">Mật lệnh Áo Đen:<br><b id="ov-word-spy" style="font-size:28px; color:#fff;"></b></p>
+            </div>
+            <div class="nes-container is-dark" style="margin:14px 0; padding:14px; text-align:left; border-color:#555;">
+                <p style="color:#f7d51d; font-size:20px; text-align:center; margin:0 0 10px;" class="text-pop">HỒ SƠ KẾT VÁN</p>
+                <div id="ov-roles"></div>
+                <div id="ov-history" style="font-size:17px; color:#ddd; margin-top:12px;"></div>
+                <div id="ov-points" style="margin-top:12px;"></div>
+            </div>
             <div style="display:flex; gap:12px; margin-top:20px;">
                 <button type="button" id="ov-again" class="nes-btn is-success" style="flex:1; display:none;" onclick="hostRematch()">VÁN MỚI (CÙNG PHÒNG)</button>
                 <button type="button" class="nes-btn" style="flex:1;" onclick="onlineExit()">RỜI PHÒNG</button>
             </div>
         </div>
     </div>
+
 
     <!-- OVERLAY SỬA ĐIỂM TỔNG -->
     <div id="score-editor-overlay" style="display:none; position:fixed; inset:0; z-index:9999; background:rgba(0,0,0,0.92); justify-content:center; align-items:center; padding:20px;">
@@ -1481,10 +1695,16 @@
         function cT(ms, fn) { chaseTimers.push(setTimeout(() => { if (!chaseDone) fn(); }, ms)); }
         function chaseShowScene(id) {
             const dip = document.getElementById('cs-dip');
+            dip.style.transitionDuration = '0.09s';
             dip.classList.add('on');
-            setTimeout(() => dip.classList.remove('on'), 140);
-            document.querySelectorAll('.cs-scene').forEach((s) => s.classList.remove('active'));
-            document.getElementById(id).classList.add('active');
+            setTimeout(() => {
+                if (chaseDone) return;
+                document.querySelectorAll('.cs-scene').forEach((s) => s.classList.remove('active'));
+                document.getElementById(id).classList.add('active');
+                void dip.offsetWidth;
+                dip.style.transitionDuration = '0.3s';
+                dip.classList.remove('on');
+            }, 160);
         }
         function csShake() {
             const s = document.getElementById('chase-screen');
@@ -1516,11 +1736,11 @@
 
             cT(0, () => {
                 chaseShowScene('cs1');
-                drawPixelArt('cs1-kaito', spriteKaito, 5);
+                drawPixelArt('cs1-kaito', spriteKid, 5);
                 drawPixelArt('cs1-gem', spriteGem, 4);
-                drawPixelArt('cs1-b1', spriteBlack, 5);
-                drawPixelArt('cs1-b2', spriteBlack, 5);
-                drawPixelArt('cs1-b3', spriteBlack, 5);
+                drawPixelArt('cs1-b1', spriteSpy, 5);
+                drawPixelArt('cs1-b2', spriteSpy, 5);
+                drawPixelArt('cs1-b3', spriteSpy, 5);
                 sfxThunder();
             });
             cT(550, sfxThunder);
@@ -1529,10 +1749,10 @@
 
             cT(4200, () => {
                 chaseShowScene('cs2');
-                drawPixelArt('cs2-b1', spriteBlack, 5);
-                drawPixelArt('cs2-b2', spriteBlack, 5);
-                drawPixelArt('cs2-b3', spriteBlack, 5);
-                drawPixelArt('cs2-kaito', spriteKaito, 5);
+                drawPixelArt('cs2-b1', spriteSpy, 5);
+                drawPixelArt('cs2-b2', spriteSpy, 5);
+                drawPixelArt('cs2-b3', spriteSpy, 5);
+                drawPixelArt('cs2-kaito', spriteKid, 5);
             });
             cT(4500, sfxGunshot);
             cT(4650, sfxGunshot);
@@ -1545,8 +1765,8 @@
                 chaseShowScene('cs3');
                 drawPixelArt('cs3-conan', spriteDetective, 5);
                 drawPixelArt('cs3-ballc', spriteBall, 4);
-                drawPixelArt('cs3-kaitofar', spriteKaito, 4);
-                drawPixelArt('cs3-kaitofall', spriteKaito, 4);
+                drawPixelArt('cs3-kaitofar', spriteKid, 4);
+                drawPixelArt('cs3-kaitofall', spriteKid, 4);
             });
             cT(10050, sfxKick);
             cT(10100, sfxWhoosh);
@@ -1554,16 +1774,16 @@
 
             cT(13400, () => {
                 chaseShowScene('cs4');
-                drawPixelArt('cs4-kaito', spriteKaito, 5);
+                drawPixelArt('cs4-kaito', spriteKid, 5);
                 drawPixelArt('cs4-dan', spriteDetective, 5);
             });
 
             cT(16800, () => {
                 chaseShowScene('cs5');
                 drawPixelArt('cs5-heli', spriteHeli, 5);
-                drawPixelArt('cs5-b1', spriteBlack, 4);
-                drawPixelArt('cs5-b2', spriteBlack, 4);
-                drawPixelArt('cs5-kaito', spriteKaito, 5);
+                drawPixelArt('cs5-b1', spriteSpy, 4);
+                drawPixelArt('cs5-b2', spriteSpy, 4);
+                drawPixelArt('cs5-kaito', spriteKid, 5);
                 drawPixelArt('cs5-dan', spriteDetective, 5);
                 playNoise(0.3, 0.3);
             });
@@ -1830,32 +2050,6 @@
             "0000AAAA000",
             "000AAAAAA00"
         ];
-        const spriteKaito = [
-            "00099900000",
-            "00099900000",
-            "00555555500",
-            "00022222000",
-            "002A2222000",
-            "00222222000",
-            "00555555000",
-            "05555555550",
-            "05555555550",
-            "00555555000",
-            "00600006000"
-        ];
-        const spriteBlack = [
-            "00000000000",
-            "00022220000",
-            "00666666000",
-            "00022220000",
-            "00044440000",
-            "00444444000",
-            "04444444490",
-            "04444444490",
-            "00444444000",
-            "00044440000",
-            "00060060000"
-        ];
         const spriteGem = [
             "00300",
             "03330",
@@ -1878,6 +2072,44 @@
             "0626666666699900",
             "0666666666669900",
             "0009900099000000"
+        ];
+        // Mat anime cuong dao — dung cho cut-in glint (monocle vẽ bằng CSS)
+        const spriteEye = [
+            "0000000000000000",
+            "0006666666660000",
+            "0006666666660000",
+            "0000000000000000",
+            "0005555555550000",
+            "0055555555555000",
+            "0055666655555000",
+            "0055666555555000",
+            "0055555555555000",
+            "0005555555550000",
+            "0000000000000000"
+        ];
+        // Sung bai cua Kid — trang, nạp sẵn một quân bài đỏ
+        const spriteCardGun = [
+            "0000880000",
+            "0005555500",
+            "0555555555",
+            "0555555550",
+            "0005556000",
+            "0005550000",
+            "0005550000"
+        ];
+        const spriteCard = [
+            "055550",
+            "555555",
+            "558855",
+            "555555",
+            "055550"
+        ];
+        const spriteGlove = [
+            "0555550",
+            "5555555",
+            "5555555",
+            "0555550",
+            "0003300"
         ];
         
         const spriteDynamite = [
@@ -2001,6 +2233,9 @@
             syncMusicButton();
             drawPixelArt('mode-dan', spriteDetective, 5);
             drawPixelArt('mode-spy', spriteSpy, 5);
+            drawPixelArt('om-dan', spriteDetective, 5);
+            drawPixelArt('om-spy', spriteSpy, 5);
+            drawPixelArt('om-kid', spriteKid, 5);
             const inviteCode = new URLSearchParams(location.search).get('p');
             if (inviteCode) document.getElementById('online-code').value = inviteCode.toUpperCase();
             try {
@@ -4254,7 +4489,7 @@
             votes: new Map(), turnMs: 60000, voteMs: 30000, discussMs: 120000,
             civilianWord: '', spyWord: '', guesserId: null, voted: false,
             timerInt: null, hostTimeouts: [], inputMode: 'off',
-            c4: null, lastElim: null, c4TimerInt: null
+            c4: null, lastElim: null, c4TimerInt: null, elimHistory: [], speakerId: null, pendingReveal: false
         };
 
         function onlineStatus(msg) { const el = document.getElementById('online-status'); if (el) el.innerText = msg || ''; }
@@ -4334,20 +4569,49 @@
 
         function renderLobby() {
             document.getElementById('lobby-code').innerText = ONLINE.code;
+            document.getElementById('lobby-code-title').innerText = 'MÃ: ' + ONLINE.code;
             document.getElementById('lobby-count').innerText = ONLINE.players.length;
-            const ul = document.getElementById('lobby-players'); ul.innerHTML = '';
+            const ul = document.getElementById('lobby-players');
+            ul.innerHTML = '';
             ONLINE.players.forEach((p) => {
                 const li = document.createElement('li');
+                li.style.cssText = 'display:flex; justify-content:space-between; align-items:center; margin-bottom:8px; background:rgba(0,0,0,.5); padding:5px 10px;';
                 const nm = document.createElement('span');
+                nm.className = 'text-pop';
+                nm.style.cssText = 'color:#fff;';
                 nm.textContent = p.name + (p.id === ONLINE.myId ? ' (bạn)' : '');
+                const right = document.createElement('div');
+                right.style.cssText = 'display:flex; gap:6px; align-items:center;';
                 const tag = document.createElement('b');
-                if (p.id === 'caseclosed-' + ONLINE.code) tag.textContent = '★ CHỦ PHÒNG';
-                li.append(nm, tag);
+                if (p.id === 'caseclosed-' + ONLINE.code) { tag.textContent = '★ CHỦ PHÒNG'; tag.style.color = '#f7d51d'; right.appendChild(tag); }
+                if (ONLINE.isHost && p.id !== ONLINE.myId) {
+                    const kick = document.createElement('button');
+                    kick.type = 'button';
+                    kick.className = 'nes-btn is-error';
+                    kick.style.cssText = 'padding:2px 10px; font-size:14px;';
+                    kick.textContent = 'X';
+                    kick.onclick = () => hostKickPlayer(p.id);
+                    right.appendChild(kick);
+                }
+                li.append(nm, right);
                 ul.appendChild(li);
             });
             document.getElementById('lobby-host-config').style.display = ONLINE.isHost ? 'block' : 'none';
             document.getElementById('lobby-start').style.display = ONLINE.isHost ? 'inline-block' : 'none';
             document.getElementById('lobby-waiting').style.display = ONLINE.isHost ? 'none' : 'block';
+        }
+
+        function hostKickPlayer(id) {
+            if (ONLINE.phase !== 'lobby' || id === ONLINE.myId) return;
+            const p = onlineGetPlayer(id);
+            showModal('<div style=\'text-align:center\'>Mời <b style="color:#f7d51d">' + esc(p ? p.name : '???') + '</b> rời khỏi phòng?</div>', 'confirm', () => {
+                const conn = ONLINE.conns.get(id);
+                if (conn) { try { conn.send({ t: 'kick' }); } catch (e) {} }
+                ONLINE.conns.delete(id);
+                ONLINE.players = ONLINE.players.filter((x) => x.id !== id);
+                try { if (conn) conn.close(); } catch (e) {}
+                hostEmit({ t: 'lobby', players: onlinePublic() });
+            });
         }
 
         function hostBroadcast(msg) { ONLINE.conns.forEach((c) => { if (c.open) c.send(msg); }); }
@@ -4465,7 +4729,7 @@
             });
             ONLINE.round = 1; ONLINE.turnIdx = 0; ONLINE.descCount = 0;
             ONLINE.votes.clear(); ONLINE.voted = false; ONLINE.guesserId = null;
-            ONLINE.lastElim = null;
+            ONLINE.lastElim = null; ONLINE.elimHistory = [];
             const c4Enabled = document.getElementById('lobby-c4').checked;
             const c4Minutes = Math.max(1, parseInt(document.getElementById('lobby-c4-min').value) || 5);
             ONLINE.c4 = c4Enabled ? { pin: String(Math.floor(1000 + Math.random() * 9000)), unlocked: false, permLocked: false, attempts: 3, done: false, started: false, minutes: c4Minutes, deadline: 0 } : null;
@@ -4484,26 +4748,76 @@
             });
         }
 
+        function playOnlineCaseIntro() {
+            renderCaseIdentity();
+            const intro = document.getElementById('case-intro-screen');
+            document.querySelector('.case-intro-lock').innerText = currentCaseMeta.number;
+            document.querySelector('.case-intro-caption').innerText = 'HIỆN TRƯỜNG ĐÃ ĐƯỢC PHONG TỎA';
+            intro.classList.remove('active');
+            void intro.offsetWidth;
+            intro.classList.add('active');
+            doorCloseSfx.pause();
+            doorCloseSfx.currentTime = 0;
+            doorCloseSfx.play().catch(() => {});
+            const finish = () => {
+                intro.classList.remove('active');
+                if (ONLINE.pendingReveal) { ONLINE.pendingReveal = false; showOnlineReveal(); }
+            };
+            const flash = intro.querySelector('.case-intro-flash');
+            if (flash._caseIntroEndHandler) flash.removeEventListener('animationend', flash._caseIntroEndHandler);
+            flash._caseIntroEndHandler = finish;
+            flash.addEventListener('animationend', finish, { once: true });
+            setTimeout(finish, 6500);
+        }
+
         function showOnlineReveal() {
             switchScreen('online-reveal-screen');
             renderCaseIdentity();
-            const w = document.getElementById('oreveal-word'), h = document.getElementById('oreveal-hint');
-            const btn = document.getElementById('oreveal-ready-btn');
-            btn.disabled = false;
-            if (ONLINE.myRole === 'SieuTrom') {
-                w.innerText = '???'; w.style.color = '#209cee';
-                h.innerHTML = "Bạn là <b style='color:#209cee'>SIÊU TRỘM</b>! Không có mật lệnh — hãy bịa câu miêu tả cho khéo!";
-            } else {
-                w.innerText = ONLINE.myWord; w.style.color = '#f7d51d';
-                if (ONLINE.myRole === 'GianDiep') {
-                    h.innerHTML = "Bạn là <b style='color:#e76e55'>ÁO ĐEN</b>! Mật lệnh của Thám tử RẤT GIỐNG của bạn — diễn cho giống để trà trộn!";
+            document.getElementById('oreveal-turn').innerText = 'LƯỢT NHẬN HỒ SƠ: ' + ONLINE.myName;
+            const board = document.getElementById('oreveal-pillboard');
+            board.innerHTML = '';
+            const pill = document.createElement('canvas');
+            pill.className = 'pixel-canvas pill-item';
+            pill.onclick = () => onlineTakePill(pill);
+            board.appendChild(pill);
+            drawPixelArt(pill, spritePill, 7);
+            document.getElementById('oreveal-instruction').style.display = 'block';
+            document.querySelector('#online-reveal-screen .pill-wrapper').style.display = 'flex';
+            document.getElementById('oreveal-box').style.display = 'none';
+            document.getElementById('oreveal-ready-btn').style.display = 'none';
+        }
+
+        function onlineTakePill(pill) {
+            if (pill.classList.contains('consumed')) return;
+            SFX.swallow();
+            pill.classList.add('consumed');
+            setTimeout(() => {
+                document.getElementById('oreveal-instruction').style.display = 'none';
+                document.querySelector('#online-reveal-screen .pill-wrapper').style.display = 'none';
+                const w = document.getElementById('oreveal-word'), h = document.getElementById('oreveal-hint');
+                const box = document.getElementById('oreveal-box');
+                h.style.display = 'none'; box.style.borderColor = '#fff';
+                w.style.color = '#f7d51d';
+                w.innerText = ONLINE.myWord;
+                if (ONLINE.myRole === 'SieuTrom') {
+                    box.style.borderColor = '#209cee'; w.innerText = '???';
+                    h.style.display = 'block';
+                    h.innerHTML = "Bạn là <b style='color:#209cee'>SIÊU TRỘM</b>! Không có mật lệnh — hãy bịa câu miêu tả cho khéo!";
                 } else {
-                    h.innerHTML = "Bạn là <b style='color:#3498db'>THÁM TỬ</b>. Tìm ra Áo Đen đang ẩn mình!";
+                    if (ONLINE.myRole === 'GianDiep') {
+                        h.style.display = 'block';
+                        h.innerHTML = "Bạn là <b style='color:#e76e55'>ÁO ĐEN</b>! Mật lệnh của Thám tử RẤT GIỐNG của bạn — diễn cho giống!";
+                    } else {
+                        h.style.display = 'block';
+                        h.innerHTML = "Bạn là <b style='color:#3498db'>THÁM TỬ</b>. Tìm ra Áo Đen đang ẩn mình!";
+                    }
+                    if (ONLINE.myIsDefuser) {
+                        h.innerHTML += "<br>Bạn còn là <b style='color:#f7d51d'>CHUYÊN GIA GỠ BOM</b>! Mã bảo mật: <b style='color:#e74c3c'>[" + ONLINE.myPin + "]</b>";
+                    }
                 }
-                if (ONLINE.myIsDefuser) {
-                    h.innerHTML += "<br>Bạn còn là <b style='color:#f7d51d'>CHUYÊN GIA GỠ BOM</b>! Mã bảo mật: <b style='color:#e74c3c'>[" + ONLINE.myPin + "]</b>";
-                }
-            }
+                box.style.display = 'block';
+                document.getElementById('oreveal-ready-btn').style.display = 'inline-block';
+            }, 300);
         }
 
         function onlineReady() {
@@ -4610,6 +4924,7 @@
                 const p = onlineGetPlayer(elimId);
                 p.isAlive = false;
                 elimRole = p.role; elimName = p.name;
+                ONLINE.elimHistory.push({ name: elimName, role: elimRole });
                 if (ONLINE.c4 && !ONLINE.c4.done) {
                     if (p.isDefuser && p.role === 'Dan') { ONLINE.c4.permLocked = true; ONLINE.c4.unlocked = false; }
                     else if (!ONLINE.c4.unlocked) ONLINE.c4.unlocked = true;
@@ -4698,7 +5013,7 @@
             clearInterval(ONLINE.timerInt);
             stopOnlineC4Timer();
             document.getElementById('bomb-container').style.display = 'none';
-            ONLINE.c4 = null; ONLINE.lastElim = null;
+            ONLINE.c4 = null; ONLINE.lastElim = null; ONLINE.elimHistory = [];
             ONLINE.phase = 'lobby';
             hostEmit({ t: 'reset', players: onlinePublic() });
         }
@@ -4717,11 +5032,15 @@
             else if (d.t === 'full') { onlineStatus(''); showModal('Phòng đã đầy (tối đa 12 người).', 'alert'); }
             else if (d.t === 'busy') { onlineStatus(''); showModal('Ván đang diễn ra — không thể vào giữa chừng.', 'alert'); }
             else if (d.t === 'close') { showModal('Chủ phòng đã giải tán phòng.', 'alert', () => onlineExit()); }
+            else if (d.t === 'kick') { showModal('Bạn đã bị chủ phòng mời ra khỏi phòng.', 'alert', () => onlineExit()); }
             else if (d.t === 'start') {
                 ONLINE.phase = 'reveal';
                 currentCaseMeta = d.meta;
+                ONLINE.pendingReveal = true;
                 addOnlineChatClear();
                 addOnlineChat(null, 'Hồ sơ mật đã được phát! Đọc kỹ rồi xác nhận sẵn sàng.', 'sys');
+                themeBgm.pause();
+                playOnlineCaseIntro();
             }
             else if (d.t === 'role') {
                 ONLINE.myRole = d.role; ONLINE.myWord = d.word;
@@ -4754,7 +5073,9 @@
             else if (d.t === 'undo') {
                 ONLINE.players = d.players.map((x) => ({ ...x }));
                 if (d.c4 && ONLINE.c4) Object.assign(ONLINE.c4, d.c4);
+                ONLINE.elimHistory = ONLINE.elimHistory.slice(0, -1);
                 addOnlineChat(null, 'Chủ phòng đã HOÀN TÁC lần bắt giữ gần nhất!', 'sys');
+                renderOnlineBoard();
                 onlineUpdateC4UI();
             }
             else if (d.t === 'victory') applyOnlineVictory(d);
@@ -4781,11 +5102,11 @@
 
         function applyOnlinePhase(d) {
             ONLINE.phase = d.phase;
+            ONLINE.speakerId = d.speaker ? d.speaker.id : null;
             if (!document.getElementById('online-game-screen').classList.contains('active')) switchScreen('online-game-screen');
             renderCaseIdentity();
             const label = document.getElementById('og-phase-label');
             const banner = document.getElementById('og-turn-banner');
-            const voteArea = document.getElementById('og-vote-area');
             renderHostControls(null);
             if (d.phase === 'describe') {
                 label.innerText = 'MIÊU TẢ';
@@ -4794,7 +5115,6 @@
                 const isMe = d.speaker.id === ONLINE.myId;
                 setInputRow(isMe ? 'Nhập 1 câu miêu tả Mật lệnh của bạn...' : 'Đang chờ ' + d.speaker.name + ' miêu tả...', isMe ? 'GỬI' : '');
                 ONLINE.inputMode = isMe ? 'describe' : 'off';
-                voteArea.style.display = 'none';
                 SFX.tick();
                 if (isMe) buzz(60);
             } else if (d.phase === 'discuss') {
@@ -4802,7 +5122,6 @@
                 banner.innerText = 'THẢO LUẬN! AI ĐANG DIỄN SÂU?';
                 setInputRow('Nhập tin nhắn thảo luận...', 'GỬI');
                 ONLINE.inputMode = 'chat';
-                voteArea.style.display = 'none';
                 if (ONLINE.isHost) renderHostControls([{ label: 'BỎ PHIẾU NGAY', fn: 'hostVoteNow' }]);
                 SFX.click();
             } else if (d.phase === 'vote') {
@@ -4810,11 +5129,10 @@
                 banner.innerText = 'BỎ PHIẾU BÍ MẬT!';
                 ONLINE.inputMode = 'off';
                 setInputRow('Chat tạm khóa khi bỏ phiếu.', '', true);
-                buildOnlineVoteGrid();
-                voteArea.style.display = 'block';
                 ONLINE.voted = false;
                 SFX.eliminate();
             }
+            renderOnlineBoard();
             startOnlineTimer(d.deadline);
             onlineUpdateC4UI();
         }
@@ -4855,34 +5173,81 @@
             if (ONLINE.phase !== 'vote' || ONLINE.voted) return;
             ONLINE.voted = true;
             SFX.click();
-            document.getElementById('og-vote-area').style.display = 'none';
             addOnlineChat(null, 'Bạn đã bỏ phiếu (bí mật).', 'sys');
+            renderOnlineBoard();
             if (ONLINE.isHost) { ONLINE.votes.set(ONLINE.myId, target); hostMaybeCloseVote(); }
             else if (ONLINE.hostConn) ONLINE.hostConn.send({ t: 'vote', target });
         }
 
-        function buildOnlineVoteGrid() {
-            const grid = document.getElementById('og-vote-grid');
+        function renderOnlineBoard() {
+            const grid = document.getElementById('og-suspect-grid');
             grid.innerHTML = '';
-            ONLINE.players.filter((p) => p.isAlive).forEach((p) => {
+            const voting = ONLINE.phase === 'vote';
+            ONLINE.players.forEach((p) => {
+                const isSpeaker = ONLINE.phase === 'describe' && ONLINE.speakerId === p.id && p.isAlive;
+                const rp = !p.isAlive ? getRolePresentation(p.role) : null;
                 const card = document.createElement('button');
                 card.type = 'button';
-                card.className = 'suspect-card';
+                card.className = `suspect-card${isSpeaker ? ' is-speaking' : ''}${p.isAlive ? '' : ` is-eliminated role-${p.role}`}`;
+                if (p.gone && p.isAlive) card.style.filter = 'grayscale(.7) brightness(.8)';
                 const pin = document.createElement('span'); pin.className = 'suspect-card__pin';
                 const portrait = document.createElement('canvas'); portrait.className = 'pixel-canvas suspect-card__portrait';
                 const name = document.createElement('span'); name.className = 'suspect-card__name';
-                name.innerText = p.id === ONLINE.myId ? p.name + ' (bạn)' : p.name;
-                const status = document.createElement('span'); status.className = 'suspect-card__status'; status.innerText = 'CHỌN ĐỂ BỎ PHIẾU';
-                card.append(pin, portrait, name, status);
-                card.onclick = () => sendOnlineVote(p.id);
+                name.innerText = p.id === ONLINE.myId ? p.name + ' (bạn)' : p.name + (p.gone && p.isAlive ? ' ⚠' : '');
+                const roleReveal = document.createElement('span'); roleReveal.className = 'suspect-card__role-reveal';
+                const status = document.createElement('span'); status.className = 'suspect-card__status';
+                if (p.isAlive) {
+                    roleReveal.innerText = 'DANH TÍNH CHƯA RÕ';
+                    if (!p.isAlive) status.innerText = '';
+                    else if (isSpeaker) status.innerText = 'ĐANG MIÊU TẢ';
+                    else if (voting) status.innerText = ONLINE.voted && p.id === ONLINE.myId ? 'BẠN ĐÃ BỎ PHIẾU' : 'CHƯA BỎ PHIẾU';
+                    else status.innerText = 'ĐANG ĐIỀU TRA';
+                    if (voting) {
+                        card.onclick = () => sendOnlineVote(p.id);
+                    }
+                } else {
+                    roleReveal.innerText = rp.label;
+                    status.innerText = p.isDefuser ? 'CHUYÊN GIA GỠ BOM ĐÃ HY SINH' : 'HỒ SƠ ĐÃ ĐÓNG';
+                    card.disabled = true;
+                }
+                card.append(pin, portrait, name, roleReveal, status);
                 grid.appendChild(card);
-                drawPixelArt(portrait, spriteSuspect, 4);
+                const revealedSprite = p.role === 'Dan' ? spriteDetective : p.role === 'GianDiep' ? spriteSpy : spriteKid;
+                drawPixelArt(portrait, p.isAlive ? spriteSuspect : revealedSprite, 4);
             });
+            renderOnlineSurvivors();
+            const note = document.getElementById('og-board-note');
+            if (voting) note.innerText = 'BỎ PHIẾU BÍ MẬT — chạm hồ sơ để bắt giữ, hoặc VỢNG.';
+            else if (ONLINE.phase === 'describe') note.innerText = 'Lượt miêu tả đang diễn ra — theo dõi bộ đàm bên dưới.';
+            else note.innerText = 'Chạm hồ sơ nghi phạm để phát lệnh bắt giữ.';
+            const extra = document.getElementById('og-vote-extra');
+            extra.style.display = voting ? 'block' : 'none';
         }
+
+        function renderOnlineSurvivors() {
+            const container = document.getElementById('og-survivors');
+            container.innerHTML = '';
+            let counter = 0;
+            const groups = [['Dan', spriteDetective, 'glow-detective'], ['GianDiep', spriteSpy, 'glow-spy'], ['SieuTrom', spriteKid, 'glow-kid']];
+            groups.forEach(([role, sprite, glow]) => {
+                const n = ONLINE.players.filter((p) => p.isAlive && p.role === role).length;
+                for (let i = 0; i < n; i++) {
+                    const cv = document.createElement('canvas');
+                    cv.id = 'og-surv-' + counter;
+                    cv.className = 'pixel-canvas anim-wave ' + glow;
+                    cv.style.animationDelay = (counter * 0.15) + 's';
+                    container.appendChild(cv);
+                    drawPixelArt(cv, sprite, 4);
+                    counter++;
+                }
+            });
+            if (counter === 0) container.innerHTML = '<p style="color:#888;">Không còn ai sống sót...</p>';
+        }
+
+        function buildOnlineVoteGrid() { renderOnlineBoard(); }
 
         function applyVoteResult(d) {
             ONLINE.phase = 'reveal-result';
-            document.getElementById('og-vote-area').style.display = 'none';
             ONLINE.inputMode = 'off';
             setInputRow('Chờ chủ phòng...', '', true);
             if (d.c4 && ONLINE.c4) Object.assign(ONLINE.c4, d.c4);
@@ -4891,6 +5256,7 @@
                 const p = onlineGetPlayer(id);
                 return (p ? p.name : '???') + ': ' + c;
             }).join(' • ') || 'Tất cả VỢNG';
+            renderOnlineBoard();
             if (d.eliminatedId) {
                 SFX.eliminate();
                 buzz([70, 40, 70]);
@@ -4898,6 +5264,10 @@
                 addOnlineChat(null, 'Kết quả phiếu: ' + tallyText, 'sys');
                 addOnlineChat(null, d.eliminatedName + ' bị bắt giữ! Thân phận: ' + rp.label, 'sys');
                 document.getElementById('og-turn-banner').innerHTML = d.eliminatedName + ' BỊ BẮT GIỮ — <b style="color:' + rp.color + '">' + rp.label + '</b> • CÒN SỐNG: ' + aliveN;
+                const sprite = d.eliminatedRole === 'Dan' ? spriteDetective : d.eliminatedRole === 'GianDiep' ? spriteSpy : spriteKid;
+                showModal('<div style="text-align:center;"><canvas id="ovr-mascot" class="pixel-canvas"></canvas><p style="font-size:22px; margin:10px 0 0;">Nghi phạm <b style="color:#fff">' + esc(d.eliminatedName) + '</b> đã bị khống chế!<br>Thân phận: <b style="color:' + rp.color + '; font-size:26px;">' + rp.label + '</b></p></div>', 'alert');
+                drawPixelArt('ovr-mascot', sprite, 9);
+                setTimeout(closeModal, 2600);
             } else {
                 addOnlineChat(null, 'Kết quả phiếu: ' + tallyText + ' — Không ai bị bắt!', 'sys');
                 document.getElementById('og-turn-banner').innerText = 'KHÔNG AI BỊ BẮT GIỮ (phiếu hòa / VỢNG) • CÒN SỐNG: ' + aliveN;
@@ -4966,22 +5336,35 @@
             closeDefuseModal();
             document.getElementById('bomb-container').style.display = 'none';
             const map = {
-                Dan: ['THÁM TỬ CHIẾN THẮNG', '#3498db'],
-                GianDiep: ['TỔ CHỨC ÁO ĐEN CHIẾN THẮNG', '#e76e55'],
-                SieuTromSurvive: ['SIÊU TRỘM CHIẾN THẮNG', '#209cee'],
-                SieuTromLatKeo: ['SIÊU TRỘM LẬT KÈO THẮNG', '#209cee'],
-                CoWin: ['THẾ LỰC NGẦM CÙNG CHIẾN THẮNG', '#e76e55'],
-                TimeOut: ['ÁO ĐEN THẮNG — BOM ĐÃ NỔ', '#e74c3c'],
-                DefusalFail: ['ÁO ĐEN THẮNG — CẮT SAI DÂY', '#e74c3c'],
-                DefusalWin: ['ĐÃ GỠ BOM THÀNH CÔNG!', '#27ae60']
+                Dan: ['THÁM TỬ CHIẾN THẮNG', '#3498db', 'dan'],
+                GianDiep: ['TỔ CHỨC ÁO ĐEN CHIẾN THẮNG', '#e76e55', 'spy'],
+                SieuTromSurvive: ['SIÊU TRỘM CHIẾN THẮNG', '#209cee', 'kid'],
+                SieuTromLatKeo: ['SIÊU TRỘM LẬT KÈO THẮNG', '#209cee', 'kid'],
+                CoWin: ['THẾ LỰC NGẦM CÙNG CHIẾN THẮNG', '#e76e55', 'spykid'],
+                TimeOut: ['ÁO ĐEN THẮNG — BOM ĐÃ NỔ', '#e74c3c', 'spy'],
+                DefusalFail: ['ÁO ĐEN THẮNG — CẮT SAI DÂY', '#e74c3c', 'spy'],
+                DefusalWin: ['ĐÃ GỠ BOM THÀNH CÔNG!', '#27ae60', 'dan']
             };
-            const info = map[d.winner] || ['KẾT THÚC CHUYÊN ÁN', '#ffffff'];
+            const info = map[d.winner] || ['KẾT THÚC CHUYÊN ÁN', '#ffffff', 'dan'];
             switchScreen('online-victory-screen');
             renderCaseIdentity();
             SFX.victory();
             buzz([90, 60, 90, 60, 180]);
+            if (musicEnabled) playBackgroundMusic();
             document.getElementById('ov-faction').innerHTML = '<b style="color:' + info[1] + '">' + info[0] + '</b>';
-            document.getElementById('ov-words').innerHTML = 'Mật lệnh Thám Tử: <b style="color:#fff">' + esc(d.words.civ) + '</b> • Mật lệnh Áo Đen: <b style="color:#fff">' + esc(d.words.spy) + '</b>';
+            const mascots = document.getElementById('ov-mascots');
+            mascots.innerHTML = '';
+            const mset = info[2] === 'spykid' ? ['spy', 'kid'] : [info[2]];
+            mset.forEach((m, i) => {
+                const cv = document.createElement('canvas');
+                cv.id = 'ov-mascot-' + i;
+                cv.className = 'pixel-canvas anim-wave ' + (m === 'dan' ? 'glow-detective' : m === 'spy' ? 'glow-spy' : 'glow-kid');
+                cv.style.animationDelay = (i * 0.15) + 's';
+                mascots.appendChild(cv);
+                drawPixelArt(cv, m === 'dan' ? spriteDetective : m === 'spy' ? spriteSpy : spriteKid, 6);
+            });
+            document.getElementById('ov-word-civ').innerText = d.words.civ || '???';
+            document.getElementById('ov-word-spy').innerText = d.words.spy || '???';
             const roles = document.getElementById('ov-roles');
             roles.innerHTML = '';
             d.roles.forEach((r) => {
@@ -4997,6 +5380,13 @@
                 row.append(s, b);
                 roles.appendChild(row);
             });
+            const hist = document.getElementById('ov-history');
+            hist.innerHTML = ONLINE.elimHistory.length
+                ? '<p style="color:#f7d51d; margin:0 0 8px;">DIỄN BIẾN BẮT GIỮ</p>' + ONLINE.elimHistory.map((h, i) => {
+                    const rp = getRolePresentation(h.role);
+                    return '<div>' + (i + 1) + '. ' + esc(h.name) + ' — <b style="color:' + rp.color + ';">' + rp.label + '</b></div>';
+                }).join('')
+                : '<p style="margin:0;">Chưa có nghi phạm nào bị bắt giữ.</p>';
             const pts = document.getElementById('ov-points');
             pts.innerHTML = '';
             const entries = Object.entries(d.points);
