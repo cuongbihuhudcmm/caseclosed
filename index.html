@@ -387,31 +387,41 @@
             .rule-file-no { display: none; }
         }
 
-        /* --- CUTSCENE MO MAN: 5 PHAN CANH (v2) --- */
-        #chase-screen { position: fixed; inset: 0; z-index: 10002; background: #07070d; display: none; overflow: hidden; cursor: pointer; }
+        /* --- CUTSCENE MO MAN: 6 PHAN CANH (v3) --- */
+        #chase-screen { position: fixed; inset: 0; z-index: 10002; background: #0b0f1e; display: none; overflow: hidden; cursor: pointer; }
         #chase-screen.active { display: block; }
         #chase-screen.cs-shake { animation: csShake .28s steps(3) 1; }
         @keyframes csShake { 0% { transform: translate(3px, 2px); } 33% { transform: translate(-3px, -2px); } 66% { transform: translate(2px, -1px); } 100% { transform: none; } }
         .cs-scene { position: absolute; inset: 0; display: none; }
         .cs-scene.active { display: block; }
+        #cs1 { background: linear-gradient(#0e1428 0%, #141c36 55%, #1b2340 100%); }
+        #cs2, #cs3 { background: linear-gradient(#0d1226, #171e3a); }
+        #cs4, #cs5 { background: linear-gradient(#0d1226, #151c36); }
+        .cs-skyline-jag { position: absolute; left: 0; right: 0; height: 42%;
+            background: linear-gradient(#2c3558, #1d2440);
+            clip-path: polygon(0 100%, 0 60%, 5% 60%, 5% 36%, 11% 36%, 11% 56%, 17% 56%, 17% 24%, 24% 24%, 24% 48%, 30% 48%, 30% 28%, 37% 28%, 37% 52%, 44% 52%, 44% 18%, 51% 18%, 51% 42%, 58% 42%, 58% 30%, 65% 30%, 65% 50%, 72% 50%, 72% 24%, 79% 24%, 79% 46%, 86% 46%, 86% 32%, 93% 32%, 93% 55%, 100% 55%, 100% 100%); }
+        .cs-windows { position: absolute; inset: 0; pointer-events: none;
+            background-image:
+                radial-gradient(rgba(255, 214, 130, .55) 1.6px, transparent 2.2px),
+                radial-gradient(rgba(150, 195, 255, .38) 1.6px, transparent 2.2px);
+            background-size: 27px 36px, 35px 48px;
+            background-position: 4px 6px, 17px 23px; }
         .cs-vignette { position: absolute; inset: 0; z-index: 42; pointer-events: none;
-            background: radial-gradient(ellipse at center, transparent 52%, rgba(0, 0, 0, .5) 100%); }
+            background: radial-gradient(ellipse at center, transparent 55%, rgba(0, 0, 0, .38) 100%); }
         .cs-bar { position: absolute; left: 0; right: 0; height: 6.5vh; background: #000; z-index: 45; }
         .cs-bar-t { top: 0; } .cs-bar-b { bottom: 0; }
         .cs-dip { position: absolute; inset: 0; background: #000; opacity: 0; pointer-events: none; z-index: 44; transition: opacity .13s; }
         .cs-dip.on { opacity: 1; }
-        .chase-skip { position: absolute; bottom: 1.6%; right: 4%; color: #5c5c66; font-size: 15px; letter-spacing: 2px; z-index: 50; }
+        .chase-skip { position: absolute; bottom: 1.6%; right: 4%; color: #767684; font-size: 15px; letter-spacing: 2px; z-index: 50; }
         .cs-moon { position: absolute; top: 9%; right: 9%; width: 80px; height: 80px; border-radius: 50%;
-            background: radial-gradient(circle at 35% 35%, #f3ecd2, #ddcfa0 60%, #c4b47f);
-            box-shadow: 0 0 36px 10px rgba(244, 236, 205, .18), inset -8px -6px 0 rgba(31, 28, 22, .16); }
+            background: radial-gradient(circle at 35% 35%, #f6efd4, #e2d4a4 60%, #c9b982);
+            box-shadow: 0 0 42px 12px rgba(244, 236, 205, .22), inset -8px -6px 0 rgba(31, 28, 22, .16); }
 
-        #cs1 { background: linear-gradient(#08080f 0%, #0b0b17 55%, #11111f 100%); }
-        .cs-ambient { position: absolute; inset: 0; background: radial-gradient(ellipse at 78% 18%, rgba(150, 165, 255, .07), transparent 55%); }
         .cs-lightning { position: absolute; inset: 0; background: #cdd6ff; opacity: 0; }
         #cs1.active .cs-lightning { animation: csLightning .85s steps(2) .15s 1; }
-        @keyframes csLightning { 0% { opacity: 0; } 18% { opacity: .5; } 32% { opacity: .06; } 48% { opacity: .38; } 100% { opacity: 0; } }
-        .cs-roof { position: absolute; left: 0; right: 0; bottom: 0; height: 24%; background: #16121e; border-top: 5px solid #292136; }
-        .cs-roofdoor { position: absolute; right: 12%; bottom: 24%; width: 54px; height: 84px; background: #221930; border: 4px solid #0d0a12; border-bottom: none; transform-origin: bottom left; }
+        @keyframes csLightning { 0% { opacity: 0; } 18% { opacity: .45; } 32% { opacity: .05; } 48% { opacity: .34; } 100% { opacity: 0; } }
+        .cs-roof { position: absolute; left: 0; right: 0; bottom: 0; height: 24%; background: #1b1726; border-top: 5px solid #322a44; }
+        .cs-roofdoor { position: absolute; right: 12%; bottom: 24%; width: 54px; height: 84px; background: #2a2038; border: 4px solid #120d1c; border-bottom: none; transform-origin: bottom left; }
         #cs1.active .cs-roofdoor { animation: csDoorBurst .55s steps(4) 1.8s forwards; }
         @keyframes csDoorBurst { to { transform: rotate(-78deg) translate(-30px, -8px); opacity: .75; } }
         .cs1-kaito { position: absolute; right: 34%; bottom: calc(24% + 6px); }
@@ -428,149 +438,190 @@
         #cs1.active .cs1-b3 { animation: csBlackIn .45s steps(4) 2.4s forwards; }
         @keyframes csBlackIn { to { transform: translateX(0); } }
 
-        #cs2 { background: linear-gradient(#08080f, #0d0d1a); }
         .cs2-black { position: absolute; left: 4%; }
-        .cs2-b1 { top: 40%; } .cs2-b2 { top: 44%; left: 1%; } .cs2-b3 { top: 37%; left: 8%; }
-        .cs-muzzle { position: absolute; left: 13%; top: 44%; width: 20px; height: 14px; background: rgba(255, 226, 122, .85); opacity: 0;
+        .cs2-b1 { top: 42%; } .cs2-b2 { top: 46%; left: 1%; } .cs2-b3 { top: 39%; left: 8%; }
+        .cs-muzzle { position: absolute; left: 13%; top: 46%; width: 20px; height: 14px; background: rgba(255, 226, 122, .85); opacity: 0;
             clip-path: polygon(0 40%, 100% 0, 70% 50%, 100% 100%, 0 60%); }
         #cs2.active .cs-muzzle { animation: csMuzzle 1.6s steps(2) 2; }
         @keyframes csMuzzle { 0%, 55% { opacity: 0; } 62%, 100% { opacity: 1; } }
-        .cs-bullet { position: absolute; left: 15%; top: 46%; width: 15px; height: 4px; background: rgba(247, 213, 29, .85);
+        .cs-bullet { position: absolute; left: 15%; top: 48%; width: 15px; height: 4px; background: rgba(247, 213, 29, .85);
             box-shadow: -8px 0 6px rgba(247, 213, 29, .35); opacity: 0; }
         #cs2.active .cs-bu1 { animation: csBullet .55s linear 3; }
         #cs2.active .cs-bu2 { animation: csBullet .55s linear .15s 3; }
         #cs2.active .cs-bu3 { animation: csBullet .55s linear .3s 3; }
-        @keyframes csBullet { 0% { opacity: .9; transform: translate(0, -6px); } 100% { opacity: .9; transform: translate(44vw, 28px); } }
-        .cs2-unit { position: absolute; left: 34%; top: 30%; }
-        #cs2.active .cs2-unit { animation: csGlide 1.5s steps(10) 1s forwards, csFall 1s steps(8) 2.6s forwards; }
-        @keyframes csGlide { to { transform: translate(26vw, 22vh) rotate(-10deg); } }
-        @keyframes csFall { from { transform: translate(26vw, 22vh) rotate(-10deg); } to { transform: translate(30vw, 66vh) rotate(24deg); } }
-        #cs2.active .cs2-unit canvas { animation: csFlip .5s steps(7) .5s forwards; }
-        @keyframes csFlip { 0% { transform: rotate(0) translateY(0); } 30% { transform: rotate(-140deg) translateY(-16px); } 100% { transform: rotate(-360deg) translateY(0); } }
-        .cs-glider { position: absolute; left: 50%; top: -34px; transform: translateX(-50%); width: 0; height: 0; opacity: 0;
-            border-left: 58px solid transparent; border-right: 58px solid transparent; border-bottom: 30px solid #ddd6c2;
+        @keyframes csBullet { 0% { opacity: .9; transform: translate(0, -6px); } 100% { opacity: .9; transform: translate(42vw, 26px); } }
+        .cs2-swing { position: absolute; left: 46%; top: 4%; transform-origin: top center; transform: rotate(30deg); }
+        .cs2-rope { position: absolute; left: 50%; top: 0; width: 3px; height: 210px; margin-left: -1px;
+            background: linear-gradient(#e8e2d0, #9a958a); transform: scaleY(0); transform-origin: top; }
+        #cs2.active .cs2-rope { animation: csRopeShoot .25s steps(3) .5s forwards, csRopeOut .2s steps(2) 2.6s forwards; }
+        @keyframes csRopeShoot { to { transform: scaleY(1); } }
+        @keyframes csRopeOut { to { opacity: 0; } }
+        .cs2-fly { position: absolute; top: 208px; left: 0; transform: translateX(-50%); }
+        #cs2.active .cs2-swing { animation: csSwing 1.8s ease-in-out .75s forwards; }
+        @keyframes csSwing { from { transform: rotate(30deg); } to { transform: rotate(-34deg); } }
+        #cs2.active .cs2-fly { animation: csRelease 1.9s steps(10) 2.75s forwards; }
+        @keyframes csRelease { 0% { transform: translateX(-50%) rotate(0); } 40% { transform: translate(9vw, -4vh) rotate(8deg); } 100% { transform: translate(26vw, 2vh) rotate(-8deg); } }
+        .cs-glider { position: absolute; left: 50%; top: -32px; transform: translateX(-50%); width: 0; height: 0; opacity: 0;
+            border-left: 54px solid transparent; border-right: 54px solid transparent; border-bottom: 28px solid #ddd6c2;
             filter: drop-shadow(2px 2px 0 rgba(0,0,0,.5)); }
-        #cs2.active .cs-glider { animation: csGliderIn .14s steps(2) .95s forwards; }
+        #cs2.active .cs-glider { animation: csGliderIn .14s steps(2) 2.7s forwards; }
+        #cs3 .cs-glider { opacity: 1; animation: none; }
         @keyframes csGliderIn { to { opacity: 1; } }
-        .cs-ball { position: absolute; right: -80px; top: 12%;
-            filter: drop-shadow(0 0 8px rgba(247, 213, 29, .75)) drop-shadow(0 0 18px rgba(247, 213, 29, .4)); }
-        .cs-ball::after { content: ''; position: absolute; right: 100%; top: 50%; width: 64px; height: 3px;
-            background: linear-gradient(90deg, transparent, rgba(247, 213, 29, .55)); }
-        #cs2.active .cs-ball { animation: csBallFly .5s linear 2s forwards; }
-        @keyframes csBallFly { to { transform: translate(-56vw, 33vh); } }
-        .cs-impact { position: absolute; left: 53%; top: 45%; width: 100px; height: 100px; border-radius: 50%; opacity: 0;
-            background: radial-gradient(circle, rgba(255, 228, 150, .8), rgba(255, 228, 150, 0) 68%);
-            transform: translate(-50%, -50%) scale(.3); }
-        #cs2.active .cs-impact { animation: csImpact .4s steps(4) 2.45s forwards; }
-        @keyframes csImpact { 0% { opacity: 1; transform: translate(-50%, -50%) scale(.3); } 100% { opacity: 0; transform: translate(-50%, -50%) scale(1.7); } }
-        .cs2-dan { position: absolute; right: 6%; bottom: 10%; opacity: 0; transform: scale(2); filter: drop-shadow(3px 3px 0 #1d6b9e); }
-        #cs2.active .cs2-dan { animation: csDanReveal .45s steps(3) 2.9s forwards; }
-        @keyframes csDanReveal { 0% { opacity: 0; transform: scale(2); } 60% { opacity: 1; } 100% { opacity: 1; transform: scale(1); } }
-        .cs-glint { position: absolute; right: 8.6%; bottom: 13.4%; width: 8px; height: 8px; background: #fff; opacity: 0; }
-        #cs2.active .cs-glint { animation: csGlint .3s steps(2) 3.3s 2; }
-        @keyframes csGlint { 0%, 100% { opacity: 0; } 50% { opacity: .95; } }
 
-        .cs-citylights { position: absolute; inset: 0 0 30% 0; opacity: .55;
+        .cs-street { position: absolute; left: 0; right: 0; bottom: 0; height: 16%; background: #2b3140; border-top: 5px solid #4a5266; overflow: hidden; }
+        .cs-street::after { content: ''; position: absolute; left: 0; right: 0; top: 40%; height: 4px;
+            background: repeating-linear-gradient(90deg, rgba(247, 213, 29, .55) 0 34px, transparent 34px 74px);
+            animation: csTrainScroll .5s linear infinite; }
+        .cs3-ride { position: absolute; bottom: calc(16% + 2px); left: -16%; }
+        #cs3.active .cs3-ride { animation: csRideIn .9s steps(8) .2s forwards, csKick .35s steps(3) 1.25s forwards; }
+        @keyframes csRideIn { to { left: 34%; } }
+        @keyframes csKick { to { transform: rotate(-16deg) translateX(14px); } }
+        .cs-skate { position: absolute; left: 50%; bottom: -10px; transform: translateX(-50%); width: 52px; height: 8px; background: #222; }
+        .cs-flame { position: absolute; left: 100%; top: -4px; width: 30px; height: 12px; background: linear-gradient(90deg, rgba(99, 194, 255, .85), rgba(33, 150, 243, .5));
+            filter: blur(1px); animation: csFlame .14s steps(2) infinite; }
+        @keyframes csFlame { 50% { transform: scaleX(.6) translateX(8px); } }
+        .cs3-ball-wrap { position: absolute; left: 54%; bottom: calc(16% + 10px); }
+        #cs3.active .cs3-ball-wrap { animation: csBallSoar 1.1s steps(11) 1.3s forwards; }
+        @keyframes csBallSoar { to { transform: translate(37vw, -48vh) scale(.4) rotate(720deg); } }
+        .cs3-ball-bob { filter: drop-shadow(0 0 8px rgba(247, 213, 29, .7)) drop-shadow(0 0 16px rgba(247, 213, 29, .35)); }
+        #cs3.active .cs3-ball-bob { animation: csBallBob .35s steps(3) infinite alternate; }
+        @keyframes csBallBob { from { transform: translateY(0); } to { transform: translateY(-12px); } }
+        .cs3-far { position: absolute; top: 10%; right: 4%; transform: scale(.55); opacity: 0; }
+        #cs3.active .cs3-far { animation: csFarIn .25s steps(3) 1.95s forwards; }
+        @keyframes csFarIn { to { opacity: .95; } }
+        .cs3-impact { left: auto; right: 9%; top: 15%; transform: none; }
+        #cs3.active .cs3-impact { animation: csImpact .4s steps(4) 2.35s forwards; }
+        .cs-impact { position: absolute; width: 100px; height: 100px; border-radius: 50%; opacity: 0;
+            background: radial-gradient(circle, rgba(255, 228, 150, .8), rgba(255, 228, 150, 0) 68%); }
+        @keyframes csImpact { 0% { opacity: 1; transform: scale(.3); } 100% { opacity: 0; transform: scale(1.7); } }
+        .cs3-fall { position: absolute; top: 12%; right: 8%; opacity: 0; }
+        #cs3.active .cs3-fall { animation: csFarFall 1.1s steps(9) 2.5s forwards; }
+        @keyframes csFarFall { 0% { opacity: 1; transform: translate(0, 0) rotate(0); } 100% { opacity: 1; transform: translate(7vw, 56vh) rotate(22deg); } }
+        .cs3-train { position: absolute; left: 0; right: 0; bottom: 0; height: 15%; background: #3a4557; border-top: 6px solid #97a3b4; opacity: 0; overflow: hidden; }
+        #cs3.active .cs3-train { animation: csTrainIn .4s steps(4) 2.8s forwards; }
+        @keyframes csTrainIn { to { opacity: 1; } }
+
+        .cs-citylights { position: absolute; inset: 0 0 30% 0; opacity: .5;
             background-image: radial-gradient(2px 2px at 40px 60px, #f7d51d 50%, transparent 51%),
                 radial-gradient(2px 2px at 160px 110px, #e76e55 50%, transparent 51%),
                 radial-gradient(3px 3px at 260px 40px, #f0e6c8 50%, transparent 51%),
                 radial-gradient(2px 2px at 340px 130px, #3498db 50%, transparent 51%);
             background-size: 400px 180px; }
-        #cs3.active .cs-citylights, #cs4.active .cs-citylights { animation: csCityScroll .3s linear infinite; }
+        #cs4.active .cs-citylights, #cs5.active .cs-citylights { animation: csCityScroll .3s linear infinite; }
         @keyframes csCityScroll { to { transform: translateX(-400px); } }
-        .cs-train { position: absolute; left: 0; right: 0; bottom: 0; height: 32%; background: #333d4c; border-top: 7px solid #828e9d; overflow: hidden; }
+        .cs-train { position: absolute; left: 0; right: 0; bottom: 0; height: 32%; background: #3a4557; border-top: 7px solid #97a3b4; overflow: hidden; }
         .cs-train-windows { position: absolute; inset: 12px 0;
-            background: repeating-linear-gradient(90deg, transparent 0 46px, rgba(205, 225, 255, .11) 46px 96px);
+            background: repeating-linear-gradient(90deg, transparent 0 46px, rgba(205, 225, 255, .13) 46px 96px);
             animation: csTrainScroll .55s linear infinite; }
         @keyframes csTrainScroll { to { transform: translateX(-142px); } }
         .cs-sign { position: absolute; bottom: 34%; width: 32px; height: 32px; background: #e8c447; border: 4px solid #a34d1d;
             transform: rotate(45deg); opacity: 0; z-index: 1; }
-        #cs3.active .cs-sg1 { animation: csSignSweep 1.2s linear infinite; }
-        #cs3.active .cs-sg2 { animation: csSignSweep 1.2s linear .4s infinite; }
-        #cs3.active .cs-sg3 { animation: csSignSweep 1.2s linear .8s infinite; }
+        #cs4.active .cs-sg1 { animation: csSignSweep 1.2s linear infinite; }
+        #cs4.active .cs-sg2 { animation: csSignSweep 1.2s linear .4s infinite; }
+        #cs4.active .cs-sg3 { animation: csSignSweep 1.2s linear .8s infinite; }
         @keyframes csSignSweep { 0% { opacity: .95; left: 106%; } 97% { opacity: .95; } 100% { opacity: 0; left: -12%; } }
-        .cs-dust { position: absolute; bottom: calc(32% + 4px); width: 12px; height: 12px; border-radius: 50%; background: rgba(160, 160, 175, .5); opacity: 0; }
-        #cs3.active .cs-du1 { left: 30%; animation: csDust .55s steps(4) infinite; }
-        #cs3.active .cs-du2 { left: 52%; animation: csDust .55s steps(4) .25s infinite; }
-        @keyframes csDust { 0% { opacity: .6; transform: translate(0, 0) scale(.5); } 100% { opacity: 0; transform: translate(-46px, -14px) scale(1.4); } }
-        .cs3-kaito { position: absolute; bottom: calc(32% + 4px); left: 56%; }
-        #cs3.active .cs3-kaito { animation: csRunBob .34s steps(3) infinite alternate; }
+        .cs-dust { position: absolute; bottom: calc(32% + 4px); width: 12px; height: 12px; border-radius: 50%; background: rgba(170, 170, 190, .5); opacity: 0; }
+        #cs4.active .cs-du1 { left: 30%; animation: csDust .55s steps(4) infinite; }
+        #cs4.active .cs-du2 { left: 52%; animation: csDust .55s steps(4) .25s infinite; }
+        @keyframes csDust { 0% { opacity: .55; transform: translate(0, 0) scale(.5); } 100% { opacity: 0; transform: translate(-46px, -14px) scale(1.4); } }
+        .cs4-kaito { position: absolute; bottom: calc(32% + 4px); left: 56%; }
+        #cs4.active .cs4-kaito { animation: csRunBob .34s steps(3) infinite alternate; }
         @keyframes csRunBob { from { transform: translateX(0) rotate(-2deg); } to { transform: translateX(-26px) rotate(2deg); } }
-        .cs3-dan-unit { position: absolute; bottom: calc(32% + 4px); left: 34%; }
-        #cs3.active .cs3-dan-unit { animation: csRunBob .34s steps(3) .1s infinite alternate; }
+        .cs4-dan-unit { position: absolute; bottom: calc(32% + 4px); left: 34%; }
+        #cs4.active .cs4-dan-unit { animation: csRunBob .34s steps(3) .1s infinite alternate; }
         .cs-skate { position: absolute; left: 50%; bottom: -10px; transform: translateX(-50%); width: 52px; height: 8px; background: #222; }
         .cs-flame { position: absolute; left: 100%; top: -4px; width: 30px; height: 12px; background: linear-gradient(90deg, rgba(99, 194, 255, .85), rgba(33, 150, 243, .5));
             filter: blur(1px); animation: csFlame .14s steps(2) infinite; }
         @keyframes csFlame { 50% { transform: scaleX(.6) translateX(8px); } }
 
-        #cs4 { background: #090910; }
-        .cs-searchlight { position: absolute; top: 17%; right: 9%; width: 150px; height: 300px; opacity: 0;
-            background: linear-gradient(rgba(255, 240, 190, .13), rgba(255, 240, 190, 0));
+        .cs-overpass { position: absolute; left: 0; bottom: 0; width: 60%; height: 13%; background: #2c3344; border-top: 5px solid #46506a;
+            background-image: repeating-linear-gradient(90deg, transparent 0 70px, rgba(0, 0, 0, .3) 70px 84px); }
+        .cs-car { position: absolute; bottom: 11.5%; left: -34%; width: 104px; height: 26px; background: #14141d;
+            border: 3px solid #000; border-radius: 8px 18px 4px 4px; }
+        #cs5.active .cs-car { animation: csCarIn 1s steps(9) .15s forwards; }
+        @keyframes csCarIn { to { left: 6%; } }
+        .cs-car-top { position: absolute; left: 18px; top: -16px; width: 50px; height: 17px; background: #1e1e2c;
+            border: 3px solid #000; border-bottom: none; border-radius: 6px 10px 0 0; }
+        .cs-wheel { position: absolute; bottom: -9px; width: 18px; height: 18px; background: #000; border: 3px solid #41414f; border-radius: 50%; }
+        .cs-w1 { left: 12px; } .cs-w2 { right: 16px; }
+        .cs-headlight { position: absolute; right: -16px; top: 5px; width: 18px; height: 6px; background: rgba(255, 240, 190, .7); }
+        .cs5-bg1 { position: absolute; left: 24px; top: -36px; }
+        .cs5-bg2 { position: absolute; left: 54px; top: -32px; }
+        .cs-m3 { left: 9%; top: 20%; } .cs-m4 { left: 12%; top: 18%; }
+        #cs5.active .cs-m3, #cs5.active .cs-m4 { animation: csMuzzle 1.6s steps(2) 3; }
+        .cs-dbullet { position: absolute; width: 14px; height: 4px; background: rgba(247, 213, 29, .85); opacity: 0;
+            box-shadow: -8px 0 5px rgba(247, 213, 29, .3); transform: rotate(-30deg); }
+        .cs-db1 { left: 11%; bottom: 26%; } .cs-db2 { left: 14%; bottom: 24%; }
+        #cs5.active .cs-db1 { animation: csDBullet .55s linear 1.2s 3; }
+        #cs5.active .cs-db2 { animation: csDBullet .55s linear 1.4s 3; }
+        @keyframes csDBullet { 0% { opacity: .9; } 100% { opacity: .9; transform: rotate(-30deg) translate(30vw, -40vh); } }
+        .cs-searchlight { position: absolute; top: 16%; right: 9%; width: 150px; height: 300px; opacity: 0;
+            background: linear-gradient(rgba(255, 240, 190, .12), rgba(255, 240, 190, 0));
             clip-path: polygon(46% 0, 54% 0, 100% 100%, 0 100%); transform: rotate(14deg); }
-        #cs4.active .cs-searchlight { animation: csSearchIn .8s steps(5) .9s forwards; }
+        #cs5.active .cs-searchlight { animation: csSearchIn .8s steps(5) 1s forwards; }
         @keyframes csSearchIn { to { opacity: 1; } }
-        .cs-rotor { position: absolute; top: 12%; right: 5%; width: 190px; height: 5px; background: rgba(170, 170, 187, .85); opacity: 0; }
-        #cs4.active .cs-rotor { opacity: 1; animation: csRotor .16s linear infinite; }
+        .cs-rotor { position: absolute; top: 11%; right: 5%; width: 190px; height: 5px; background: rgba(170, 170, 187, .85); opacity: 0; }
+        #cs5.active .cs-rotor { opacity: 1; animation: csRotor .16s linear infinite; }
         @keyframes csRotor { 0%, 100% { transform: scaleX(1); } 50% { transform: scaleX(.15); } }
-        .cs4-heli { position: absolute; top: 13%; right: -30%; }
-        #cs4.active .cs4-heli { animation: csHeliIn 1.1s steps(8) forwards; }
+        .cs5-heli { position: absolute; top: 12%; right: -30%; }
+        #cs5.active .cs5-heli { animation: csHeliIn 1.1s steps(8) .3s forwards; }
         @keyframes csHeliIn { to { right: 7%; } }
         .cs-vbullet { position: absolute; width: 4px; height: 15px; background: rgba(247, 213, 29, .85); opacity: 0;
             box-shadow: 0 -8px 5px rgba(247, 213, 29, .3); }
-        .cs-vb1 { top: 24%; right: 13%; } .cs-vb2 { top: 24%; right: 11%; } .cs-vb3 { top: 24%; right: 15%; }
-        #cs4.active .cs-vb1 { animation: csVBullet .32s linear 5; }
-        #cs4.active .cs-vb2 { animation: csVBullet .32s linear .11s 5; }
-        #cs4.active .cs-vb3 { animation: csVBullet .32s linear .22s 5; }
-        @keyframes csVBullet { 0% { opacity: .9; transform: translateY(0); } 100% { opacity: .9; transform: translateY(44vh); } }
+        .cs-vb1 { top: 22%; right: 13%; } .cs-vb2 { top: 22%; right: 11%; } .cs-vb3 { top: 22%; right: 15%; }
+        #cs5.active .cs-vb1 { animation: csVBullet .32s linear 2.2s 4; }
+        #cs5.active .cs-vb2 { animation: csVBullet .32s linear 2.31s 4; }
+        #cs5.active .cs-vb3 { animation: csVBullet .32s linear 2.42s 4; }
+        @keyframes csVBullet { 0% { opacity: .9; transform: translateY(0); } 100% { opacity: .9; transform: translateY(42vh); } }
+        .cs-m2 { left: auto; right: 12%; top: 20%; position: absolute; }
+        #cs5.active .cs-m2 { animation: csMuzzle 1.6s steps(2) 3; }
         .cs-spark { position: absolute; bottom: calc(32% + 2px); width: 10px; height: 10px; opacity: 0;
             background: radial-gradient(circle, #ffe27a 30%, transparent 70%); }
         .cs-sp1 { left: 20%; } .cs-sp2 { left: 66%; }
-        #cs4.active .cs-sp1 { animation: csSpark .5s steps(2) 1.4s 3; }
-        #cs4.active .cs-sp2 { animation: csSpark .5s steps(2) 1.9s 3; }
+        #cs5.active .cs-sp1 { animation: csSpark .5s steps(2) 2.4s 3; }
+        #cs5.active .cs-sp2 { animation: csSpark .5s steps(2) 2.9s 3; }
         @keyframes csSpark { 0%, 100% { opacity: 0; } 50% { opacity: .9; } }
-        .cs-muzzle2 { left: auto; right: 12%; top: 22%; position: absolute; }
-        #cs4.active .cs-muzzle2 { animation: csMuzzle 1.8s steps(2) 2; }
-        .cs4-kaito { position: absolute; bottom: calc(32% + 4px); left: 56%; }
-        #cs4.active .cs4-kaito { animation: csRunBob .34s steps(3) infinite alternate; }
-        .cs4-dan { position: absolute; bottom: calc(32% + 4px); left: 34%; }
-        #cs4.active .cs4-dan { animation: csRunBob .34s steps(3) .1s infinite alternate; }
+        .cs5-kaito { position: absolute; bottom: calc(32% + 4px); left: 56%; }
+        #cs5.active .cs5-kaito { animation: csRunBob .34s steps(3) infinite alternate; }
+        .cs5-dan { position: absolute; bottom: calc(32% + 4px); left: 34%; }
+        #cs5.active .cs5-dan { animation: csRunBob .34s steps(3) .1s infinite alternate; }
         .cs-smoke { position: absolute; left: 58%; bottom: calc(32% + 30px); width: 30px; height: 30px; border-radius: 50%;
             background: rgba(154, 154, 170, .65); opacity: 0; }
-        #cs4.active .cs-sm1 { animation: csSmoke .95s steps(5) 2.1s forwards; }
-        #cs4.active .cs-sm2 { animation: csSmoke .95s steps(5) 2.35s forwards; }
-        #cs4.active .cs-sm3 { animation: csSmoke .95s steps(5) 2.6s forwards; }
+        #cs5.active .cs-sm1 { animation: csSmoke .95s steps(5) 3s forwards; }
+        #cs5.active .cs-sm2 { animation: csSmoke .95s steps(5) 3.25s forwards; }
+        #cs5.active .cs-sm3 { animation: csSmoke .95s steps(5) 3.5s forwards; }
         @keyframes csSmoke { 0% { opacity: .7; transform: scale(.4); } 100% { opacity: 0; transform: scale(3) translateY(-30px); } }
         .cs-debris { position: absolute; left: 44%; bottom: calc(32% + 8px); width: 26px; height: 12px; background: #7d8794; border: 2px solid #4a525c; opacity: 0; }
-        #cs4.active .cs-debris { animation: csDebris .6s steps(7) 2.9s forwards; }
-        @keyframes csDebris { 0% { opacity: 1; transform: translate(0, 0) rotate(0); } 100% { opacity: 1; transform: translate(33vw, -45vh) rotate(320deg); } }
-        .cs-impact-heli { position: absolute; top: 15%; right: 9%; width: 110px; height: 110px; border-radius: 50%; opacity: 0;
+        #cs5.active .cs-debris { animation: csDebris .6s steps(7) 3.4s forwards; }
+        @keyframes csDebris { 0% { opacity: 1; transform: translate(0, 0) rotate(0); } 100% { opacity: 1; transform: translate(33vw, -44vh) rotate(320deg); } }
+        .cs-impact-heli { position: absolute; top: 14%; right: 9%; width: 110px; height: 110px; border-radius: 50%; opacity: 0;
             background: radial-gradient(circle, rgba(255, 200, 120, .8), rgba(255, 200, 120, 0) 68%);
             transform: translate(50%, 0) scale(.3); }
-        #cs4.active .cs-impact-heli { animation: csImpact .4s steps(4) 3.45s forwards; }
-        .cs-helismoke { position: absolute; top: 16%; right: 10%; width: 22px; height: 22px; border-radius: 50%; background: rgba(136, 136, 136, .6); opacity: 0; }
-        #cs4.active .cs-helismoke { animation: csSmoke 1.1s steps(5) 3.6s infinite; }
-        #cs4.active.cs-slowmo .cs-scene * { animation-play-state: paused !important; }
-        #cs4.cs-slowmo { transform: scale(1.06); filter: saturate(.45) brightness(.94); transition: transform .3s, filter .3s; }
+        #cs5.active .cs-impact-heli { animation: csImpact .4s steps(4) 3.95s forwards; }
+        .cs-helismoke { position: absolute; top: 15%; right: 10%; width: 22px; height: 22px; border-radius: 50%; background: rgba(136, 136, 136, .6); opacity: 0; }
+        #cs5.active .cs-helismoke { animation: csSmoke 1.1s steps(5) 4.1s infinite; }
+        #cs5.active.cs-slowmo .cs-scene * { animation-play-state: paused !important; }
+        #cs5.cs-slowmo { transform: scale(1.06); filter: saturate(.45) brightness(.94); transition: transform .3s, filter .3s; }
         .cs-tunnel { position: absolute; top: 0; bottom: 0; width: 0; background: #000; z-index: 20; }
         .cs-tunnel-l { left: 0; } .cs-tunnel-r { right: 0; }
-        #cs4.active .cs-tunnel-l { animation: csTunnel .6s steps(6) 4.2s forwards; }
-        #cs4.active .cs-tunnel-r { animation: csTunnel .6s steps(6) 4.2s forwards; }
+        #cs5.active .cs-tunnel-l { animation: csTunnel .5s steps(6) 4.9s forwards; }
+        #cs5.active .cs-tunnel-r { animation: csTunnel .5s steps(6) 4.9s forwards; }
         @keyframes csTunnel { to { width: 56%; } }
 
-        #cs5 { background: #000; }
+        #cs6 { background: #000; }
         .cs-mag { position: absolute; left: 50%; top: 44%; width: 150px; height: 150px; border: 14px solid rgba(232, 230, 224, .06);
             border-radius: 50%; transform: translate(-50%, -50%); }
         .cs-mag::after { content: ''; position: absolute; right: -46px; bottom: -46px; width: 60px; height: 14px;
             background: rgba(232, 230, 224, .06); transform: rotate(45deg); border-radius: 7px; }
         .cs-card { position: absolute; right: 22%; top: 30%; width: 74px; height: 106px; border: 3px solid rgba(232, 230, 224, .06);
             background: rgba(168, 39, 31, .05); transform: rotate(14deg); }
-        #cs5-particles { position: absolute; inset: 0; }
-        #cs5-particles span { position: absolute; left: 50%; top: 46%; width: 8px; height: 8px;
+        #cs6-particles { position: absolute; inset: 0; }
+        #cs6-particles span { position: absolute; left: 50%; top: 46%; width: 8px; height: 8px;
             animation: csParticle 1.15s steps(8) forwards; }
         @keyframes csParticle { from { transform: translate(var(--px), var(--py)); opacity: 1; } to { transform: translate(0, 0) scale(.3); opacity: .9; } }
         .cs-ring { position: absolute; left: 50%; top: 46%; width: 24px; height: 24px; border: 4px solid rgba(232, 230, 224, .65);
             border-radius: 50%; opacity: 0; transform: translate(-50%, -50%) scale(.2); }
-        #cs5 .cs-ring.show { animation: csRing .5s steps(5) forwards; }
+        #cs6 .cs-ring.show { animation: csRing .5s steps(5) forwards; }
         @keyframes csRing { from { opacity: .8; transform: translate(-50%, -50%) scale(.2); } to { opacity: 0; transform: translate(-50%, -50%) scale(10); } }
         .cs5-title { position: absolute; left: 0; right: 0; top: 40%; text-align: center; opacity: 0;
             font-size: clamp(42px, 8.6vw, 90px); letter-spacing: 10px; text-shadow: 4px 4px 0 #000, 7px 7px 0 rgba(0, 0, 0, .55); }
@@ -581,6 +632,7 @@
         .cs5-sub { position: absolute; left: 0; right: 0; top: 57%; text-align: center;
             color: #d8b83a; font-size: 25px; letter-spacing: 6px; opacity: 0; }
         .cs5-sub.show { opacity: 1; animation: blinkerAnim 1.1s steps(2) infinite; }
+
 
         /* --- CHON CHE DO --- */
         .mode-cards { display: flex; gap: 20px; justify-content: center; flex-wrap: wrap; max-width: 760px; margin: 36px auto 0; padding: 0 10px; }
@@ -918,10 +970,10 @@
     <!-- CẮT CẢNH MỞ MÀN: VỤ TRỘM DƯỚI TRĂNG -->
     <div id="chase-screen">
         <div class="cs-scene" id="cs1">
-            <div class="cs-ambient"></div>
+            <div class="cs-skyline-jag" style="bottom:24%;"><div class="cs-windows" style="opacity:.8;"></div></div>
+            
             <div class="cs-lightning"></div>
             <div class="cs-moon"></div>
-            <div class="city-skyline skyline-far" style="opacity:.45;"></div>
             <div class="cs-roof"></div>
             <div class="cs-roofdoor"></div>
             <canvas id="cs1-kaito" class="pixel-canvas cs1-kaito"></canvas>
@@ -931,7 +983,9 @@
             <canvas id="cs1-b3" class="pixel-canvas cs1-black cs1-b3"></canvas>
         </div>
         <div class="cs-scene" id="cs2">
-            <div class="cs-moon" style="top:6%; right:10%; width:60px; height:60px;"></div>
+            <div class="cs-skyline-jag"><div class="cs-windows" style="opacity:.8;"></div></div>
+            
+            <div class="cs-moon" style="top:7%; right:10%; width:64px; height:64px;"></div>
             <canvas id="cs2-b1" class="pixel-canvas cs2-black cs2-b1"></canvas>
             <canvas id="cs2-b2" class="pixel-canvas cs2-black cs2-b2"></canvas>
             <canvas id="cs2-b3" class="pixel-canvas cs2-black cs2-b3"></canvas>
@@ -939,16 +993,34 @@
             <div class="cs-bullet cs-bu1"></div>
             <div class="cs-bullet cs-bu2"></div>
             <div class="cs-bullet cs-bu3"></div>
-            <div class="cs2-unit" id="cs2-unit">
-                <div class="cs-glider"></div>
-                <canvas id="cs2-kaito" class="pixel-canvas"></canvas>
+            <div class="cs2-swing">
+                <div class="cs2-rope"></div>
+                <div class="cs2-fly">
+                    <div class="cs-glider"></div>
+                    <canvas id="cs2-kaito" class="pixel-canvas"></canvas>
+                </div>
             </div>
-            <div class="cs-ball" id="cs2-ball"><canvas id="cs2-ballc" class="pixel-canvas"></canvas></div>
-            <div class="cs-impact"></div>
-            <canvas id="cs2-dan" class="pixel-canvas cs2-dan"></canvas>
-            <div class="cs-glint"></div>
         </div>
         <div class="cs-scene" id="cs3">
+            <div class="cs-skyline-jag" style="height:34%;"><div class="cs-windows" style="opacity:.8;"></div></div>
+            
+            <div class="cs-street"></div>
+            <div class="cs3-ride">
+                <canvas id="cs3-conan" class="pixel-canvas"></canvas>
+                <div class="cs-skate"><div class="cs-flame"></div></div>
+            </div>
+            <div class="cs3-ball-wrap"><div class="cs3-ball-bob"><canvas id="cs3-ballc" class="pixel-canvas"></canvas></div></div>
+            <div class="cs3-far" id="cs3-far">
+                <div class="cs-glider"></div>
+                <canvas id="cs3-kaitofar" class="pixel-canvas"></canvas>
+            </div>
+            <div class="cs-impact cs3-impact"></div>
+            <div class="cs3-fall" id="cs3-fall"><canvas id="cs3-kaitofall" class="pixel-canvas"></canvas></div>
+            <div class="cs3-train" id="cs3-train"><div class="cs-train-windows"></div></div>
+        </div>
+        <div class="cs-scene" id="cs4">
+            <div class="cs-skyline-jag" style="height:36%;"><div class="cs-windows" style="opacity:.8;"></div></div>
+            
             <div class="cs-citylights"></div>
             <div class="cs-train"><div class="cs-train-windows"></div></div>
             <div class="cs-sign cs-sg1"></div>
@@ -956,26 +1028,41 @@
             <div class="cs-sign cs-sg3"></div>
             <div class="cs-dust cs-du1"></div>
             <div class="cs-dust cs-du2"></div>
-            <canvas id="cs3-kaito" class="pixel-canvas cs3-kaito"></canvas>
-            <div class="cs3-dan-unit">
-                <canvas id="cs3-dan" class="pixel-canvas"></canvas>
+            <canvas id="cs4-kaito" class="pixel-canvas cs4-kaito"></canvas>
+            <div class="cs4-dan-unit">
+                <canvas id="cs4-dan" class="pixel-canvas"></canvas>
                 <div class="cs-skate"><div class="cs-flame"></div></div>
             </div>
         </div>
-        <div class="cs-scene" id="cs4">
+        <div class="cs-scene" id="cs5">
+            <div class="cs-skyline-jag" style="height:30%;"><div class="cs-windows" style="opacity:.8;"></div></div>
+            
             <div class="cs-citylights"></div>
             <div class="cs-train"><div class="cs-train-windows"></div></div>
+            <div class="cs-overpass"></div>
+            <div class="cs-car">
+                <div class="cs-car-top"></div>
+                <canvas id="cs5-b1" class="pixel-canvas cs5-bg1"></canvas>
+                <canvas id="cs5-b2" class="pixel-canvas cs5-bg2"></canvas>
+                <div class="cs-wheel cs-w1"></div>
+                <div class="cs-wheel cs-w2"></div>
+                <div class="cs-headlight"></div>
+            </div>
+            <div class="cs-muzzle cs-m3"></div>
+            <div class="cs-muzzle cs-m4"></div>
+            <div class="cs-dbullet cs-db1"></div>
+            <div class="cs-dbullet cs-db2"></div>
             <div class="cs-searchlight"></div>
             <div class="cs-rotor"></div>
-            <canvas id="cs4-heli" class="pixel-canvas cs4-heli"></canvas>
+            <canvas id="cs5-heli" class="pixel-canvas cs5-heli"></canvas>
             <div class="cs-vbullet cs-vb1"></div>
             <div class="cs-vbullet cs-vb2"></div>
             <div class="cs-vbullet cs-vb3"></div>
-            <div class="cs-muzzle cs-muzzle2"></div>
+            <div class="cs-muzzle cs-m2"></div>
             <div class="cs-spark cs-sp1"></div>
             <div class="cs-spark cs-sp2"></div>
-            <canvas id="cs4-kaito" class="pixel-canvas cs4-kaito"></canvas>
-            <canvas id="cs4-dan" class="pixel-canvas cs4-dan"></canvas>
+            <canvas id="cs5-kaito" class="pixel-canvas cs5-kaito"></canvas>
+            <canvas id="cs5-dan" class="pixel-canvas cs5-dan"></canvas>
             <div class="cs-smoke cs-sm1"></div>
             <div class="cs-smoke cs-sm2"></div>
             <div class="cs-smoke cs-sm3"></div>
@@ -985,13 +1072,13 @@
             <div class="cs-tunnel cs-tunnel-l"></div>
             <div class="cs-tunnel cs-tunnel-r"></div>
         </div>
-        <div class="cs-scene" id="cs5">
+        <div class="cs-scene" id="cs6">
             <div class="cs-mag"></div>
             <div class="cs-card"></div>
-            <div id="cs5-particles"></div>
-            <div class="cs-ring" id="cs5-ring"></div>
-            <div class="cs5-title" id="cs5-title"><span class="t1">CASE</span><span class="t2">CLOSED</span></div>
-            <div class="cs5-sub blinker" id="cs5-sub">PRESS START</div>
+            <div id="cs6-particles"></div>
+            <div class="cs-ring" id="cs6-ring"></div>
+            <div class="cs5-title" id="cs6-title"><span class="t1">CASE</span><span class="t2">CLOSED</span></div>
+            <div class="cs5-sub blinker" id="cs6-sub">PRESS START</div>
         </div>
         <div class="cs-vignette"></div>
         <div class="cs-bar cs-bar-t"></div>
@@ -1388,7 +1475,7 @@
             }, 800); 
         }
 
-        let chaseDone = false;
+                let chaseDone = false;
         let chaseTimers = [];
         let chaseMusicInt = null;
         function cT(ms, fn) { chaseTimers.push(setTimeout(() => { if (!chaseDone) fn(); }, ms)); }
@@ -1409,6 +1496,9 @@
         function sfxGunshot() { playNoise(0.06, 0.35); playTone(190, 'square', 0.04, 0.18); }
         function sfxBoom(big) { playNoise(big ? 0.9 : 0.5, 0.55); playTone(55, 'sine', 0.6, 0.4); playTone(40, 'square', 0.5, 0.25); }
         function sfxTach() { playTone(920, 'square', 0.03, 0.16); }
+        function sfxWhoosh() { playNoise(0.3, 0.22); }
+        function sfxFwip() { playTone(520, 'sine', 0.12, 0.18); playTone(780, 'sine', 0.08, 0.1); }
+        function sfxKick() { playTone(150, 'square', 0.1, 0.25); playNoise(0.08, 0.3); }
         function startChaseMusic() {
             const notes = [110, 110, 131, 110, 98, 98, 147, 131];
             let i = 0;
@@ -1422,8 +1512,7 @@
 
         function showChaseIntro() {
             if (window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches) { finishChase(); return; }
-            const s = document.getElementById('chase-screen');
-            s.classList.add('active');
+            document.getElementById('chase-screen').classList.add('active');
 
             cT(0, () => {
                 chaseShowScene('cs1');
@@ -1438,57 +1527,69 @@
             cT(1900, () => { playNoise(0.25, 0.4); playTone(90, 'square', 0.2, 0.3); csShake(); });
             cT(2600, sfxGunshot);
 
-            cT(4400, () => {
+            cT(4200, () => {
                 chaseShowScene('cs2');
                 drawPixelArt('cs2-b1', spriteBlack, 5);
                 drawPixelArt('cs2-b2', spriteBlack, 5);
                 drawPixelArt('cs2-b3', spriteBlack, 5);
                 drawPixelArt('cs2-kaito', spriteKaito, 5);
-                drawPixelArt('cs2-ballc', spriteBall, 4);
-                drawPixelArt('cs2-dan', spriteDetective, 6);
             });
-            cT(4700, sfxGunshot);
-            cT(4830, sfxGunshot);
-            cT(4960, sfxGunshot);
-            cT(5090, sfxGunshot);
-            cT(5220, sfxGunshot);
-            cT(5600, () => playTone(700, 'sine', 0.15, 0.15));
-            cT(6150, () => { sfxBoom(false); csShake(); });
+            cT(4500, sfxGunshot);
+            cT(4650, sfxGunshot);
+            cT(4800, sfxGunshot);
+            cT(4700, sfxFwip);
+            cT(4950, () => { sfxWhoosh(); startChaseMusic(); });
+            cT(6950, sfxWhoosh);
 
-            cT(8600, () => {
+            cT(8800, () => {
                 chaseShowScene('cs3');
-                drawPixelArt('cs3-kaito', spriteKaito, 5);
-                drawPixelArt('cs3-dan', spriteDetective, 5);
-                startChaseMusic();
+                drawPixelArt('cs3-conan', spriteDetective, 5);
+                drawPixelArt('cs3-ballc', spriteBall, 4);
+                drawPixelArt('cs3-kaitofar', spriteKaito, 4);
+                drawPixelArt('cs3-kaitofall', spriteKaito, 4);
             });
+            cT(10050, sfxKick);
+            cT(10100, sfxWhoosh);
+            cT(11150, () => { playNoise(0.3, 0.35); playTone(70, 'sine', 0.35, 0.25); });
 
-            cT(12400, () => {
+            cT(13400, () => {
                 chaseShowScene('cs4');
-                drawPixelArt('cs4-heli', spriteHeli, 5);
                 drawPixelArt('cs4-kaito', spriteKaito, 5);
                 drawPixelArt('cs4-dan', spriteDetective, 5);
-                playTone(85, 'sawtooth', 0.9, 0.18);
-            });
-            cT(13700, sfxGunshot);
-            cT(13820, sfxGunshot);
-            cT(13940, sfxGunshot);
-            cT(14060, sfxGunshot);
-            cT(14180, sfxGunshot);
-            cT(14300, sfxGunshot);
-            cT(14420, sfxGunshot);
-            cT(15200, () => playTone(320, 'square', 0.12, 0.2));
-            cT(15800, () => { sfxBoom(false); csShake(); });
-            cT(16400, () => document.getElementById('cs4').classList.add('cs-slowmo'));
-            cT(17200, () => {
-                document.getElementById('cs4').classList.remove('cs-slowmo');
-                playTone(60, 'sine', 0.5, 0.3);
             });
 
-            cT(17800, () => {
-                stopChaseMusic();
+            cT(16800, () => {
                 chaseShowScene('cs5');
+                drawPixelArt('cs5-heli', spriteHeli, 5);
+                drawPixelArt('cs5-b1', spriteBlack, 4);
+                drawPixelArt('cs5-b2', spriteBlack, 4);
+                drawPixelArt('cs5-kaito', spriteKaito, 5);
+                drawPixelArt('cs5-dan', spriteDetective, 5);
+                playNoise(0.3, 0.3);
+            });
+            cT(17100, () => playTone(85, 'sawtooth', 0.9, 0.18));
+            cT(18100, sfxGunshot);
+            cT(18220, sfxGunshot);
+            cT(18340, sfxGunshot);
+            cT(18460, sfxGunshot);
+            cT(19000, sfxGunshot);
+            cT(19120, sfxGunshot);
+            cT(19240, sfxGunshot);
+            cT(19360, sfxGunshot);
+            cT(19480, sfxGunshot);
+            cT(20200, sfxKick);
+            cT(20750, () => { sfxBoom(false); csShake(); });
+            cT(21000, () => document.getElementById('cs5').classList.add('cs-slowmo'));
+            cT(21700, () => {
+                document.getElementById('cs5').classList.remove('cs-slowmo');
+                playNoise(0.4, 0.3);
+            });
+
+            cT(22200, () => {
+                stopChaseMusic();
+                chaseShowScene('cs6');
                 sfxBoom(true);
-                const box = document.getElementById('cs5-particles');
+                const box = document.getElementById('cs6-particles');
                 box.innerHTML = '';
                 const colors = ['#e8e6e0', '#a8271f', '#e8e6e0', '#c23b2e'];
                 for (let i = 0; i < 26; i++) {
@@ -1501,22 +1602,22 @@
                     box.appendChild(sp);
                 }
             });
-            cT(19000, () => {
-                document.getElementById('cs5-title').classList.add('show');
-                document.getElementById('cs5-ring').classList.add('show');
+            cT(23500, () => {
+                document.getElementById('cs6-title').classList.add('show');
+                document.getElementById('cs6-ring').classList.add('show');
                 csShake();
                 sfxTach(); setTimeout(sfxTach, 70); setTimeout(sfxTach, 140); setTimeout(sfxTach, 210);
             });
-            cT(20100, () => document.getElementById('cs5-sub').classList.add('show'));
+            cT(24700, () => document.getElementById('cs6-sub').classList.add('show'));
         }
 
         function jumpToTitleScene() {
             chaseTimers.forEach(clearTimeout);
             stopChaseMusic();
-            document.getElementById('cs4').classList.remove('cs-slowmo');
-            chaseShowScene('cs5');
+            document.getElementById('cs5').classList.remove('cs-slowmo');
+            chaseShowScene('cs6');
             sfxBoom(true);
-            const box = document.getElementById('cs5-particles');
+            const box = document.getElementById('cs6-particles');
             box.innerHTML = '';
             const colors = ['#e8e6e0', '#a8271f', '#e8e6e0', '#c23b2e'];
             for (let i = 0; i < 26; i++) {
@@ -1530,12 +1631,12 @@
             }
             setTimeout(() => {
                 if (chaseDone) return;
-                document.getElementById('cs5-title').classList.add('show');
-                document.getElementById('cs5-ring').classList.add('show');
+                document.getElementById('cs6-title').classList.add('show');
+                document.getElementById('cs6-ring').classList.add('show');
                 csShake();
                 sfxTach(); setTimeout(sfxTach, 70); setTimeout(sfxTach, 140); setTimeout(sfxTach, 210);
             }, 1100);
-            setTimeout(() => { if (!chaseDone) document.getElementById('cs5-sub').classList.add('show'); }, 2200);
+            setTimeout(() => { if (!chaseDone) document.getElementById('cs6-sub').classList.add('show'); }, 2200);
         }
 
         function finishChase() {
@@ -1549,7 +1650,7 @@
         }
         document.getElementById('chase-screen').addEventListener('click', () => {
             if (chaseDone) return;
-            if (document.getElementById('cs5').classList.contains('active')) finishChase();
+            if (document.getElementById('cs6').classList.contains('active')) finishChase();
             else jumpToTitleScene();
         });
 
@@ -4250,7 +4351,11 @@
         }
 
         function hostBroadcast(msg) { ONLINE.conns.forEach((c) => { if (c.open) c.send(msg); }); }
-        function hostSendTo(id, msg) { const c = ONLINE.conns.get(id); if (c && c.open) c.send(msg); }
+        function hostSendTo(id, msg) {
+            if (id === ONLINE.myId) { clientOnData(msg); return; }
+            const c = ONLINE.conns.get(id);
+            if (c && c.open) c.send(msg);
+        }
         function hostEmit(msg) { hostBroadcast(msg); clientOnData(msg); }
         function hostLater(ms, fn) { ONLINE.hostTimeouts.push(setTimeout(fn, ms)); }
         function hostClearTimers() { ONLINE.hostTimeouts.forEach(clearTimeout); ONLINE.hostTimeouts = []; }
