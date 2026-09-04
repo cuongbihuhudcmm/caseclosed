@@ -1,4 +1,4 @@
-const CACHE_NAME = 'caseclosed-shell-v6';
+const CACHE_NAME = 'caseclosed-shell-v8';
 const APP_SHELL = [
   './',
   './index.html',
@@ -7,11 +7,11 @@ const APP_SHELL = [
   './icon-192.png',
   './icon-512.png',
   './vendor/nes.min.css',
+  './vendor/peerjs.min.js',
   './fonts/vt323.css',
   './fonts/pxiKyp0ihIEF2isQFJXGdg.woff2',
   './fonts/pxiKyp0ihIEF2isRFJXGdg.woff2',
   './fonts/pxiKyp0ihIEF2isfFJU.woff2',
-  './THEME.mp3',
   './doorclose.mp3'
 ];
 

@@ -1,4 +1,5 @@
 <!DOCTYPE html>
+<!--DEPLOY_MARKER_V4_LIVE-->
 <html lang="vi">
 <head>
     <meta charset="UTF-8">
@@ -696,7 +697,8 @@
 
         /* --- CUT-IN ANIME: MAT + SUNG BAI + POV MONOCLE --- */
         .cs-cutin { position: absolute; inset: 0; z-index: 43; display: flex; align-items: center; justify-content: center;
-            opacity: 0; visibility: hidden; pointer-events: none; background: #07070d; overflow: hidden; }
+            opacity: 0; visibility: hidden; pointer-events: none;
+            background: radial-gradient(circle at 50% 50%, #12121c 0 34%, #07070d 62%); overflow: hidden; }
         .cs-cutin.show { visibility: visible; animation: cutinPop .9s steps(8) forwards; }
         @keyframes cutinPop { 0% { opacity: 0; transform: scale(1.28); } 12% { opacity: 1; } 24% { transform: scale(1); } 82% { opacity: 1; transform: scale(1); } 100% { opacity: 0; transform: scale(1.05); } }
         .anime-lines { position: absolute; inset: -24%;
@@ -704,25 +706,25 @@
             animation: linesSpin 2.6s linear infinite; }
         .anime-lines.rev { animation-direction: reverse; }
         @keyframes linesSpin { to { transform: rotate(360deg); } }
-        .monocle-ring { position: absolute; left: 50%; top: 50%; width: 200px; height: 200px;
-            transform: translate(-57%, -55%); border: 6px solid #dfe6ff; border-radius: 50%;
+        .monocle-ring { position: absolute; left: 50%; top: 50%; width: 208px; height: 208px;
+            transform: translate(calc(-50% - 12px), -50%); border: 6px solid #dfe6ff; border-radius: 50%;
             box-shadow: 0 0 20px rgba(190, 215, 255, .5), inset 0 0 16px rgba(190, 215, 255, .28); }
-        .eye-glint { position: absolute; left: -32%; top: 40%; width: 36%; height: 9%; opacity: 0;
+        .eye-glint { position: absolute; left: 22%; top: 43%; width: 20%; height: 9%; opacity: 0;
             background: linear-gradient(90deg, transparent, rgba(255, 255, 255, .95), transparent); transform: rotate(-24deg); }
         .cs-cutin.show .eye-glint { animation: eyeGlint .5s steps(4) .18s 2; }
-        @keyframes eyeGlint { 0% { opacity: 0; transform: rotate(-24deg) translateX(-60%); } 30% { opacity: .95; } 100% { opacity: 0; transform: rotate(-24deg) translateX(430%); } }
-        .eye-star { position: absolute; left: 50%; top: 50%; width: 26px; height: 26px; background: #fff; opacity: 0;
+        @keyframes eyeGlint { 0% { opacity: 0; transform: rotate(-24deg) translateX(-20%); } 30% { opacity: .95; } 100% { opacity: 0; transform: rotate(-24deg) translateX(200%); } }
+        .eye-star { position: absolute; left: calc(50% - 44px); top: calc(50% - 14px); width: 26px; height: 26px; background: #fff; opacity: 0;
             clip-path: polygon(50% 0, 62% 38%, 100% 50%, 62% 62%, 50% 100%, 38% 62%, 0 50%, 38% 38%); }
         .cs-cutin.show .eye-star { animation: starBlink .28s steps(2) .2s 3; }
         @keyframes starBlink { 0%, 100% { opacity: 0; transform: scale(.4) rotate(0); } 50% { opacity: 1; transform: scale(1.1) rotate(20deg); } }
         /* Bien the Áo đen — mat quyen rua do */
-        #cutin-eye.evil { background: #0d0507; }
+        #cutin-eye.evil { background: radial-gradient(circle at 50% 50%, #1c0a0e 0 34%, #0d0507 62%); }
         #cutin-eye.evil .monocle-ring { display: none; }
         #cutin-eye.evil .anime-lines { background: repeating-conic-gradient(from 0deg at 50% 50%, rgba(255, 60, 40, .13) 0deg 2.4deg, transparent 2.4deg 7.2deg); }
         #cutin-eye.evil .eye-star { background: #ff5340; }
 
         #cutin-gun .gun-wrap { position: absolute; right: 13%; bottom: 15%; transform: rotate(-24deg); }
-        .gun-flash { position: absolute; right: -54px; top: -16px; width: 92px; height: 62px; background: #ffe27a; opacity: 0;
+        .gun-flash { position: absolute; right: -50px; top: -14px; width: 92px; height: 62px; background: #ffe27a; opacity: 0;
             clip-path: polygon(0 50%, 28% 0, 34% 38%, 55% 8%, 58% 40%, 100% 30%, 66% 55%, 100% 78%, 58% 66%, 52% 100%, 36% 62%, 22% 88%); }
         #cutin-gun.show .gun-flash { animation: gunFlash .5s steps(2) .12s 2; }
         @keyframes gunFlash { 0%, 100% { opacity: 0; transform: scale(.5); } 50% { opacity: 1; transform: scale(1); } }
@@ -730,6 +732,20 @@
         #cutin-gun.show .cutin-card.cc1 { animation: ccFly .55s steps(6) .2s forwards; }
         #cutin-gun.show .cutin-card.cc2 { animation: ccFly .55s steps(6) .34s forwards; }
         @keyframes ccFly { 0% { opacity: 1; transform: translate(0, 0) rotate(0); } 100% { opacity: 1; transform: translate(-48vw, -30vh) rotate(-560deg); } }
+
+        /* Calling card cua Kid — "I WILL STEAL YOUR HEART TONIGHT" */
+        .calling-card { position: absolute; left: 31%; top: 22%; width: 250px; padding: 13px 15px 11px; background: #f5f2e8;
+            color: #17130e; border: 3px solid #17130e; box-shadow: 6px 6px 0 rgba(0, 0, 0, .5); transform: rotate(-7deg);
+            opacity: 0; pointer-events: none; }
+        #cutin-gun.show .calling-card { animation: ccCardPop 1.05s steps(7) .28s forwards; }
+        @keyframes ccCardPop { 0% { opacity: 0; transform: rotate(-7deg) translate(70px, 130px) scale(.35); } 16% { opacity: 1; transform: rotate(-7deg) translate(0, 0) scale(1.08); } 30% { opacity: 1; transform: rotate(-7deg) scale(1); } 76% { opacity: 1; transform: rotate(-7deg) scale(1); } 100% { opacity: 0; transform: rotate(-18deg) translate(-42vw, -28vh) scale(.92); } }
+        .calling-card .cc-text { font-size: 22px; line-height: 1.2; letter-spacing: 1px; }
+        .calling-card .cc-sign { display: flex; align-items: center; margin-top: 9px; font-size: 19px; letter-spacing: 2px; }
+        .cc-heart { display: inline-block; position: relative; width: 15px; height: 14px; margin-right: 7px; }
+        .cc-heart::before, .cc-heart::after { content: ""; position: absolute; top: 0; width: 9px; height: 13px; border-radius: 9px 9px 0 0; background: #17130e; }
+        .cc-heart::before { left: 8px; transform: rotate(-45deg); transform-origin: 0 100%; }
+        .cc-heart::after { left: -2px; transform: rotate(45deg); transform-origin: 100% 100%; }
+        .calling-card canvas { position: absolute; right: 6px; bottom: 6px; }
 
         /* POV thu nhat qua monocle cua Kid */
         .cs-pov { position: absolute; inset: 0; z-index: 43; opacity: 0; visibility: hidden; pointer-events: none;
@@ -749,9 +765,9 @@
         .pov-streaks i:nth-child(4) { top: 64%; width: 120px; animation-delay: .05s; animation-duration: .44s; }
         .pov-streaks i:nth-child(5) { top: 76%; animation-delay: .3s; }
         @keyframes povStreak { to { transform: translateX(-130vw); } }
-        .pov-glove { position: absolute; bottom: -4px; }
-        .pov-glove.l { left: 9%; transform: rotate(16deg); }
-        .pov-glove.r { right: 9%; transform: scaleX(-1) rotate(16deg); }
+        .pov-glove { position: absolute; bottom: 16%; }
+        .pov-glove.l { left: 24%; transform: rotate(16deg); }
+        .pov-glove.r { right: 24%; transform: scaleX(-1) rotate(16deg); }
         .cs-pov.show .pov-glove canvas { animation: gloveGrip .4s steps(2) infinite alternate; }
         @keyframes gloveGrip { to { transform: translateY(-7px); } }
         .pov-ring { position: absolute; left: 50%; top: 46%; width: 118vmin; height: 118vmin;
@@ -839,6 +855,122 @@
         #og-host-controls { max-width: 780px; margin: 12px auto 0; padding: 0 8px; justify-content: center; }
         #og-host-controls:empty { display: none !important; }
         .online-victory-list { max-width: 560px; margin: 10px auto; text-align: left; }
+
+        /* --- CHE DO CONTRA --- */
+        #contra-title-screen { position: relative; overflow: hidden; background: radial-gradient(1200px 600px at 50% -10%, #1a1030 0%, #0b0b16 55%, #07070d 100%); min-height: 100dvh; }
+        .contra-stars { position: absolute; inset: 0; z-index: 1; pointer-events: none; opacity: .8;
+            background-image: radial-gradient(1.6px 1.6px at 40px 60px, #fff 50%, transparent 51%),
+                radial-gradient(1.6px 1.6px at 140px 160px, #f7d51d 50%, transparent 51%),
+                radial-gradient(2px 2px at 260px 90px, #e76e55 50%, transparent 51%),
+                radial-gradient(1.4px 1.4px at 340px 200px, #3498db 50%, transparent 51%);
+            background-size: 420px 260px; animation: contraStarScroll 6s linear infinite; }
+        @keyframes contraStarScroll { to { background-position: -420px 0; } }
+        .contra-logo { margin: 6px 0 0; font-size: clamp(64px, 15vw, 130px); line-height: .95; letter-spacing: 10px; color: #ff2d1a;
+            text-shadow: 0 0 22px rgba(255, 45, 26, .55), 4px 4px 0 #7a0f06, 8px 8px 0 #000; -webkit-text-stroke: 2px #ffd9c9; }
+        .contra-sub { margin: 4px 0 0; color: #f7d51d; font-size: clamp(18px, 4vw, 26px); letter-spacing: 8px; text-shadow: 3px 3px 0 #000; }
+        .contra-chars { display: flex; gap: 18px; justify-content: center; flex-wrap: wrap; max-width: 860px; margin: 30px auto 0; padding: 0 12px; }
+        .contra-char { flex: 1; min-width: 220px; max-width: 270px; background: #101018; border: 4px solid #fff; box-shadow: 6px 6px 0 #000;
+            padding: 18px 12px 14px; cursor: pointer; display: flex; flex-direction: column; align-items: center; gap: 8px; color: #fff;
+            font-family: 'VT323', monospace; font-size: 19px; transition: transform .12s steps(2), border-color .12s steps(2); }
+        .contra-char:hover { transform: translateY(-5px); border-color: #f7d51d; }
+        .contra-char:active { transform: translateY(1px); }
+        .contra-char.p1-picked { border-color: #3498db; box-shadow: 6px 6px 0 #000, inset 0 0 0 3px #3498db; }
+        .contra-char.p2-picked { border-color: #e76e55; box-shadow: 6px 6px 0 #000, inset 0 0 0 3px #e76e55; }
+        .contra-char b { font-size: 22px; letter-spacing: 1px; text-shadow: 2px 2px 0 #000; }
+        .cc-stats { display: flex; align-items: center; gap: 8px; width: 100%; justify-content: space-between; }
+        .cc-stats span { color: #95a5a6; font-size: 15px; letter-spacing: 1px; }
+        .cc-hp { display: inline-flex; gap: 3px; }
+        .cc-hp b { width: 12px; height: 11px; background: #e74c3c;
+            clip-path: polygon(50% 100%, 0 45%, 0 15%, 22% 0, 50% 18%, 78% 0, 100% 15%, 100% 45%); }
+        .cc-bar { display: inline-flex; gap: 3px; }
+        .cc-bar b { width: 12px; height: 11px; background: #2a2a35; border: 1px solid #555; }
+        .cc-bar b.on { background: #f7d51d; border-color: #f7d51d; }
+        .cc-desc { color: #8a8a99; font-size: 15px; text-align: center; line-height: 1.3; min-height: 38px; }
+        .cc-perk { color: #f7d51d; font-size: 15px; text-align: center; letter-spacing: .5px; }
+        .cg-hud { display: flex; align-items: center; gap: 14px; max-width: 960px; margin: 14px auto 6px; padding: 0 10px; }
+        .cg-p { font-size: 16px; white-space: nowrap; flex: 1; }
+        .cg-p .cg-hearts { display: inline-flex; gap: 2px; vertical-align: middle; }
+        .cg-p .cg-hearts i { width: 11px; height: 10px; background: #e74c3c; display: inline-block;
+            clip-path: polygon(50% 100%, 0 45%, 0 15%, 22% 0, 50% 18%, 78% 0, 100% 15%, 100% 45%); }
+        .cg-wpn { color: #f7d51d; font-style: normal; }
+        .cg-mid { flex: 1.4; text-align: center; color: #ddd; font-size: 15px; line-height: 1.3; }
+        .cg-mid b { color: #f7d51d; font-size: 18px; }
+        .cg-progress { height: 12px; background: #111; border: 2px solid #555; max-width: 940px; margin: 4px auto 0; }
+        #cg-fill { display: block; height: 100%; width: 0%; background: #f7d51d; }
+        .cg-score { color: #fff; font-size: 18px; letter-spacing: 1px; }
+        .cg-score b { color: #f7d51d; }
+        #cg-banner { position: absolute; left: 0; right: 0; top: 36%; text-align: center; font-size: 34px; color: #f7d51d;
+            letter-spacing: 5px; text-shadow: 3px 3px 0 #000, 6px 6px 0 rgba(0,0,0,.5); opacity: 0; pointer-events: none; z-index: 20; }
+        #cg-banner.show { animation: cgBanner 2.2s steps(8) forwards; }
+        @keyframes cgBanner { 0% { opacity: 0; transform: scale(1.7); } 12% { opacity: 1; transform: scale(1); } 80% { opacity: 1; } 100% { opacity: 0; } }
+        #cg-bosswrap { max-width: 960px; height: 10px; margin: 4px auto 0; padding: 0 10px; }
+        #cg-bossfill { display: block; height: 100%; background: #c23b2e; box-shadow: 0 0 8px rgba(194, 59, 46, .8); }
+        .cg-stage { position: relative; max-width: 960px; margin: 0 auto; padding: 0 10px; }
+        #contra-canvas { display: block; width: 100%; image-rendering: pixelated; image-rendering: crisp-edges;
+            border: 4px solid #fff; box-shadow: 6px 6px 0 #000; background: #0b0f1e; }
+        #cg-pause { position: absolute; top: 12px; right: 20px; z-index: 16; width: 38px; height: 34px; font-size: 15px;
+            color: #fff; background: rgba(10,10,18,.72); border: 2px solid rgba(255,255,255,.55); cursor: pointer; }
+        #cg-pause:hover { border-color: #f7d51d; color: #f7d51d; }
+        #cg-overlay { position: absolute; inset: 0; background: rgba(5, 5, 10, .92); display: flex; flex-direction: column;
+            align-items: center; justify-content: center; gap: 12px; text-align: center; z-index: 18; padding: 18px; overflow-y: auto; }
+        #cg-overlay h3 { margin: 0; font-size: 44px; letter-spacing: 6px; text-shadow: 4px 4px 0 #000; color: #ff2d1a; }
+        #cg-overlay p { margin: 0; color: #f7d51d; font-size: 24px; }
+        #cg-overlay.is-win h3 { color: #f7d51d; }
+        .cg-result-stats { display: grid; grid-template-columns: repeat(3, minmax(82px, 1fr)); gap: 8px; width: min(440px, 92vw); }
+        .cg-result-stats span { padding: 7px 5px; border: 2px solid #555; background: #11121a; color: #aaa; font-size: 14px; }
+        .cg-result-stats b { display: block; color: #fff; font-size: 22px; margin-top: 2px; }
+        #cg-bosswrap { max-width: 940px; height: 12px; margin: 5px auto 0; padding: 0 10px 0 36px; position: relative;
+            border: 2px solid #555; background: #111; box-sizing: content-box; }
+        .cg-bosslabel { position: absolute; left: 10px; top: -3px; color: #ff3b5c; font-size: 12px; letter-spacing: 2px;
+            text-shadow: 1px 1px 0 #000; z-index: 2; }
+        #cg-bossfill { display: block; height: 100%; background: #c23b2e; box-shadow: 0 0 8px rgba(194, 59, 46, .8); }
+        .cg-face { display: inline-block; width: 11px; height: 11px; border: 2px solid #fff; box-shadow: 1px 1px 0 #000; vertical-align: middle; margin-right: 4px; }
+        .cg-lv { color: #fff; font-size: 15px; margin: 0 2px; }
+        .cg-wpn { display: inline-block; width: 18px; height: 16px; line-height: 16px; text-align: center; color: #0b0b12;
+            font-style: normal; font-weight: bold; font-size: 13px; border: 2px solid #fff; box-shadow: 1px 1px 0 #000; vertical-align: middle; }
+        /* Nút cảm ứng — overlay trên canvas, chỉ hiện trên thiết bị cảm ứng */
+        .contra-touch { position: absolute; left: 0; right: 0; bottom: 0; display: none;
+            justify-content: space-between; align-items: flex-end; padding: 0 12px 12px; pointer-events: none; z-index: 15; }
+        @media (hover: none) and (pointer: coarse) { .contra-touch { display: flex; } }
+        .ct-pad { display: grid; grid-template: repeat(3, 48px) / repeat(3, 48px); gap: 3px; pointer-events: auto; }
+        .ct-up { grid-area: 1 / 2; } .ct-down { grid-area: 3 / 2; }
+        .ct-left { grid-area: 2 / 1; } .ct-right { grid-area: 2 / 3; }
+        .ct-actions { display: flex; gap: 12px; align-items: flex-end; pointer-events: auto; }
+        .ct-btn { width: 56px; height: 56px; font-family: 'VT323', monospace; font-size: 20px; color: #fff; background: rgba(27, 27, 38, .62);
+            border: 3px solid rgba(255, 255, 255, .75); box-shadow: 0 4px 0 rgba(0,0,0,.55); cursor: pointer;
+            touch-action: none; user-select: none; -webkit-user-select: none; border-radius: 10px; backdrop-filter: blur(2px); }
+        .ct-btn:active, .ct-btn.is-held { transform: translateY(3px); box-shadow: 0 1px 0 rgba(0,0,0,.55); border-color: #f7d51d; color: #f7d51d; }
+        .ct-jump, .ct-fire { width: 76px; height: 76px; border-radius: 50%; font-size: 17px; }
+        .ct-jump { background: rgba(20, 65, 138, .66); }
+        .ct-fire { background: rgba(138, 30, 20, .66); width: 88px; height: 88px; font-size: 19px; }
+        @media screen and (max-width: 560px) { .contra-logo { letter-spacing: 5px; } .ct-pad { grid-template: repeat(3, 44px) / repeat(3, 44px); } .ct-btn { width: 44px; height: 44px; font-size: 17px; } .ct-jump, .ct-fire { width: 62px; height: 62px; } .ct-fire { width: 74px; height: 74px; } }
+
+        /* --- CONTRA FULLSCREEN --- */
+        body.contra-full { overflow: hidden; }
+        #contra-game-screen { background: #05050a; }
+        #contra-game-screen.active { position: fixed; inset: 0; z-index: 10010; }
+        .cg-stage { position: absolute; inset: 0; max-width: none; margin: 0; padding: 0; }
+        #contra-canvas { position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%);
+            image-rendering: pixelated; image-rendering: crisp-edges; border: none; box-shadow: none; border-radius: 0; }
+        #contra-game-screen .cg-hud { position: absolute; top: 0; left: 0; right: 0; z-index: 16; margin: 0;
+            padding: 8px 14px 16px; background: linear-gradient(rgba(5,5,10,.85), rgba(5,5,10,0)); }
+        #contra-game-screen .cg-progress { position: absolute; top: 42px; left: 50%; transform: translateX(-50%);
+            width: min(56vw, 500px); margin: 0; z-index: 16; }
+        #contra-game-screen #cg-bosswrap { position: absolute; top: 60px; left: 50%; transform: translateX(-50%);
+            width: min(56vw, 500px); margin: 0; z-index: 16; }
+        #contra-game-screen #cg-banner { top: 24%; font-size: clamp(22px, 4.6vw, 40px); }
+        #cg-banner .cg-bannersub { display: block; font-size: 15px; color: #ddd; letter-spacing: 3px; margin-top: 8px; text-shadow: 2px 2px 0 #000; }
+        #cg-pause { top: max(8px, env(safe-area-inset-top)); right: max(10px, env(safe-area-inset-right)); }
+        #cg-exit { position: absolute; top: 8px; right: 58px; z-index: 17; padding: 4px 12px; font-size: 14px;
+            background: rgba(10,10,18,.72); border-color: rgba(255,255,255,.5); }
+        #cg-hint { position: absolute; bottom: 4px; left: 0; right: 0; text-align: center; color: rgba(255,255,255,.38);
+            font-size: 13px; z-index: 14; margin: 0; pointer-events: none; }
+        #cg-rotate { display: none; position: absolute; top: 96px; left: 0; right: 0; text-align: center; z-index: 17;
+            color: #f7d51d; font-size: 16px; letter-spacing: 2px; text-shadow: 2px 2px 0 #000; pointer-events: none; }
+        @media (hover: none) and (pointer: coarse) { #cg-hint { display: none; } #cg-exit { top: max(56px, calc(env(safe-area-inset-top) + 48px)); right: max(10px, env(safe-area-inset-right)); } .contra-touch { padding-bottom: max(10px, env(safe-area-inset-bottom)); } }
+        @media (max-height: 420px) { #cg-overlay { gap: 7px; } #cg-overlay h3 { font-size: 30px; } #cg-overlay p { font-size: 18px; } .cg-result-stats span { padding: 4px; } .cg-result-stats b { font-size: 18px; } }
+        @media (prefers-reduced-motion: reduce) { .contra-stars { animation: none; } #cg-banner.show { animation-duration: .01ms; } }
+
     </style>
 </head>
 <body>
@@ -1261,6 +1393,35 @@
             <div class="cs5-sub blinker" id="cs6-sub">PRESS START</div>
          </div>
         </div>
+        <div class="cs-cutin" id="cutin-eye">
+            <div class="anime-lines"></div>
+            <canvas id="cutin-eye-cv" class="pixel-canvas"></canvas>
+            <div class="monocle-ring"></div>
+            <div class="eye-glint"></div>
+            <div class="eye-star"></div>
+        </div>
+        <div class="cs-cutin" id="cutin-gun">
+            <div class="anime-lines rev"></div>
+            <div class="gun-wrap">
+                <canvas id="cutin-gun-cv" class="pixel-canvas"></canvas>
+                <div class="gun-flash"></div>
+            </div>
+            <canvas id="cutin-cc1" class="pixel-canvas cutin-card cc1"></canvas>
+            <canvas id="cutin-cc2" class="pixel-canvas cutin-card cc2"></canvas>
+            <div class="calling-card">
+                <div class="cc-text">I WILL STEAL YOUR<br>HEART TONIGHT.</div>
+                <div class="cc-sign"><span class="cc-heart"></span>KAITO KID</div>
+                <canvas id="cc-kid-face" class="pixel-canvas"></canvas>
+            </div>
+        </div>
+        <div class="cs-pov" id="cs2-pov">
+            <div class="pov-ground"></div>
+            <div class="pov-streaks"><i></i><i></i><i></i><i></i><i></i></div>
+            <div class="pov-glove l"><canvas id="pov-gl" class="pixel-canvas"></canvas></div>
+            <div class="pov-glove r"><canvas id="pov-gr" class="pixel-canvas"></canvas></div>
+            <div class="pov-ring"></div>
+            <div class="pov-mask"></div>
+        </div>
         <div class="cs-vignette"></div>
         <div class="cs-bar cs-bar-t"></div>
         <div class="cs-bar cs-bar-b"></div>
@@ -1285,7 +1446,113 @@
                 <b>CHƠI ONLINE</b>
                 <span>Mỗi người 1 thiết bị, chơi từ xa qua phòng riêng.</span>
             </button>
+            <button type="button" class="mode-card" onclick="enterContra()">
+                <canvas id="mode-contra" class="pixel-canvas glow-kid"></canvas>
+                <b>CHẾ ĐỘ CONTRA</b>
+                <span>Chọn linh vật, cầm súng diệt quân Áo Đen phản loạn!</span>
+            </button>
         </div>
+    </div>
+
+    <!-- CONTRA: TUA DE ARCADE -->
+    <div id="contra-title-screen" class="screen">
+        <div class="contra-stars"></div>
+        <div style="text-align:center; margin-top:6vh; position:relative; z-index:2;">
+            <p style="color:#95a5a6; letter-spacing:4px; margin:0;" class="text-pop">BEESTUDIO presents</p>
+            <h1 class="contra-logo">CONTRA</h1>
+            <p class="contra-sub">DIỆT ÁO ĐEN PHẢN LOẠN</p>
+            <div style="display:flex; justify-content:center; gap:22px; margin:26px 0 8px;">
+                <canvas id="ct-dan" class="pixel-canvas anim-bounce glow-detective"></canvas>
+                <canvas id="ct-spy" class="pixel-canvas anim-bounce glow-spy" style="animation-delay:.12s;"></canvas>
+                <canvas id="ct-kid" class="pixel-canvas anim-bounce glow-kid" style="animation-delay:.24s;"></canvas>
+            </div>
+            <p id="contra-hi" style="color:#f7d51d; letter-spacing:3px; margin:6px 0;" class="text-pop">HI-SCORE 0</p>
+            <button type="button" class="nes-btn is-error" style="font-size:22px; padding:10px 34px; margin-top:10px;" onclick="contraGoSelect()">- PRESS START -</button>
+            <p style="color:#666; margin-top:26px; font-size:15px;" class="text-pop">© 2026 BEESTUDIO / ĐIỆP VỤ TỐI MẬT</p>
+            <button type="button" class="nes-btn" style="margin-top:14px; padding:6px 18px;" onclick="switchScreen('mode-screen')">◄ Quay lại</button>
+        </div>
+    </div>
+
+    <!-- CONTRA: CHON NHAN VAT -->
+    <div id="contra-select-screen" class="screen">
+        <div style="text-align:center; margin-top:4vh;">
+            <h2 class="arcade-title" style="color:#f7d51d; font-size:38px; text-shadow:4px 4px 0 #e76e55, 2px 2px 0 #000; margin:0;">CHỌN NHÂN VẬT</h2>
+            <p class="subtitle-text">3 LINH VẬT, 3 LỐI CHƠI</p>
+            <button type="button" id="contra-coop" class="nes-btn" style="padding:8px 20px; font-size:17px; margin-top:10px;" onclick="contraToggleCoop()">CHẾ ĐỘ: 1 NGƯỜI</button>
+            <p id="contra-pick-status" style="color:#ddd; min-height:24px; margin:12px 0 0;" class="text-pop">CHỌN ĐẶC VỤ P1</p>
+        </div>
+        <div class="contra-chars">
+            <button type="button" class="contra-char" data-char="Dan" onclick="contraPick('Dan')">
+                <canvas class="pixel-canvas" id="cs-dan"></canvas>
+                <b style="color:#3498db;">THÁM TỬ</b>
+                <div class="cc-stats"><span>MÁU</span><i class="cc-hp" data-hp="5"></i></div>
+                <div class="cc-stats"><span>TỐC ĐỘ</span><i class="cc-bar" data-lv="3"></i></div>
+                <div class="cc-stats"><span>HỎA LỰC</span><i class="cc-bar" data-lv="3"></i></div>
+                <span class="cc-desc">Bền bỉ, dễ làm quen và an toàn nhất</span>
+                <span class="cc-perk">5 Máu • Hồi sinh an toàn lâu hơn</span>
+            </button>
+            <button type="button" class="contra-char" data-char="GianDiep" onclick="contraPick('GianDiep')">
+                <canvas class="pixel-canvas" id="cs-spy"></canvas>
+                <b style="color:#e76e55;">ÁO ĐEN PHẢN BỘI</b>
+                <div class="cc-stats"><span>MÁU</span><i class="cc-hp" data-hp="3"></i></div>
+                <div class="cc-stats"><span>TỐC ĐỘ</span><i class="cc-bar" data-lv="5"></i></div>
+                <div class="cc-stats"><span>HỎA LỰC</span><i class="cc-bar" data-lv="5"></i></div>
+                <span class="cc-desc">Tốc độ cao, hỏa lực mạnh nhưng ít máu</span>
+                <span class="cc-perk">3 Máu • Chạy nhanh • Bắn liên thanh</span>
+            </button>
+            <button type="button" class="contra-char" data-char="SieuTrom" onclick="contraPick('SieuTrom')">
+                <canvas class="pixel-canvas" id="cs-kid"></canvas>
+                <b style="color:#209cee;">SIÊU TRỘM</b>
+                <div class="cc-stats"><span>MÁU</span><i class="cc-hp" data-hp="4"></i></div>
+                <div class="cc-stats"><span>TỐC ĐỘ</span><i class="cc-bar" data-lv="4"></i></div>
+                <div class="cc-stats"><span>HỎA LỰC</span><i class="cc-bar" data-lv="4"></i></div>
+                <span class="cc-desc">Cơ động, vượt địa hình và giữ được vũ khí</span>
+                <span class="cc-perk">4 Máu • Nhảy đôi • Giữ súng</span>
+            </button>
+        </div>
+        <p style="text-align:center; color:#95a5a6; font-size:16px; margin:14px 0 0;" class="text-pop">Bắn phi thuyền tiếp tế để nhận vũ khí. Nhặt trái tim trên cao để tăng 1 mạng.</p>
+        <div style="text-align:center; margin:22px 0;">
+            <button type="button" class="nes-btn" onclick="switchScreen('contra-title-screen')">◄ Tiêu đề</button>
+        </div>
+    </div>
+
+    <!-- CONTRA: SAN DAU -->
+    <div id="contra-game-screen" class="screen">
+        <div class="cg-hud">
+            <div class="cg-p" id="cg-p1"></div>
+            <div class="cg-mid"><span id="cg-stage"></span><br>ĐIỂM <b id="cg-score">0</b></div>
+            <div class="cg-p" id="cg-p2" style="text-align:right;"></div>
+        </div>
+        <div class="cg-progress"><i id="cg-fill"></i></div>
+        <div id="cg-bosswrap" style="display:none;"><span class="cg-bosslabel">TRÙM</span><i id="cg-bossfill"></i></div>
+        <div id="cg-banner"></div>
+        <div id="cg-rotate">⟳ XOAY NGANG ĐỂ TRẢI NGHIỆM TỐT HƠN</div>
+        <div class="cg-stage">
+            <canvas id="contra-canvas" width="480" height="270"></canvas>
+            <button type="button" id="cg-pause" onclick="contraTogglePause()">⏸</button>
+            <div class="contra-touch">
+                <div class="ct-pad">
+                    <button type="button" class="ct-btn ct-up" data-k="up" aria-label="Ngắm lên">▲</button>
+                    <button type="button" class="ct-btn ct-down" data-k="down" aria-label="Nằm hoặc ngắm xuống">▼</button>
+                    <button type="button" class="ct-btn ct-left" data-k="left" aria-label="Đi sang trái">◀</button>
+                    <button type="button" class="ct-btn ct-right" data-k="right" aria-label="Đi sang phải">▶</button>
+                </div>
+                <div class="ct-actions">
+                    <button type="button" class="ct-btn ct-jump" data-k="jump">NHẢY</button>
+                    <button type="button" class="ct-btn ct-fire" data-k="fire">BẮN</button>
+                </div>
+            </div>
+            <div id="cg-overlay" style="display:none;">
+                <h3 id="cg-over-title">GAME OVER</h3>
+                <p id="cg-over-score"></p>
+                <div id="cg-over-stats" class="cg-result-stats"></div>
+                <button type="button" class="nes-btn is-error" onclick="contraRetry()">CHƠI LẠI</button>
+                <button type="button" class="nes-btn is-warning" onclick="contraGoSelect()">ĐỔI NHÂN VẬT</button>
+                <button type="button" class="nes-btn" onclick="exitContra()">THOÁT</button>
+            </div>
+        </div>
+        <p id="cg-hint" class="text-pop">P1: A D đi • W S ngắm • SPACE nhảy • F/J bắn • P tạm dừng | P2: phím mũi tên • K bắn • L nhảy</p>
+        <button type="button" id="cg-exit" class="nes-btn" onclick="exitContra()">◄ THOÁT</button>
     </div>
 
         <!-- ONLINE: MENU -->
@@ -1513,7 +1780,7 @@
     </div>
 
     <!-- ================= JAVASCRIPT ================= -->
-    <script src="https://unpkg.com/peerjs@1.5.4/dist/peerjs.min.js" defer></script>
+    <script src="./vendor/peerjs.min.js" defer></script>
     <script>
         function requestFullScreen() {
             const elem = document.documentElement;
@@ -1585,6 +1852,7 @@
         };
         const themeBgm = new Audio('THEME.mp3'); 
         themeBgm.loop = true; themeBgm.volume = BGM_NORMAL_VOLUME;
+        themeBgm.preload = 'none'; // 14MB — chỉ tải khi người chơi bật nhạc
         const doorCloseSfx = new Audio('doorclose.mp3');
         doorCloseSfx.volume = 0.88;
         let musicEnabled = localStorage.getItem('caseclosed_music_enabled') !== 'false';
@@ -1719,6 +1987,8 @@
         function sfxWhoosh() { playNoise(0.3, 0.22); }
         function sfxFwip() { playTone(520, 'sine', 0.12, 0.18); playTone(780, 'sine', 0.08, 0.1); }
         function sfxKick() { playTone(150, 'square', 0.1, 0.25); playNoise(0.08, 0.3); }
+        function sfxGlint() { playTone(1200, 'sine', 0.07, 0.14); setTimeout(() => playTone(1600, 'sine', 0.07, 0.12), 60); setTimeout(() => playTone(2100, 'sine', 0.1, 0.1), 120); }
+        function sfxCard() { playTone(880, 'square', 0.04, 0.12); playNoise(0.05, 0.18); }
         function startChaseMusic() {
             const notes = [110, 110, 131, 110, 98, 98, 147, 131];
             let i = 0;
@@ -1729,6 +1999,21 @@
             }, 155);
         }
         function stopChaseMusic() { clearInterval(chaseMusicInt); chaseMusicInt = null; }
+
+        const CUTIN_IDS = ['cutin-eye', 'cutin-gun', 'cs2-pov'];
+        function hideCutins() {
+            CUTIN_IDS.forEach((id) => {
+                const el = document.getElementById(id);
+                if (el) el.classList.remove('show', 'evil');
+            });
+        }
+        function showCutin(id, ms) {
+            const el = document.getElementById(id);
+            el.classList.remove('show');
+            void el.offsetWidth;
+            el.classList.add('show');
+            if (ms) chaseTimers.push(setTimeout(() => { if (!chaseDone) el.classList.remove('show'); }, ms));
+        }
 
         function showChaseIntro() {
             if (window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches) { finishChase(); return; }
@@ -1746,6 +2031,11 @@
             cT(550, sfxThunder);
             cT(1900, () => { playNoise(0.25, 0.4); playTone(90, 'square', 0.2, 0.3); csShake(); });
             cT(2600, sfxGunshot);
+            cT(3150, () => {
+                showCutin('cutin-eye', 900);
+                drawPixelArt('cutin-eye-cv', spriteEye, 15);
+                sfxGlint();
+            });
 
             cT(4200, () => {
                 chaseShowScene('cs2');
@@ -1760,6 +2050,23 @@
             cT(4700, sfxFwip);
             cT(4950, () => { sfxWhoosh(); startChaseMusic(); });
             cT(6950, sfxWhoosh);
+            cT(6900, () => {
+                showCutin('cutin-gun', 850);
+                drawPixelArt('cutin-gun-cv', spriteCardGun, 9);
+                drawPixelArt('cutin-cc1', spriteCard, 6);
+                drawPixelArt('cutin-cc2', spriteCard, 6);
+                drawPixelArt('cc-kid-face', spriteKid, 3);
+            });
+            cT(7050, sfxCard);
+            cT(7250, sfxFwip);
+            cT(7400, sfxFwip);
+            cT(7800, () => {
+                showCutin('cs2-pov', 1000);
+                drawPixelArt('pov-gl', spriteGlove, 6);
+                drawPixelArt('pov-gr', spriteGlove, 6);
+                sfxWhoosh();
+                playNoise(0.5, 0.22);
+            });
 
             cT(8800, () => {
                 chaseShowScene('cs3');
@@ -1788,6 +2095,12 @@
                 playNoise(0.3, 0.3);
             });
             cT(17100, () => playTone(85, 'sawtooth', 0.9, 0.18));
+            cT(18500, () => {
+                document.getElementById('cutin-eye').classList.add('evil');
+                showCutin('cutin-eye', 750);
+                drawPixelArt('cutin-eye-cv', spriteEye, 15);
+                sfxGlint();
+            });
             cT(18100, sfxGunshot);
             cT(18220, sfxGunshot);
             cT(18340, sfxGunshot);
@@ -1834,6 +2147,7 @@
         function jumpToTitleScene() {
             chaseTimers.forEach(clearTimeout);
             stopChaseMusic();
+            hideCutins();
             document.getElementById('cs5').classList.remove('cs-slowmo');
             chaseShowScene('cs6');
             sfxBoom(true);
@@ -1864,6 +2178,7 @@
             chaseDone = true;
             chaseTimers.forEach(clearTimeout);
             stopChaseMusic();
+            hideCutins();
             const s = document.getElementById('chase-screen');
             s.classList.remove('active');
             switchScreen('mode-screen');
@@ -2076,9 +2391,8 @@
         // Mat anime cuong dao — dung cho cut-in glint (monocle vẽ bằng CSS)
         const spriteEye = [
             "0000000000000000",
+            "0000666666660000",
             "0006666666660000",
-            "0006666666660000",
-            "0000000000000000",
             "0005555555550000",
             "0055555555555000",
             "0055666655555000",
@@ -2087,22 +2401,26 @@
             "0005555555550000",
             "0000000000000000"
         ];
-        // Sung bai cua Kid — trang, nạp sẵn một quân bài đỏ
+        // Sung bai cua Kid — nong dai, duoi tay co, nap san quan bai do
         const spriteCardGun = [
-            "0000880000",
-            "0005555500",
-            "0555555555",
-            "0555555550",
-            "0005556000",
-            "0005550000",
-            "0005550000"
+            "000008800000",
+            "005555555555",
+            "005555555555",
+            "005550600000",
+            "005550000000",
+            "005550000000",
+            "005550000000",
+            "006660000000"
         ];
         const spriteCard = [
-            "055550",
-            "555555",
-            "558855",
-            "555555",
-            "055550"
+            "0555555",
+            "5666655",
+            "5555555",
+            "5666555",
+            "5555555",
+            "5665555",
+            "5555555",
+            "0555555"
         ];
         const spriteGlove = [
             "0555550",
@@ -2233,6 +2551,7 @@
             syncMusicButton();
             drawPixelArt('mode-dan', spriteDetective, 5);
             drawPixelArt('mode-spy', spriteSpy, 5);
+            drawPixelArt('mode-contra', spriteKid, 5);
             drawPixelArt('om-dan', spriteDetective, 5);
             drawPixelArt('om-spy', spriteSpy, 5);
             drawPixelArt('om-kid', spriteKid, 5);
@@ -4489,13 +4808,14 @@
             votes: new Map(), turnMs: 60000, voteMs: 30000, discussMs: 120000,
             civilianWord: '', spyWord: '', guesserId: null, voted: false,
             timerInt: null, hostTimeouts: [], inputMode: 'off',
-            c4: null, lastElim: null, c4TimerInt: null, elimHistory: [], speakerId: null, pendingReveal: false
+            c4: null, lastElim: null, c4TimerInt: null, elimHistory: [], speakerId: null, pendingReveal: false,
+            revealedRoles: {}, c4BoomTimer: null, guessTimer: null
         };
 
         function onlineStatus(msg) { const el = document.getElementById('online-status'); if (el) el.innerText = msg || ''; }
         function onlineCodeGen() { const c = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789'; let s = ''; for (let i = 0; i < 5; i++) s += c[Math.floor(Math.random() * c.length)]; return s; }
         function onlineGetPlayer(id) { return ONLINE.players.find((p) => p.id === id) || null; }
-        function onlinePublic() { return ONLINE.players.map((p) => ({ id: p.id, name: p.name, isAlive: p.isAlive })); }
+        function onlinePublic() { return ONLINE.players.map((p) => ({ id: p.id, name: p.name, isAlive: p.isAlive, gone: !!p.gone })); }
         function onlineGetName() {
             const n = document.getElementById('online-name').value.trim().slice(0, 16);
             if (!n) { showModal('Nhập tên đặc vụ trước đã!', 'alert'); return null; }
@@ -4550,6 +4870,7 @@
 
         function onlineExit() {
             if (ONLINE.isHost && ONLINE.peer && ONLINE.phase !== 'lobby') { try { hostBroadcast({ t: 'close' }); } catch (e) {} }
+            hostClearC4Timer();
             try { if (ONLINE.peer) ONLINE.peer.destroy(); } catch (e) {}
             ONLINE.peer = null; ONLINE.conns.clear(); ONLINE.hostConn = null;
             ONLINE.players = []; ONLINE.phase = 'lobby'; ONLINE.myRole = null; ONLINE.myWord = null; ONLINE.voted = false;
@@ -4623,6 +4944,7 @@
         function hostEmit(msg) { hostBroadcast(msg); clientOnData(msg); }
         function hostLater(ms, fn) { ONLINE.hostTimeouts.push(setTimeout(fn, ms)); }
         function hostClearTimers() { ONLINE.hostTimeouts.forEach(clearTimeout); ONLINE.hostTimeouts = []; }
+        function hostClearC4Timer() { if (ONLINE.c4BoomTimer) { clearTimeout(ONLINE.c4BoomTimer); ONLINE.c4BoomTimer = null; } }
 
         function hostOnData(conn, d) {
             if (!d || typeof d !== 'object') return;
@@ -4686,6 +5008,7 @@
         function hostResolveDefuseWord(word) {
             if (ONLINE.c4.done) return;
             ONLINE.c4.done = true;
+            hostClearC4Timer();
             const ok = word.trim().toLowerCase() === ONLINE.spyWord.toLowerCase();
             hostEmit({ t: 'c4Result', ok });
             if (ok) hostVictory('DefusalWin'); else hostVictory('DefusalFail');
@@ -4702,6 +5025,7 @@
                 p.gone = true;
                 hostEmit({ t: 'chat', from: 'HỆ THỐNG', text: p.name + ' đã mất kết nối!', kind: 'sys' });
                 if (ONLINE.phase === 'describe' && ONLINE.players[ONLINE.turnIdx] && ONLINE.players[ONLINE.turnIdx].id === conn.peer) hostSkipTurn();
+                if (ONLINE.guesserId === conn.peer) hostResolveGuess('');
                 if (ONLINE.phase === 'reveal') hostCheckReady();
             }
         }
@@ -4730,6 +5054,7 @@
             ONLINE.round = 1; ONLINE.turnIdx = 0; ONLINE.descCount = 0;
             ONLINE.votes.clear(); ONLINE.voted = false; ONLINE.guesserId = null;
             ONLINE.lastElim = null; ONLINE.elimHistory = [];
+            ONLINE.revealedRoles = {};
             const c4Enabled = document.getElementById('lobby-c4').checked;
             const c4Minutes = Math.max(1, parseInt(document.getElementById('lobby-c4-min').value) || 5);
             ONLINE.c4 = c4Enabled ? { pin: String(Math.floor(1000 + Math.random() * 9000)), unlocked: false, permLocked: false, attempts: 3, done: false, started: false, minutes: c4Minutes, deadline: 0 } : null;
@@ -4745,6 +5070,15 @@
             ONLINE.players.forEach((p) => {
                 const msg = { t: 'role', role: p.role, word: p.word, isDefuser: !!p.isDefuser, pin: p.isDefuser ? ONLINE.c4.pin : null };
                 if (p.id === ONLINE.myId) clientOnData(msg); else hostSendTo(p.id, msg);
+            });
+            hostLater(90000, () => {
+                if (ONLINE.phase !== 'reveal') return;
+                let changed = false;
+                ONLINE.players.forEach((p) => { if (!p.gone && !p.ready) { p.ready = true; changed = true; } });
+                if (changed) {
+                    hostEmit({ t: 'chat', from: 'HỆ THỐNG', text: 'Tự động xác nhận sẵn sàng sau 90 giây chờ.', kind: 'sys' });
+                    hostCheckReady();
+                }
             });
         }
 
@@ -4839,17 +5173,19 @@
         function hostBeginDescribe() {
             ONLINE.phase = 'describe';
             ONLINE.descCount = 0;
-            ONLINE.turnIdx = ONLINE.players.findIndex((p) => p.isAlive);
+            ONLINE.turnIdx = ONLINE.players.findIndex((p) => p.isAlive && !p.gone);
             if (ONLINE.c4 && !ONLINE.c4.started && !ONLINE.c4.done) {
                 ONLINE.c4.started = true;
                 ONLINE.c4.deadline = Date.now() + ONLINE.c4.minutes * 60000;
                 hostEmit({ t: 'c4Start', deadline: ONLINE.c4.deadline });
-                hostLater(ONLINE.c4.minutes * 60000, hostC4TimeUp);
+                hostClearC4Timer();
+                ONLINE.c4BoomTimer = setTimeout(hostC4TimeUp, ONLINE.c4.minutes * 60000);
             }
             hostStartTurn();
         }
 
         function hostC4TimeUp() {
+            hostClearC4Timer();
             if (!ONLINE.c4 || ONLINE.c4.done || ONLINE.phase === 'victory') return;
             ONLINE.c4.done = true;
             hostEmit({ t: 'c4Boom' });
@@ -4857,8 +5193,14 @@
         }
 
         function hostStartTurn() {
-            const sp = ONLINE.players[ONLINE.turnIdx];
-            if (!sp) { hostBeginDiscuss(); return; }
+            let sp = ONLINE.players[ONLINE.turnIdx];
+            let guard = 0;
+            while ((!sp || !sp.isAlive || sp.gone) && guard <= ONLINE.players.length) {
+                ONLINE.turnIdx = (ONLINE.turnIdx + 1) % ONLINE.players.length;
+                sp = ONLINE.players[ONLINE.turnIdx];
+                guard++;
+            }
+            if (!sp || !sp.isAlive || sp.gone) { hostBeginDiscuss(); return; }
             hostClearTimers();
             hostEmit({ t: 'phase', phase: 'describe', round: ONLINE.round, speaker: { id: sp.id, name: sp.name }, deadline: Date.now() + ONLINE.turnMs });
             hostLater(ONLINE.turnMs, () => hostSkipTurn());
@@ -4880,9 +5222,9 @@
 
         function hostAdvanceTurn() {
             ONLINE.descCount++;
-            const aliveCount = ONLINE.players.filter((p) => p.isAlive).length;
+            const aliveCount = ONLINE.players.filter((p) => p.isAlive && !p.gone).length;
             if (ONLINE.descCount >= aliveCount) { hostBeginDiscuss(); return; }
-            do { ONLINE.turnIdx = (ONLINE.turnIdx + 1) % ONLINE.players.length; } while (!ONLINE.players[ONLINE.turnIdx].isAlive);
+            do { ONLINE.turnIdx = (ONLINE.turnIdx + 1) % ONLINE.players.length; } while (!ONLINE.players[ONLINE.turnIdx] || !ONLINE.players[ONLINE.turnIdx].isAlive || ONLINE.players[ONLINE.turnIdx].gone);
             hostStartTurn();
         }
 
@@ -4934,6 +5276,8 @@
             ONLINE.phase = 'reveal-result';
             hostEmit({
                 t: 'voteResult', tally: counts, eliminatedId: elimId, eliminatedRole: elimRole, eliminatedName: elimName,
+                eliminatedIsDefuser: elimId ? !!onlineGetPlayer(elimId).isDefuser : false,
+                players: onlinePublic(),
                 c4: ONLINE.c4 ? { unlocked: ONLINE.c4.unlocked, permLocked: ONLINE.c4.permLocked, attempts: ONLINE.c4.attempts } : null
             });
             if (elimId && elimRole === 'SieuTrom') {
@@ -4941,12 +5285,16 @@
                 ONLINE.guesserId = elimId;
                 const msg = { t: 'guessAsk' };
                 if (elimId === ONLINE.myId) clientOnData(msg); else hostSendTo(elimId, msg);
+                if (ONLINE.guessTimer) clearTimeout(ONLINE.guessTimer);
+                ONLINE.guessTimer = setTimeout(() => { if (ONLINE.guesserId === elimId) hostResolveGuess(''); }, 60000);
             } else {
                 hostAfterElimination();
             }
         }
 
         function hostResolveGuess(word) {
+            if (ONLINE.guessTimer) { clearTimeout(ONLINE.guessTimer); ONLINE.guessTimer = null; }
+            ONLINE.guesserId = null;
             const ok = word.trim().toLowerCase() === ONLINE.civilianWord.toLowerCase();
             hostEmit({ t: 'guessResult', ok });
             if (ok) { hostVictory('SieuTromLatKeo'); return; }
@@ -4982,6 +5330,7 @@
 
         function hostVictory(winner) {
             hostClearTimers();
+            hostClearC4Timer();
             ONLINE.phase = 'victory';
             const S = DEFAULT_SCORE_SETTINGS;
             const points = {};
@@ -5004,12 +5353,13 @@
                 }
                 if (v) points[p.id] = v;
             });
-            hostEmit({ t: 'victory', winner, roles: ONLINE.players.map((p) => ({ name: p.name, role: p.role, isAlive: p.isAlive })), points, words: { civ: ONLINE.civilianWord, spy: ONLINE.spyWord } });
+            hostEmit({ t: 'victory', winner, roles: ONLINE.players.map((p) => ({ name: p.name, role: p.role, isAlive: p.isAlive })), points, words: { civ: ONLINE.civilianWord, spy: ONLINE.spyWord }, history: ONLINE.elimHistory });
         }
 
         function hostRematch() {
             ONLINE.players.forEach((p) => { p.isAlive = true; p.ready = false; p.gone = false; p.role = null; p.word = null; p.isDefuser = false; });
             hostClearTimers();
+            hostClearC4Timer();
             clearInterval(ONLINE.timerInt);
             stopOnlineC4Timer();
             document.getElementById('bomb-container').style.display = 'none';
@@ -5035,6 +5385,7 @@
             else if (d.t === 'kick') { showModal('Bạn đã bị chủ phòng mời ra khỏi phòng.', 'alert', () => onlineExit()); }
             else if (d.t === 'start') {
                 ONLINE.phase = 'reveal';
+                ONLINE.revealedRoles = {};
                 currentCaseMeta = d.meta;
                 ONLINE.pendingReveal = true;
                 addOnlineChatClear();
@@ -5071,12 +5422,14 @@
                 addOnlineChat(null, d.ok ? 'Mật mã chính xác — ĐÃ VÔ HIỆU HÓA BOM!' : 'CẮT NHẦM DÂY... BÙM!', 'sys');
             }
             else if (d.t === 'undo') {
-                ONLINE.players = d.players.map((x) => ({ ...x }));
+                if (!ONLINE.isHost && d.players) ONLINE.players = d.players.map((x) => ({ ...x }));
+                if (d.removedId) delete ONLINE.revealedRoles[d.removedId];
                 if (d.c4 && ONLINE.c4) Object.assign(ONLINE.c4, d.c4);
                 ONLINE.elimHistory = ONLINE.elimHistory.slice(0, -1);
                 addOnlineChat(null, 'Chủ phòng đã HOÀN TÁC lần bắt giữ gần nhất!', 'sys');
                 renderOnlineBoard();
                 onlineUpdateC4UI();
+                if (ONLINE.isHost) renderHostControls([{ label: 'TIẾP TỤC ĐIỀU TRA', fn: 'hostContinueAfterResult' }]);
             }
             else if (d.t === 'victory') applyOnlineVictory(d);
             else if (d.t === 'guessAsk') {
@@ -5090,7 +5443,7 @@
                 if (ONLINE.isHost) renderHostControls([{ label: 'TIẾP TỤC ĐIỀU TRA', fn: 'hostContinueAfterResult' }]);
             }
             else if (d.t === 'reset') {
-                ONLINE.players = d.players.map((x) => ({ ...x }));
+                if (!ONLINE.isHost && d.players) ONLINE.players = d.players.map((x) => ({ ...x }));
                 ONLINE.phase = 'lobby'; ONLINE.myRole = null; ONLINE.myWord = null;
                 ONLINE.myIsDefuser = false; ONLINE.myPin = null;
                 ONLINE.c4 = null; stopOnlineC4Timer();
@@ -5185,10 +5538,12 @@
             const voting = ONLINE.phase === 'vote';
             ONLINE.players.forEach((p) => {
                 const isSpeaker = ONLINE.phase === 'describe' && ONLINE.speakerId === p.id && p.isAlive;
-                const rp = !p.isAlive ? getRolePresentation(p.role) : null;
+                const rev = ONLINE.revealedRoles[p.id] || null;
+                const effRole = p.role || (rev && rev.role) || null;
+                const rp = !p.isAlive ? getRolePresentation(effRole) : null;
                 const card = document.createElement('button');
                 card.type = 'button';
-                card.className = `suspect-card${isSpeaker ? ' is-speaking' : ''}${p.isAlive ? '' : ` is-eliminated role-${p.role}`}`;
+                card.className = `suspect-card${isSpeaker ? ' is-speaking' : ''}${p.isAlive ? '' : ` is-eliminated role-${effRole}`}`;
                 if (p.gone && p.isAlive) card.style.filter = 'grayscale(.7) brightness(.8)';
                 const pin = document.createElement('span'); pin.className = 'suspect-card__pin';
                 const portrait = document.createElement('canvas'); portrait.className = 'pixel-canvas suspect-card__portrait';
@@ -5207,12 +5562,12 @@
                     }
                 } else {
                     roleReveal.innerText = rp.label;
-                    status.innerText = p.isDefuser ? 'CHUYÊN GIA GỠ BOM ĐÃ HY SINH' : 'HỒ SƠ ĐÃ ĐÓNG';
+                    status.innerText = (p.isDefuser || (rev && rev.isDefuser)) ? 'CHUYÊN GIA GỠ BOM ĐÃ HY SINH' : 'HỒ SƠ ĐÃ ĐÓNG';
                     card.disabled = true;
                 }
                 card.append(pin, portrait, name, roleReveal, status);
                 grid.appendChild(card);
-                const revealedSprite = p.role === 'Dan' ? spriteDetective : p.role === 'GianDiep' ? spriteSpy : spriteKid;
+                const revealedSprite = effRole === 'Dan' ? spriteDetective : effRole === 'GianDiep' ? spriteSpy : spriteKid;
                 drawPixelArt(portrait, p.isAlive ? spriteSuspect : revealedSprite, 4);
             });
             renderOnlineSurvivors();
@@ -5228,18 +5583,14 @@
             const container = document.getElementById('og-survivors');
             container.innerHTML = '';
             let counter = 0;
-            const groups = [['Dan', spriteDetective, 'glow-detective'], ['GianDiep', spriteSpy, 'glow-spy'], ['SieuTrom', spriteKid, 'glow-kid']];
-            groups.forEach(([role, sprite, glow]) => {
-                const n = ONLINE.players.filter((p) => p.isAlive && p.role === role).length;
-                for (let i = 0; i < n; i++) {
-                    const cv = document.createElement('canvas');
-                    cv.id = 'og-surv-' + counter;
-                    cv.className = 'pixel-canvas anim-wave ' + glow;
-                    cv.style.animationDelay = (counter * 0.15) + 's';
-                    container.appendChild(cv);
-                    drawPixelArt(cv, sprite, 4);
-                    counter++;
-                }
+            ONLINE.players.forEach((p) => {
+                if (!p.isAlive) return;
+                const cv = document.createElement('canvas');
+                cv.className = 'pixel-canvas anim-wave';
+                cv.style.animationDelay = (counter * 0.15) + 's';
+                container.appendChild(cv);
+                drawPixelArt(cv, spriteSuspect, 4);
+                counter++;
             });
             if (counter === 0) container.innerHTML = '<p style="color:#888;">Không còn ai sống sót...</p>';
         }
@@ -5250,7 +5601,9 @@
             ONLINE.phase = 'reveal-result';
             ONLINE.inputMode = 'off';
             setInputRow('Chờ chủ phòng...', '', true);
+            if (!ONLINE.isHost && d.players) ONLINE.players = d.players.map((x) => ({ ...x }));
             if (d.c4 && ONLINE.c4) Object.assign(ONLINE.c4, d.c4);
+            if (d.eliminatedId && d.eliminatedRole) ONLINE.revealedRoles[d.eliminatedId] = { role: d.eliminatedRole, isDefuser: !!d.eliminatedIsDefuser };
             const aliveN = ONLINE.players.filter((p) => p.isAlive).length;
             const tallyText = Object.entries(d.tally).map(([id, c]) => {
                 const p = onlineGetPlayer(id);
@@ -5380,9 +5733,10 @@
                 row.append(s, b);
                 roles.appendChild(row);
             });
+            const histList = Array.isArray(d.history) ? d.history : ONLINE.elimHistory;
             const hist = document.getElementById('ov-history');
-            hist.innerHTML = ONLINE.elimHistory.length
-                ? '<p style="color:#f7d51d; margin:0 0 8px;">DIỄN BIẾN BẮT GIỮ</p>' + ONLINE.elimHistory.map((h, i) => {
+            hist.innerHTML = histList.length
+                ? '<p style="color:#f7d51d; margin:0 0 8px;">DIỄN BIẾN BẮT GIỮ</p>' + histList.map((h, i) => {
                     const rp = getRolePresentation(h.role);
                     return '<div>' + (i + 1) + '. ' + esc(h.name) + ' — <b style="color:' + rp.color + ';">' + rp.label + '</b></div>';
                 }).join('')
@@ -5457,7 +5811,7 @@
             const btn = document.getElementById('btn-defuse');
             const status = document.getElementById('c4-status');
             const me = onlineGetPlayer(ONLINE.myId);
-            const iAmDefuser = !!(me && me.isDefuser && me.isAlive);
+            const iAmDefuser = !!(ONLINE.myIsDefuser && me && me.isAlive);
             if (ONLINE.c4.permLocked) {
                 btn.disabled = true; btn.innerText = 'C4 VÔ HIỆU';
                 status.innerText = 'C4 ĐÃ BỊ KHÓA VĨNH VIỄN';
@@ -5498,12 +5852,1284 @@
 
         function hostUndoElimination() {
             if (!ONLINE.lastElim) return;
-            const p = onlineGetPlayer(ONLINE.lastElim.id);
+            const removedId = ONLINE.lastElim.id;
+            const p = onlineGetPlayer(removedId);
             if (p) p.isAlive = true;
             if (ONLINE.c4 && ONLINE.lastElim.c4) Object.assign(ONLINE.c4, ONLINE.lastElim.c4);
             ONLINE.lastElim = null;
-            hostEmit({ t: 'undo', players: onlinePublic(), c4: ONLINE.c4 ? { unlocked: ONLINE.c4.unlocked, permLocked: ONLINE.c4.permLocked, attempts: ONLINE.c4.attempts } : null });
+            hostEmit({ t: 'undo', removedId, players: onlinePublic(), c4: ONLINE.c4 ? { unlocked: ONLINE.c4.unlocked, permLocked: ONLINE.c4.permLocked, attempts: ONLINE.c4.attempts } : null });
         }
+
+                                        /* ================= CHE DO CONTRA v4 — CONTRA STAGE 1 LAYOUT ================= */
+        const CONTRA = {
+            W: 480, H: 270, GROUND: 232, WATER_TOP: 252,
+            chars: {
+                Dan: { name: 'THÁM TỬ', color: '#3498db', hp: 5, speed: 2.25, fireCd: 13, jumpV: -7.2, jumps: 1, perk: '5 Máu • Hồi sinh an toàn lâu hơn', weaponKeep: false, invBonus: 35 },
+                GianDiep: { name: 'ÁO ĐEN PHẢN BỘI', color: '#e76e55', hp: 3, speed: 2.85, fireCd: 8, jumpV: -7.35, jumps: 1, perk: '3 Máu • Chạy nhanh • Bắn liên thanh', weaponKeep: false, invBonus: 0 },
+                SieuTrom: { name: 'SIÊU TRỘM', color: '#209cee', hp: 4, speed: 2.5, fireCd: 11, jumpV: -7.5, jumps: 2, perk: '4 Máu • Nhảy đôi • Giữ súng', weaponKeep: true, invBonus: 10 }
+            },
+            stages: [
+                { name: 'MÀN 1: RỪNG THÂM NỘI', sub: 'Xuyên rừng đêm tiếp cận căn cứ', type: 'side', len: 5600,
+                  pal: { bld: '#151a30', win: 'rgba(247,213,29,.25)', ground: '#1b1726', gTop: '#3f7a3a', plat: '#2c3344', platTop: '#46506a', water: '#163f7a', waterTop: '#4aa3e8', wall: '#2a1a20' },
+                  ground: [[0,950,232],[1350,550,232],[2500,300,206],[2800,300,232],[3100,800,232],[4300,1300,232]],
+                  platforms: [[950,206,400],[1450,182,110],[1640,182,110],[1900,206,300],[2260,206,240],[1960,152,140],[2270,152,140],[3160,190,80],[3320,152,80],[3480,114,80],[3640,152,80],[3800,114,80],[3640,64,140],[3900,206,400],[4500,182,110],[4700,138,110]],
+                  caps: [[800,'M'],[2000,'S'],[3350,'L'],[4350,'R']], hearts: [3680],
+                  spawnStart: 420, spawnGap: 185, shooterRatio: 0.45, eSpeed: 0.9, eFire: 95, eBulletSpd: 2.3, jumperRatio: 0.2, eHpBonus: 0,
+                  gate: { coreHp: 40, turretHp: 6, turretCd: 95, wallX: 5250 } },
+                { name: 'MÀN 2: CẦU PHÁO THỦ', sub: 'Vượt sông qua 3 cây cầu bị hỏa lực kiềm chế', type: 'side', len: 5800,
+                  pal: { bld: '#1c1530', win: 'rgba(255,107,74,.22)', ground: '#241a2e', gTop: '#6a4f7a', plat: '#3a2c4a', platTop: '#8a6a9a', water: '#163f7a', waterTop: '#4aa3e8', wall: '#241428' },
+                  ground: [[0,800,232],[950,500,206],[1550,600,232],[2250,500,206],[2850,600,232],[3550,500,206],[4150,1650,232]],
+                  platforms: [[800,206,650],[900,150,180],[1300,150,180],[2250,206,600],[2350,150,180],[2700,150,180],[3550,206,600],[3650,150,180],[3950,150,180],[300,138,100],[500,96,90],[1600,182,90],[1800,138,90],[3000,138,100],[3200,96,90],[4400,182,110],[4700,138,110]],
+                  caps: [[600,'S'],[1700,'L'],[3100,'M'],[4500,'R']], hearts: [1300],
+                  spawnStart: 440, spawnGap: 175, shooterRatio: 0.5, eSpeed: 1.0, eFire: 85, eBulletSpd: 2.5, jumperRatio: 0.24, eHpBonus: 0,
+                  gate: { coreHp: 55, turretHp: 7, turretCd: 80, wallX: 5450 } },
+                { name: 'MÀN 3: CĂN CỨ BÍ MẬT', sub: 'Hạ đủ mục tiêu để mở khóa lõi căn cứ', type: 'base', targets: 6, coreHp: 48,
+                  pal: { bld: '#0e1f1c', win: 'rgba(87,217,255,.2)', ground: '#12241f', gTop: '#2a4a40', plat: '#1a332c', platTop: '#2f5a4c', water: '#163f7a', waterTop: '#4aa3e8' } },
+                { name: 'MÀN 4: PHÁO ĐÀI TỐI MẬT', sub: 'Kết liễu pháo đài của tổ chức Áo Đen', type: 'side', len: 6000, officers: true,
+                  pal: { bld: '#2a1214', win: 'rgba(255,80,80,.25)', ground: '#26161a', gTop: '#7a3c30', plat: '#3d2228', platTop: '#8a5a54', water: '#0e2a4a', waterTop: '#3a7ec8', wall: '#33141c' },
+                  ground: [[0,900,232],[1000,500,206],[1600,700,232],[2400,500,206],[3000,700,232],[3800,500,206],[4400,1600,232]],
+                  platforms: [[900,206,100],[1500,206,100],[2300,206,100],[2900,206,100],[3700,206,100],[4300,206,100],[300,138,90],[500,96,80],[700,182,80],[1100,150,90],[1300,96,80],[1750,182,90],[1950,138,90],[2550,150,90],[2750,96,80],[3150,182,90],[3350,138,90],[3550,96,80],[3950,150,90],[4150,96,80],[4600,182,110],[4850,138,110],[5100,182,110]],
+                  caps: [[500,'S'],[1250,'L'],[2050,'M'],[2850,'R'],[3650,'S'],[4550,'L']], hearts: [1140],
+                  spawnStart: 420, spawnGap: 150, shooterRatio: 0.6, eSpeed: 1.2, eFire: 70, eBulletSpd: 2.75, jumperRatio: 0.3, eHpBonus: 1,
+                  gate: { coreHp: 90, turretHp: 8, turretCd: 62, wallX: 5650 } }
+            ],
+            pick: 'Dan', pick2: 'GianDiep', coOp: false, pickSlot: 0,
+            running: false, raf: null, runId: 0, transitionTimer: null, lastTs: 0, accumulator: 0,
+            players: [], enemies: [], bullets: [], ebullets: [], parts: [], pops: [], spawns: [], platforms: [], terrain: [], caps: [], hearts: [], pods: [], drops: [],
+            gate: null, cam: 0, score: 0, frame: 0, state: 'play', stars: [],
+            stageIdx: 0, stage: null, base: null, shake: 0, hitstop: 0, paused: false, reinforceCd: 520,
+            stats: { kills: 0, deaths: 0, shots: 0, frames: 0 },
+            pool: { bullets: [], ebullets: [], parts: [] }
+        };
+
+        function contraSprite(matrix, scale) {
+            const c = document.createElement('canvas');
+            drawPixelArt(c, matrix, scale);
+            return c;
+        }
+        const _contraSprCache = {};
+        function contraSpriteCached(key) {
+            if (!_contraSprCache[key]) {
+                const m = key === 'Dan' ? spriteDetective : key === 'GianDiep' ? spriteSpy : spriteKid;
+                _contraSprCache[key] = contraSprite(m, 2);
+            }
+            return _contraSprCache[key];
+        }
+        function contraTintSprite() {
+            if (!_contraSprCache.officer) {
+                const base = contraSprite(spriteSpy, 2);
+                const c = document.createElement('canvas');
+                c.width = base.width; c.height = base.height;
+                const x = c.getContext('2d');
+                x.drawImage(base, 0, 0);
+                x.globalCompositeOperation = 'source-atop';
+                x.globalAlpha = 0.6;
+                x.fillStyle = '#ff2d1a';
+                x.fillRect(0, 0, c.width, c.height);
+                _contraSprCache.officer = c;
+            }
+            return _contraSprCache.officer;
+        }
+
+        function enterContra() {
+            SFX.click();
+            switchScreen('contra-title-screen');
+            drawPixelArt('ct-dan', spriteDetective, 5);
+            drawPixelArt('ct-spy', spriteSpy, 5);
+            drawPixelArt('ct-kid', spriteKid, 5);
+            document.getElementById('contra-hi').innerText = 'HI-SCORE ' + (parseInt(localStorage.getItem('cc_contra_hi')) || 0);
+        }
+
+        function contraGoSelect() {
+            SFX.click();
+            contraStopRun();
+            CONTRA.pickSlot = 0;
+            switchScreen('contra-select-screen');
+            drawPixelArt('cs-dan', spriteDetective, 5);
+            drawPixelArt('cs-spy', spriteSpy, 5);
+            drawPixelArt('cs-kid', spriteKid, 5);
+            contraRenderCharacterStats();
+            document.querySelectorAll('.contra-char').forEach((el) => el.classList.remove('p1-picked', 'p2-picked'));
+            contraSyncCoopBtn();
+            if (musicEnabled) playBackgroundMusic();
+        }
+
+        function contraToggleCoop() {
+            if (window.matchMedia('(hover: none) and (pointer: coarse)').matches) return;
+            CONTRA.coOp = !CONTRA.coOp;
+            CONTRA.pickSlot = 0;
+            SFX.click();
+            document.querySelectorAll('.contra-char').forEach((el) => el.classList.remove('p1-picked', 'p2-picked'));
+            contraSyncCoopBtn();
+        }
+
+        function contraSyncCoopBtn() {
+            const btn = document.getElementById('contra-coop');
+            const status = document.getElementById('contra-pick-status');
+            if (!btn) return;
+            const touchOnly = window.matchMedia('(hover: none) and (pointer: coarse)').matches;
+            if (touchOnly) {
+                CONTRA.coOp = false; CONTRA.pickSlot = 0;
+                btn.disabled = true;
+                btn.innerText = 'CHẾ ĐỘ: 1 NGƯỜI (CẢM ỨNG)';
+                btn.style.borderColor = '#777';
+                if (status) status.innerText = 'CHỌN ĐẶC VỤ P1';
+                return;
+            }
+            btn.disabled = false;
+            btn.innerText = CONTRA.coOp ? 'CHẾ ĐỘ: 2 NGƯỜI' : 'CHẾ ĐỘ: 1 NGƯỜI';
+            btn.style.borderColor = CONTRA.coOp ? '#f7d51d' : '#fff';
+            if (status) status.innerText = CONTRA.coOp && CONTRA.pickSlot === 1 ? 'ĐÃ CHỌN P1. CHỌN ĐẶC VỤ P2' : 'CHỌN ĐẶC VỤ P1';
+        }
+
+        function contraRenderCharacterStats() {
+            document.querySelectorAll('.cc-hp').forEach((el) => {
+                const count = Math.max(0, parseInt(el.dataset.hp, 10) || 0);
+                el.innerHTML = Array.from({ length: count }, () => '<b></b>').join('');
+            });
+            document.querySelectorAll('.cc-bar').forEach((el) => {
+                const level = Math.max(0, Math.min(5, parseInt(el.dataset.lv, 10) || 0));
+                el.innerHTML = Array.from({ length: 5 }, (_, i) => '<b class="' + (i < level ? 'on' : '') + '"></b>').join('');
+            });
+        }
+
+        function contraPick(key) {
+            SFX.click();
+            if (CONTRA.coOp && CONTRA.pickSlot === 0) {
+                CONTRA.pick = key;
+                CONTRA.pickSlot = 1;
+                const card = document.querySelector('.contra-char[data-char="' + key + '"]');
+                if (card) card.classList.add('p1-picked');
+                contraSyncCoopBtn();
+                return;
+            }
+            if (CONTRA.coOp) {
+                CONTRA.pick2 = key; CONTRA.pickSlot = 2;
+                const card = document.querySelector('.contra-char[data-char="' + key + '"]');
+                if (card) card.classList.add('p2-picked');
+            }
+            else CONTRA.pick = key;
+            startContraGame();
+        }
+
+        function contraRetry() { startContraGame(); }
+
+        function contraClearInputs() {
+            CONTRA.players.forEach((p) => {
+                Object.keys(p.keys).forEach((key) => { p.keys[key] = false; });
+                p.jumpQueued = false;
+            });
+            document.querySelectorAll('.ct-btn.is-held').forEach((btn) => btn.classList.remove('is-held'));
+        }
+
+        function contraStopRun() {
+            CONTRA.running = false;
+            if (CONTRA.raf) cancelAnimationFrame(CONTRA.raf);
+            CONTRA.raf = null;
+            CONTRA.runId++;
+            clearTimeout(CONTRA.transitionTimer);
+            CONTRA.transitionTimer = null;
+            contraClearInputs();
+            document.body.classList.remove('contra-full');
+        }
+
+        function exitContra() {
+            contraStopRun();
+            switchScreen('mode-screen');
+            if (musicEnabled) playBackgroundMusic();
+        }
+
+        function contraMakePlayer(idx, charKey) {
+            const ch = CONTRA.chars[charKey];
+            return {
+                idx, charKey, ch,
+                x: 40 + idx * 40, y: CONTRA.GROUND - 22, w: 20, h: 22, vx: 0, vy: 0,
+                hp: ch.hp, maxHp: ch.hp, lives: 2, weapon: 'N',
+                face: 1, cd: 0, inv: 90, prone: false, onGround: false, jumps: 0, coyote: 0, jumpBuf: 0,
+                out: false, jumpQueued: false, mf: 0, mx: 0, my: 0, seg: null, inWater: false, waterLock: 0,
+                keys: { left: false, right: false, up: false, down: false, fire: false }
+            };
+        }
+
+        function contraResize(force) {
+            if (!force && !document.getElementById('contra-game-screen').classList.contains('active')) return;
+            const cv = document.getElementById('contra-canvas');
+            if (!cv) return;
+            CONTRA.W = 480; CONTRA.H = 270; CONTRA.GROUND = 232; CONTRA.WATER_TOP = 252;
+            cv.width = CONTRA.W; cv.height = CONTRA.H;
+            const scale = Math.min(window.innerWidth / CONTRA.W, window.innerHeight / CONTRA.H);
+            cv.style.width = Math.round(CONTRA.W * scale) + 'px';
+            cv.style.height = Math.round(CONTRA.H * scale) + 'px';
+            CONTRA.stars = [];
+            for (let i = 0; i < 46; i++) CONTRA.stars.push({ x: Math.random() * CONTRA.W, y: Math.random() * CONTRA.H * 0.55, s: Math.random() < 0.3 ? 2 : 1 });
+            const portrait = window.innerHeight > window.innerWidth && window.innerWidth < 700;
+            const hint = document.getElementById('cg-rotate');
+            if (hint) hint.style.display = portrait ? 'block' : 'none';
+            CONTRA.players.forEach((p) => { if (!p.out && p.onGround && !p.inWater) p.y = CONTRA.GROUND - p.h; });
+        }
+        window.addEventListener('resize', () => contraResize(false));
+
+        function startContraGame() {
+            const roster = CONTRA.coOp ? [CONTRA.pick, CONTRA.pick2] : [CONTRA.pick];
+            contraStopRun();
+            themeBgm.pause();
+            switchScreen('contra-game-screen');
+            document.body.classList.add('contra-full');
+            contraResize(true);
+            CONTRA.players = roster.map((k, i) => contraMakePlayer(i, k));
+            CONTRA.enemies = []; CONTRA.bullets = []; CONTRA.ebullets = []; CONTRA.parts = []; CONTRA.pops = []; CONTRA.drops = [];
+            CONTRA.score = 0; CONTRA.frame = 0; CONTRA.state = 'play';
+            CONTRA.shake = 0; CONTRA.hitstop = 0; CONTRA.stageIdx = 0; CONTRA.paused = false; CONTRA.pops = [];
+            CONTRA.lastTs = performance.now(); CONTRA.accumulator = 0;
+            CONTRA.reinforceCd = 520;
+            CONTRA.stats = { kills: 0, deaths: 0, shots: 0, frames: 0 };
+            document.getElementById('cg-overlay').style.display = 'none'; // FIX: cho phep choi lai sau khi thua
+            document.getElementById('cg-overlay').classList.remove('is-win');
+            document.getElementById('cg-bosswrap').style.display = 'none';
+            const pauseBtn = document.getElementById('cg-pause');
+            pauseBtn.innerText = '⏸'; pauseBtn.setAttribute('aria-label', 'Tạm dừng');
+            contraBuildStage();
+            CONTRA.running = true;
+            if (CONTRA.raf) cancelAnimationFrame(CONTRA.raf);
+            CONTRA.raf = requestAnimationFrame(contraLoop);
+        }
+
+        function contraSegAt(x) {
+            let best = null;
+            CONTRA.terrain.forEach((s) => { if (x >= s.x && x <= s.x + s.w) best = s; });
+            return best;
+        }
+        function contraFloorAt(x, y) {
+            // tim mat dat dung nhat tai x, cao hon hoac bang y (platform hoac dat)
+            let floor = null;
+            CONTRA.platforms.forEach((pl) => {
+                if (x >= pl.x && x <= pl.x + pl.w && pl.y >= y - 4) { if (floor === null || pl.y < floor) floor = pl.y; }
+            });
+            const seg = contraSegAt(x);
+            if (seg && seg.top >= y - 4) { if (floor === null || seg.top < floor) floor = seg.top; }
+            return floor;
+        }
+
+        function contraBuildStage() {
+            const st = CONTRA.stages[CONTRA.stageIdx];
+            CONTRA.stage = st;
+            CONTRA.enemies = []; CONTRA.bullets = []; CONTRA.ebullets = [];
+            CONTRA.pods = []; CONTRA.drops = [];
+            CONTRA.cam = 0; CONTRA.state = 'play';
+            CONTRA.gate = null; CONTRA.base = null;
+            if (st.type === 'side') {
+                CONTRA.platforms = st.platforms.map(([x, y, w]) => ({ x, y, w }));
+                CONTRA.terrain = st.ground.map(([x, w, top]) => ({ x, w, top }));
+                CONTRA.spawns = [];
+                let sx = st.spawnStart, si = 0;
+                while (sx < st.len - 700) {
+                    const roll = Math.random();
+                    const seg = contraSegAt(sx + 10);
+                    const cands = st.platforms.filter((pl) => sx >= pl.x + 4 && sx <= pl.x + pl.w - 24 && pl.y < 200);
+                    if (st.officers && roll < 0.18 && seg) {
+                        CONTRA.spawns.push({ x: sx, type: 'officer', seg, done: false });
+                    } else if (roll < 0.52 && cands.length) {
+                        const pl = cands[Math.floor(Math.random() * cands.length)];
+                        CONTRA.spawns.push({ x: sx, type: 'pshooter', py: pl.y, done: false });
+                    } else if (seg) {
+                        if (Math.random() < st.shooterRatio) CONTRA.spawns.push({ x: sx, type: 'shooter', seg, done: false });
+                        else if (Math.random() < st.jumperRatio * 0.6) CONTRA.spawns.push({ x: sx, type: 'jumper', seg, done: false });
+                        else CONTRA.spawns.push({ x: sx, type: 'walker', seg, done: false });
+                    }
+                    if (si % 2 === 1 && contraSegAt(sx + 80)) CONTRA.spawns.push({ x: sx + 80, type: 'walker', seg: contraSegAt(sx + 80), done: false });
+                    sx += st.spawnGap + (si % 3) * 40; si++;
+                }
+                CONTRA.caps = [];
+                CONTRA.pods = st.caps.map(([triggerX, type]) => ({ triggerX, type, spawned: false, active: false, dead: false, x: 0, y: 90, t: 0 }));
+                CONTRA.hearts = (st.hearts || []).map((x) => ({ x, taken: false, t: Math.random() * 6, y0: 96 }));
+                CONTRA.gate = {
+                    x: st.gate.wallX, entered: false,
+                    coreX: st.gate.wallX + 30, coreY: 88, coreHp: st.gate.coreHp, coreMax: st.gate.coreHp,
+                    turrets: [
+                        { x: st.gate.wallX + 12, y: 148, hp: st.gate.turretHp, cd: 70, alive: true, flash: 0 },
+                        { x: st.gate.wallX + 12, y: 194, hp: st.gate.turretHp, cd: 130, alive: true, flash: 0 }
+                    ]
+                };
+                // 3 bac tron len ngam ban core (tang tren cung ngang tam core)
+                CONTRA.platforms.push(
+                    { x: st.gate.wallX - 310, y: 192, w: 110 },
+                    { x: st.gate.wallX - 200, y: 150, w: 110 },
+                    { x: st.gate.wallX - 96, y: 108, w: 110 }
+                );
+                CONTRA.players.forEach((p, i) => {
+                    p.x = 40 + i * 40; p.y = CONTRA.GROUND - 22; p.vy = 0; p.h = 22; p.prone = false; p.inWater = false;
+                    p.inv = 90 + p.ch.invBonus; p.out = false;
+                    if (p.hp <= 0) p.hp = p.maxHp;
+                });
+            } else {
+                CONTRA.platforms = []; CONTRA.terrain = []; CONTRA.spawns = []; CONTRA.caps = []; CONTRA.hearts = []; CONTRA.pods = []; CONTRA.drops = [];
+                CONTRA.base = { kills: 0, targets: st.targets, spawnCd: 70, core: { hp: st.coreHp, max: st.coreHp, open: false, announced: false, t: 0, dead: false } };
+                CONTRA.players.forEach((p, i) => {
+                    p.x = CONTRA.W / 2 + (i === 0 ? -60 : 60); p.y = CONTRA.GROUND - 22; p.vy = 0; p.h = 22; p.prone = false; p.inWater = false;
+                    p.inv = 90 + p.ch.invBonus; p.out = false;
+                    if (p.hp <= 0) p.hp = p.maxHp;
+                });
+            }
+            contraBanner(st.name, st.sub);
+        }
+
+        function contraBanner(text, sub) {
+            const el = document.getElementById('cg-banner');
+            el.innerHTML = text + (sub ? '<span class="cg-bannersub">' + sub + '</span>' : '');
+            el.classList.remove('show');
+            void el.offsetWidth;
+            el.classList.add('show');
+        }
+
+        function contraLoop(ts) {
+            if (!CONTRA.running) return;
+            const step = 1000 / 60;
+            const delta = Math.min(50, Math.max(0, ts - CONTRA.lastTs));
+            CONTRA.lastTs = ts;
+            if (CONTRA.state === 'play' && !CONTRA.paused) {
+                CONTRA.accumulator += delta;
+                let updates = 0;
+                while (CONTRA.accumulator >= step && updates < 3) {
+                    contraUpdate();
+                    CONTRA.accumulator -= step;
+                    updates++;
+                }
+            } else CONTRA.accumulator = 0;
+            contraDraw();
+            CONTRA.raf = requestAnimationFrame(contraLoop);
+        }
+
+        function contraTogglePause() {
+            if (CONTRA.state !== 'play') return;
+            CONTRA.paused = !CONTRA.paused;
+            contraClearInputs();
+            const btn = document.getElementById('cg-pause');
+            btn.innerText = CONTRA.paused ? '▶' : '⏸';
+            btn.setAttribute('aria-label', CONTRA.paused ? 'Tiếp tục' : 'Tạm dừng');
+            SFX.click();
+        }
+
+        function contraAlive() { return CONTRA.players.filter((p) => !p.out); }
+        function contraNearest(x) {
+            let best = null, bd = 1e9;
+            contraAlive().forEach((p) => { const d = Math.abs(p.x - x); if (d < bd) { bd = d; best = p; } });
+            return best;
+        }
+
+        function contraLoseLife(p) {
+            p.lives--;
+            CONTRA.stats.deaths++;
+            if (!p.ch.weaponKeep) p.weapon = 'N';
+            contraBurst(p.x + 10, p.y + 11, 10, 4);
+            if (p.lives < 0) {
+                p.out = true;
+                if (CONTRA.players.every((pl) => pl.out)) {
+                    CONTRA.state = 'lose';
+                    sfxBoom(true);
+                    const runId = CONTRA.runId;
+                    clearTimeout(CONTRA.transitionTimer);
+                    CONTRA.transitionTimer = setTimeout(() => {
+                        if (CONTRA.runId === runId && CONTRA.state === 'lose') contraShowOverlay('GAME OVER');
+                    }, 600);
+                }
+                return;
+            }
+            p.hp = p.maxHp; p.inv = 150 + p.ch.invBonus; p.vy = 0; p.inWater = false;
+            if (CONTRA.stage.type === 'side') {
+                const seg = contraSegAt(CONTRA.cam + 60);
+                p.x = Math.min(CONTRA.cam + 40 + p.idx * 40, CONTRA.cam + CONTRA.W - 40);
+                p.y = (seg ? seg.top : CONTRA.GROUND) - 60;
+            } else { p.x = CONTRA.W / 2 + (p.idx === 0 ? -60 : 60); p.y = CONTRA.GROUND - 60; }
+        }
+
+        function contraHurtP(p, n) {
+            if (p.inv > 0 || p.out || CONTRA.state !== 'play') return;
+            p.hp -= n; p.inv = 60;
+            p.x -= p.face * 8; p.vy = -2; p.onGround = false;
+            CONTRA.shake = Math.min(1, CONTRA.shake + 0.55);
+            SFX.eliminate(); buzz([90, 40, 90]);
+            if (p.hp <= 0) {
+                p.hp = 0;
+                sfxBoom(false);
+                contraLoseLife(p);
+            }
+        }
+
+        function contraKillEnemy(e, byP) {
+            const base = e.score || 100;
+            CONTRA.score += base;
+            CONTRA.stats.kills++;
+            SFX.eliminate();
+            CONTRA.hitstop = 3;
+            CONTRA.shake = Math.min(1, CONTRA.shake + 0.3);
+            contraBurst(e.x + 10, e.y + 11, 8, 4);
+            CONTRA.pops.push({ x: e.x + 2, y: e.y - 6, txt: '+' + base, life: 45 });
+        }
+
+        function contraBurst(x, y, n, spd) {
+            for (let i = 0; i < n; i++) {
+                const pt = CONTRA.pool.parts.pop() || {};
+                pt.x = x; pt.y = y; pt.vx = (Math.random() - .5) * spd; pt.vy = -Math.random() * spd * 0.7; pt.life = 18 + Math.random() * 12;
+                CONTRA.parts.push(pt);
+            }
+        }
+
+        function contraSpawnBullet(x, y, vx, vy, opts) {
+            const b2 = CONTRA.pool.bullets.pop() || {};
+            b2.x = x; b2.y = y; b2.vx = vx; b2.vy = vy;
+            b2.spread = !!(opts && opts.spread);
+            b2.laser = !!(opts && opts.laser);
+            b2.dmg = (opts && opts.dmg) || 1;
+            b2.z = (opts && opts.z) || 0; b2.lane = (opts && opts.lane) || 0; b2.zs = (opts && opts.zs) || 0.028;
+            b2.owner = (opts && opts.owner) || 0;
+            CONTRA.bullets.push(b2);
+        }
+
+        function contraSpawnEBullet(x, y, vx, vy) {
+            const b2 = CONTRA.pool.ebullets.pop() || {};
+            b2.x = x; b2.y = y; b2.vx = vx; b2.vy = vy;
+            CONTRA.ebullets.push(b2);
+        }
+
+        function contraFireWeapon(p) {
+            const K = p.keys;
+            CONTRA.stats.shots++;
+            let ax = p.face, ay = 0;
+            const moving = K.left || K.right;
+            if (K.up) { ay = -1; if (!moving) ax = 0; }
+            else if (K.down) {
+                if (p.prone) { ay = 0; ax = p.face; } // nam sap: ban ngang sat dat
+                else {
+                    ay = 1; // cheo xuong khi di chuyen, thang xuong khi tren khong
+                    if (!moving && p.onGround) { ay = 0; ax = p.face; }
+                    if (!moving && !p.onGround) ax = 0;
+                }
+            }
+            const inBase = CONTRA.stage.type === 'base';
+            if (inBase) { ay = 0; ax = p.face; }
+            const mzX = p.x + p.w / 2 + ax * 12, mzY = p.y + (p.prone ? 10 : (ay < 0 ? 0 : 9));
+            p.mf = 3; p.mx = mzX; p.my = mzY;
+            const spd = p.weapon === 'R' ? 9.5 : 6.5;
+            if (p.weapon === 'S') {
+                const live = CONTRA.bullets.reduce((n, b2) => n + (b2.spread ? 1 : 0), 0);
+                const allow = Math.min(5, 10 - live);
+                if (allow > 0) {
+                    const base = Math.atan2(ay, ax || 0.001);
+                    for (let i = 0; i < allow; i++) {
+                        const a = base + (i - (allow - 1) / 2) * 0.17;
+                        if (inBase) contraSpawnBullet(0, 0, 0, 0, { z: 0.06, lane: (mzX - CONTRA.W / 2) / 150 + (i - (allow - 1) / 2) * 0.09, spread: true, owner: p.idx });
+                        else contraSpawnBullet(mzX, mzY, Math.cos(a) * 6.5, Math.sin(a) * 6.5, { spread: true, owner: p.idx });
+                    }
+                    p.cd = 15; playTone(660, 'square', 0.05, 0.09);
+                } else p.cd = 3;
+            } else if (p.weapon === 'L') {
+                for (let i = CONTRA.bullets.length - 1; i >= 0; i--) {
+                    if (CONTRA.bullets[i].laser && CONTRA.bullets[i].owner === p.idx) {
+                        CONTRA.pool.bullets.push(CONTRA.bullets[i]);
+                        CONTRA.bullets.splice(i, 1);
+                    }
+                }
+                if (inBase) contraSpawnBullet(0, 0, 0, 0, { z: 0.06, lane: (mzX - CONTRA.W / 2) / 150, laser: true, dmg: 3, zs: 0.05, owner: p.idx });
+                else {
+                    const len = Math.hypot(ax, ay) || 1;
+                    contraSpawnBullet(mzX, mzY, ax / len * 12, ay / len * 12, { laser: true, dmg: 3, owner: p.idx });
+                }
+                p.cd = 20; playTone(1200, 'sawtooth', 0.08, 0.1);
+            } else {
+                if (inBase) {
+                    contraSpawnBullet(0, 0, 0, 0, { z: 0.06, lane: (mzX - CONTRA.W / 2) / 150, zs: p.weapon === 'R' ? 0.036 : 0.028, owner: p.idx });
+                } else {
+                    const len = Math.hypot(ax, ay) || 1;
+                    contraSpawnBullet(mzX, mzY, ax / len * spd, ay / len * spd, { owner: p.idx });
+                }
+                p.cd = p.weapon === 'M' ? 7 : p.ch.fireCd;
+                playTone(880, 'square', 0.04, 0.07);
+            }
+        }
+
+        function contraUpdatePlayer(p) {
+            const ch = p.ch, K = p.keys, st = CONTRA.stage;
+            if (p.out) return;
+            if (p.cd > 0) p.cd--;
+            if (p.inv > 0) p.inv--;
+            if (p.mf > 0) p.mf--;
+            p.vx = 0;
+            const spdMul = p.inWater ? 0.55 : 1;
+            if (K.left) { p.vx = -ch.speed * spdMul; p.face = -1; }
+            if (K.right) { p.vx = ch.speed * spdMul; p.face = 1; }
+            const wantProne = !!(K.down && p.onGround && !p.inWater && !K.left && !K.right);
+            if (wantProne !== p.prone) {
+                const feet = p.y + p.h;
+                p.prone = wantProne;
+                p.h = wantProne ? 14 : 22;
+                p.y = feet - p.h;
+            }
+            if (p.coyote > 0) p.coyote--;
+            if (p.jumpBuf > 0) p.jumpBuf--;
+            if (p.onGround || p.inWater) p.coyote = 7;
+            if (p.jumpQueued) { p.jumpQueued = false; p.jumpBuf = 7; }
+            if (p.jumpBuf > 0) {
+                if (p.inWater) {
+                    // nhay khoi nuoc — waterLock chong re-entry ngay lap tuc
+                    p.jumpBuf = 0; p.inWater = false;
+                    p.vy = -8.2; p.onGround = false; p.jumps = 1; p.waterLock = 10;
+                    playTone(400, 'square', 0.06, 0.1);
+                    contraBurst(p.x + 10, CONTRA.WATER_TOP, 6, 3);
+                } else if (p.coyote > 0 || p.jumps < ch.jumps) {
+                    p.jumpBuf = 0; p.coyote = 0;
+                    if (!p.onGround) p.jumps++; else p.jumps = 1;
+                    p.vy = ch.jumpV; p.onGround = false;
+                    playTone(320, 'square', 0.07, 0.1);
+                }
+            }
+            if (K.fire && p.cd <= 0) contraFireWeapon(p);
+            const prevFeet = p.y + p.h;
+            if (!p.inWater) { p.vy += 0.45; p.x += p.vx; p.y += p.vy; }
+            else { p.x += p.vx; p.vy = 0; }
+            p.onGround = false;
+            if (st.type === 'side') {
+                const cx = p.x + p.w / 2;
+                const seg = contraSegAt(cx);
+                p.seg = seg;
+                if (seg && p.y + p.h >= seg.top) {
+                    if (p.inWater) { p.inWater = false; }
+                    p.y = seg.top - p.h; p.vy = 0; p.onGround = true; p.jumps = 0;
+                }
+                CONTRA.platforms.forEach((pl) => {
+                    if (p.inWater) return;
+                    if (p.vy >= 0 && prevFeet <= pl.y + 1 && p.y + p.h >= pl.y && p.x + p.w > pl.x && p.x < pl.x + pl.w) {
+                        p.y = pl.y - p.h; p.vy = 0; p.onGround = true; p.jumps = 0;
+                    }
+                });
+                // roi xuong nuoc → BOI (khong chet — dung nuoc la tuyen duong nhu Contra)
+                if (p.waterLock > 0) p.waterLock--;
+                if (!p.inWater && !seg && p.waterLock <= 0 && p.y + p.h >= CONTRA.WATER_TOP + 6) {
+                    p.inWater = true; p.y = CONTRA.WATER_TOP - 8; p.vy = 0; p.jumps = 0;
+                    playTone(220, 'sine', 0.12, 0.14);
+                    contraBurst(cx, CONTRA.WATER_TOP, 10, 3);
+                }
+                const lead = Math.max(...CONTRA.players.filter((q) => !q.out).map((q) => q.x), p.x);
+                CONTRA.cam = Math.max(0, Math.min(Math.max(CONTRA.cam, lead - 170), st.len - CONTRA.W));
+                if (p.x < CONTRA.cam + 2) p.x = CONTRA.cam + 2;
+                if (p.x > CONTRA.cam + CONTRA.W - p.w - 2) p.x = CONTRA.cam + CONTRA.W - p.w - 2;
+                if (CONTRA.gate && p.x + p.w > CONTRA.gate.x - 6) p.x = CONTRA.gate.x - 6 - p.w;
+            } else {
+                if (p.y + p.h >= CONTRA.GROUND) { p.y = CONTRA.GROUND - p.h; p.vy = 0; p.onGround = true; p.jumps = 0; }
+                if (p.x < 30) p.x = 30;
+                if (p.x > CONTRA.W - p.w - 30) p.x = CONTRA.W - p.w - 30;
+            }
+        }
+
+        function contraSpawnGroundEnemy(s, st) {
+            const seg = s.seg || contraSegAt(s.x + 10);
+            if (!seg) return;
+            const common = { x: s.x, y: seg.top - 22, w: 20, h: 22, segTop: seg.top, minX: seg.x + 2, maxX: seg.x + seg.w - 22, face: -1, flash: 0, tele: 0, onGround: true, vy: 0, vx: 0 };
+            if (s.type === 'officer') CONTRA.enemies.push({ ...common, type: 'officer', hp: 4, cd: 70, burst: 0, spr: contraTintSprite(), score: 300 });
+            else if (s.type === 'jumper') CONTRA.enemies.push({ ...common, type: 'jumper', hp: 2 + st.eHpBonus, cd: 40 + Math.random() * 40, spr: contraSprite(spriteKid, 2), score: 150 });
+            else if (s.type === 'shooter') CONTRA.enemies.push({ ...common, type: 'shooter', hp: 2 + st.eHpBonus, cd: 40 + Math.random() * 40, spr: contraSprite(spriteSpy, 2), score: 150 });
+            else CONTRA.enemies.push({ ...common, type: 'walker', hp: 2 + st.eHpBonus, cd: 0, spr: contraSprite(spriteSpy, 2), score: 100 });
+        }
+
+        function contraUpdateSide() {
+            const st = CONTRA.stage;
+            CONTRA.spawns.forEach((s) => {
+                if (!s.done && s.x < CONTRA.cam + CONTRA.W + 60) {
+                    s.done = true;
+                    if (s.type === 'pshooter') {
+                        CONTRA.enemies.push({ x: s.x, y: s.py - 22, w: 20, h: 22, type: 'shooter', hp: 2 + st.eHpBonus, cd: 40 + Math.random() * 40, face: -1, flash: 0, tele: 0, spr: contraSprite(spriteSpy, 2), score: 150 });
+                    } else contraSpawnGroundEnemy(s, st);
+                }
+            });
+            // pod bay (fly-by weapon carrier)
+            const lead = contraAlive().length ? Math.max(...contraAlive().map((p) => p.x)) : 0;
+            CONTRA.pods.forEach((pod) => {
+                if (pod.dead) return;
+                if (!pod.spawned) {
+                    if (lead > pod.triggerX) {
+                        pod.spawned = true; pod.active = true;
+                        pod.x = CONTRA.cam + CONTRA.W + 30; pod.y = 80; pod.t = 0;
+                        playTone(500, 'square', 0.08, 0.1);
+                    }
+                    return;
+                }
+                if (!pod.active) return;
+                pod.t++; pod.x -= 2.2;
+                pod.y = 80 + Math.sin(pod.t * 0.045) * 46;
+                if (pod.x < CONTRA.cam - 40) pod.dead = true;
+            });
+            // drop vu khi roi
+            CONTRA.drops.forEach((d) => {
+                if (d.taken) return;
+                if (!d.landed) {
+                    const prevY = d.y;
+                    d.vy += 0.3; d.y += d.vy;
+                    const floor = contraFloorAt(d.x + 7, prevY + 10);
+                    if (floor !== null && d.y + 12 >= floor) { d.y = floor - 12; d.landed = true; d.vy = 0; }
+                    if (d.y > CONTRA.H + 30) d.taken = true;
+                }
+                for (const p of contraAlive()) {
+                    if (p.x < d.x + 14 && p.x + p.w > d.x && p.y < d.y + 12 && p.y + p.h > d.y) {
+                        d.taken = true; p.weapon = d.type; CONTRA.score += 50;
+                        playTone(1046, 'square', 0.09, 0.12);
+                        setTimeout(() => playTone(1568, 'square', 0.12, 0.12), 80);
+                        break;
+                    }
+                }
+            });
+            CONTRA.enemies.forEach((e) => {
+                if (e.flash > 0) e.flash--;
+                const tp = contraNearest(e.x);
+                if (e.type === 'walker') {
+                    if (tp) e.face = tp.x > e.x ? 1 : -1;
+                    const charge = (tp && tp.seg && tp.seg.top === e.segTop) ? 1.6 : 1;
+                    const sp = (e.type === 'officer' ? st.eSpeed * 0.85 : st.eSpeed) * charge;
+                    e.x += e.face * sp;
+                    if (e.x < e.minX) { e.x = e.minX; e.face = 1; }
+                    if (e.x > e.maxX) { e.x = e.maxX; e.face = -1; }
+                    e.y = e.segTop - 22;
+                } else if (e.type === 'jumper') {
+                    e.cd--;
+                    if (e.onGround) {
+                        e.y = e.segTop - 22; e.vy = 0;
+                        if (e.cd <= 0 && tp) {
+                            e.vy = -5.4; e.vx = (tp.x > e.x ? 1 : -1) * 1.5; e.onGround = false; e.cd = 55 + Math.random() * 25;
+                            playTone(180, 'square', 0.05, 0.08);
+                        }
+                    } else {
+                        e.x += e.vx; e.vy += 0.32; e.y += e.vy;
+                        const seg2 = contraSegAt(e.x + 10);
+                        if (seg2 && e.vy > 0 && e.y + 22 >= seg2.top) { e.y = seg2.top - 22; e.segTop = seg2.top; e.minX = seg2.x + 2; e.maxX = seg2.x + seg2.w - 22; e.onGround = true; }
+                        if (!seg2 && e.y > CONTRA.WATER_TOP) { e.hp = 0; contraBurst(e.x + 10, CONTRA.WATER_TOP, 6, 3); }
+                    }
+                } else {
+                    if (tp) e.face = tp.x > e.x ? 1 : -1;
+                    if (e.segTop !== undefined) {
+                        const dd = tp ? Math.abs(tp.x - e.x) : 999;
+                        if (tp && dd < 80 && e.x > e.minX + 6) e.x -= e.face * 0.5;
+                        else if (tp && dd > 230 && e.x < e.maxX - 6) e.x += e.face * 0.4;
+                        e.y = e.segTop - 22;
+                    }
+                    e.cd--;
+                    e.tele = e.cd > 0 && e.cd < 14 && tp && Math.abs(tp.x - e.x) < 420;
+                    if (tp && e.cd <= 0 && Math.abs(tp.x - e.x) < 420) {
+                        const dx = (tp.x + 10) - (e.x + 10), dy = (tp.y + 11) - (e.y + 11), len = Math.hypot(dx, dy) || 1;
+                        if (e.type === 'officer') {
+                            if (!e.burst) { contraSpawnEBullet(e.x + 10, e.y + 9, dx / len * st.eBulletSpd, dy / len * st.eBulletSpd); e.burst = 1; e.cd = 10; }
+                            else if (e.burst === 1) { contraSpawnEBullet(e.x + 10, e.y + 9, dx / len * st.eBulletSpd * 1.08, dy / len * st.eBulletSpd * 1.08); e.burst = 2; e.cd = 10; }
+                            else { contraSpawnEBullet(e.x + 10, e.y + 9, dx / len * st.eBulletSpd * 1.16, dy / len * st.eBulletSpd * 1.16); e.burst = 0; e.cd = st.eFire; }
+                        } else {
+                            contraSpawnEBullet(e.x + 10, e.y + 9, dx / len * st.eBulletSpd, dy / len * st.eBulletSpd);
+                            e.cd = st.eFire + Math.random() * 22;
+                        }
+                        sfxTach();
+                    }
+                }
+                contraAlive().forEach((p) => {
+                    if (p.inv <= 0 && p.x < e.x + e.w && p.x + p.w > e.x && p.y < e.y + e.h && p.y + p.h > e.y) contraHurtP(p, 1);
+                });
+            });
+            CONTRA.enemies = CONTRA.enemies.filter((e) => e.hp > 0 && e.x > CONTRA.cam - 80);
+            // tang vien 2 dau man hinh (kieu Contra: linh chay tu ca hai phia)
+            if (CONTRA.reinforceCd === undefined) CONTRA.reinforceCd = 420;
+            CONTRA.reinforceCd--;
+            if (CONTRA.reinforceCd <= 0) {
+                CONTRA.reinforceCd = Math.max(200, 380 - CONTRA.stageIdx * 50);
+                if (CONTRA.enemies.length < 6) {
+                    const fromRight = Math.random() < 0.6;
+                    const rx = fromRight ? CONTRA.cam + CONTRA.W + 30 : CONTRA.cam - 30;
+                    const rseg = contraSegAt(rx + 10);
+                    if (rseg) contraSpawnGroundEnemy({ x: rx, type: 'walker', seg: rseg }, st);
+                }
+            }
+            // CONG: than thanh + core + tru phao
+            const g = CONTRA.gate;
+            if (g && !g.entered && CONTRA.cam + CONTRA.W > g.x - 40) {
+                g.entered = true;
+                contraBanner('CỔNG CĂN CỨ!', 'Phá lõi nhấp nháy trên cổng, né đạn từ 2 tháp pháo');
+                document.getElementById('cg-bosswrap').style.display = 'block';
+                playTone(70, 'sawtooth', 0.5, 0.2);
+            }
+            if (g && g.entered) {
+                g.turrets.forEach((t, ti) => {
+                    if (!t.alive) return;
+                    if (t.flash > 0) t.flash--;
+                    t.cd--;
+                    t.tele = t.cd > 0 && t.cd < 20;
+                    if (t.cd <= 0) {
+                        t.tele = false;
+                        t.cd = st.gate.turretCd + ti * 16;
+                        const tp = contraNearest(t.x);
+                        if (tp) {
+                            const dx = (tp.x + 10) - t.x, dy = (tp.y + 11) - (t.y + 6), len = Math.hypot(dx, dy) || 1;
+                            contraSpawnEBullet(t.x - 4, t.y + 6, dx / len * st.eBulletSpd * 1.05, dy / len * st.eBulletSpd * 1.05);
+                            t.flash = 5;
+                            sfxTach();
+                        }
+                    }
+                });
+            }
+        }
+
+        function contraUpdateBase() {
+            const st = CONTRA.stage, bs = CONTRA.base;
+            if (!bs) return;
+            const core = bs.core;
+            if (!core.dead) {
+                core.t++;
+                const unlocked = bs.kills >= bs.targets;
+                core.open = unlocked && (core.t % 220) < 72;
+                if (unlocked && !core.announced) {
+                    core.announced = true;
+                    core.t = 0;
+                    contraBanner('LÕI CĂN CỨ ĐÃ MỞ!', 'Bắn vào lõi sáng trước khi cửa giáp khép lại');
+                    playTone(920, 'square', 0.12, 0.12);
+                }
+            }
+            bs.spawnCd--;
+            if (bs.spawnCd <= 0) {
+                bs.spawnCd = Math.max(45, 80 - bs.kills * 4);
+                CONTRA.enemies.push({ lane: Math.random() * 1.6 - 0.8, z: 0, speed: 0.006 + CONTRA.stageIdx * 0.0015 + Math.random() * 0.002, hp: 1 + (st.eHpBonus || 0), type: 'runner', w: 20, h: 22, spr: contraSprite(spriteSpy, 2) });
+            }
+            CONTRA.enemies.forEach((e) => {
+                e.z += e.speed;
+                if (e.z >= 1) {
+                    e.hp = 0;
+                    const tp = contraNearest(CONTRA.W / 2 + e.lane * 150);
+                    if (tp) contraHurtP(tp, 1);
+                }
+            });
+            CONTRA.enemies = CONTRA.enemies.filter((e) => e.hp > 0);
+            if (core.open && !core.dead && core.t % 30 === 0) {
+                const tp = contraNearest(CONTRA.W / 2) || CONTRA.players[0];
+                const dx = (tp.x + 10) - CONTRA.W / 2, dy = (tp.y + 11) - (CONTRA.H * 0.44), len = Math.hypot(dx, dy) || 1;
+                contraSpawnEBullet(CONTRA.W / 2, CONTRA.H * 0.44, dx / len * 2.3, dy / len * 2.3);
+                sfxTach();
+            }
+        }
+
+        function contraStageClear() {
+            if (CONTRA.state !== 'play') return;
+            CONTRA.state = 'stageclear';
+            CONTRA.score += 1000;
+            sfxBoom(false);
+            const next = CONTRA.stages[CONTRA.stageIdx + 1];
+            const from = CONTRA.stageIdx;
+            const runId = CONTRA.runId;
+            contraBanner('MÀN ' + (CONTRA.stageIdx + 1) + ' HOÀN THÀNH!', next ? 'TIẾN LÊN: ' + next.name : 'HÀNH TRÌNH KHÉP LẠI');
+            clearTimeout(CONTRA.transitionTimer);
+            CONTRA.transitionTimer = setTimeout(() => {
+                if (CONTRA.runId !== runId || CONTRA.stageIdx !== from || CONTRA.state !== 'stageclear') return;
+                CONTRA.stageIdx = from + 1;
+                if (CONTRA.stageIdx >= CONTRA.stages.length) {
+                    CONTRA.state = 'win';
+                    contraShowOverlay('SỨ MỆNH HOÀN THÀNH!');
+                } else {
+                    contraBuildStage();
+                }
+            }, 2400);
+        }
+
+        function contraUpdate() {
+            if (CONTRA.hitstop > 0) { CONTRA.hitstop--; return; }
+            const st = CONTRA.stage;
+            CONTRA.frame++;
+            CONTRA.stats.frames++;
+            CONTRA.players.forEach((p) => contraUpdatePlayer(p));
+            if (st.type === 'side') contraUpdateSide(); else contraUpdateBase();
+            const g = CONTRA.gate;
+            const liveB = [];
+            for (const bl of CONTRA.bullets) {
+                let dead = false;
+                if (st.type === 'side') {
+                    bl.x += bl.vx; bl.y += bl.vy || 0;
+                    dead = bl.x < CONTRA.cam - 20 || bl.x > CONTRA.cam + CONTRA.W + 20 || bl.y < -20 || bl.y > CONTRA.H + 20;
+                    if (!dead) for (const e of CONTRA.enemies) {
+                        if (bl.x > e.x && bl.x < e.x + e.w && bl.y > e.y && bl.y < e.y + e.h) {
+                            e.hp -= bl.dmg; e.flash = 4;
+                            if (e.hp <= 0) contraKillEnemy(e, CONTRA.players[bl.owner]); else playTone(200, 'square', 0.05, 0.08);
+                            dead = true; break;
+                        }
+                    }
+                    // dan trung pod bay → roi vu khi
+                    if (!dead) for (const pod of CONTRA.pods) {
+                        if (pod.active && !pod.dead && bl.x > pod.x - 4 && bl.x < pod.x + 20 && bl.y > pod.y - 4 && bl.y < pod.y + 14) {
+                            pod.dead = true;
+                            CONTRA.score += 100;
+                            CONTRA.drops.push({ x: pod.x + 2, y: pod.y, vy: -1.5, type: pod.type, taken: false, landed: false });
+                            SFX.eliminate(); contraBurst(pod.x + 8, pod.y + 5, 8, 4);
+                            dead = true; break;
+                        }
+                    }
+                    // dan trung CONG: tru phao + core
+                    if (!dead && g && g.entered) {
+                        for (const t of g.turrets) {
+                            if (t.alive && bl.x > t.x - 2 && bl.x < t.x + 16 && bl.y > t.y - 2 && bl.y < t.y + 14) {
+                                t.hp -= bl.dmg; t.flash = 4; playTone(240, 'square', 0.05, 0.09);
+                                if (t.hp <= 0) {
+                                    t.alive = false; CONTRA.score += 500;
+                                    sfxBoom(false); contraBurst(t.x + 7, t.y + 6, 14, 5);
+                                    CONTRA.pops.push({ x: t.x - 4, y: t.y - 8, txt: '+500', life: 45 });
+                                }
+                                dead = true; break;
+                            }
+                        }
+                        if (!dead && bl.x > g.coreX - 10 && bl.x < g.coreX + 10 && bl.y > g.coreY - 8 && bl.y < g.coreY + 8) {
+                            g.coreHp -= bl.dmg;
+                            playTone(300, 'square', 0.06, 0.1);
+                            CONTRA.shake = Math.min(1, CONTRA.shake + 0.15);
+                            if (g.coreHp <= 0) {
+                                CONTRA.score += 2500; sfxBoom(true); csShake();
+                                contraBurst(g.coreX, g.coreY, 30, 8);
+                                contraStageClear();
+                            }
+                            dead = true;
+                        }
+                    }
+                } else {
+                    bl.z += bl.zs || 0.028;
+                    const by = CONTRA.H * 0.44 + (CONTRA.GROUND - CONTRA.H * 0.44) * bl.z;
+                    if (bl.z >= 1) dead = true;
+                    const bs = CONTRA.base;
+                    if (!bs) { CONTRA.pool.bullets.push(bl); continue; }
+                    if (!dead) for (const e of CONTRA.enemies) {
+                        if (e.z > 0.45 && Math.abs(bl.lane - e.lane) < 0.14 && Math.abs(bl.z - e.z) < 0.1 && by > CONTRA.H * 0.55) {
+                            e.hp -= bl.dmg;
+                            if (e.hp <= 0) {
+                                bs.kills++;
+                                CONTRA.stats.kills++;
+                                CONTRA.score += 100;
+                                SFX.eliminate(); CONTRA.hitstop = 2;
+                                contraBurst(CONTRA.W / 2 + e.lane * 150 * e.z, by - 10, 6, 3);
+                            } else playTone(200, 'square', 0.05, 0.08);
+                            dead = true; break;
+                        }
+                    }
+                    if (!dead && bs.core && !bs.core.dead && bs.core.open && Math.abs(bl.lane) < 0.15 && bl.z > 0.8) {
+                        bs.core.hp -= bl.dmg;
+                        playTone(300, 'square', 0.06, 0.1);
+                        CONTRA.shake = Math.min(1, CONTRA.shake + 0.15);
+                        if (bs.core.hp <= 0) {
+                            bs.core.dead = true;
+                            CONTRA.score += 2000; sfxBoom(true); csShake();
+                            contraBurst(CONTRA.W / 2, CONTRA.H * 0.4, 30, 8);
+                            contraStageClear();
+                        }
+                        dead = true;
+                    }
+                }
+                if (dead) CONTRA.pool.bullets.push(bl); else liveB.push(bl);
+            }
+            CONTRA.bullets = liveB;
+            const liveE = [];
+            for (const bl of CONTRA.ebullets) {
+                bl.x += bl.vx; bl.y += bl.vy;
+                if (bl.x < -40 || bl.x > CONTRA.cam + CONTRA.W + 60 || bl.y > CONTRA.H + 20 || bl.y < -20) { CONTRA.pool.ebullets.push(bl); continue; }
+                let hit = false;
+                contraAlive().forEach((p) => {
+                    if (!hit && p.inv <= 0 && bl.x > p.x + 3 && bl.x < p.x + p.w - 3 && bl.y > p.y + 3 && bl.y < p.y + p.h - 3) { contraHurtP(p, 1); hit = true; }
+                });
+                if (hit) CONTRA.pool.ebullets.push(bl); else liveE.push(bl);
+            }
+            CONTRA.ebullets = liveE;
+            if (st.type === 'side') {
+                CONTRA.hearts.forEach((h) => {
+                    if (h.taken) return;
+                    h.t += 0.07;
+                    if (h.y0 === undefined) h.y0 = 96;
+                    const heartY = h.y0 + Math.sin(h.t * 3) * 5;
+                    for (const p of contraAlive()) {
+                        if (p.x < h.x + 18 && p.x + p.w > h.x && p.y < heartY + 16 && p.y + p.h > heartY) {
+                            h.taken = true;
+                            if (p.lives < 5) p.lives++;
+                            CONTRA.score += 200;
+                            playTone(784, 'square', 0.08, 0.12);
+                            setTimeout(() => playTone(1046, 'square', 0.1, 0.12), 90);
+                            contraBurst(h.x + 9, h.y0, 6, 3);
+                            break;
+                        }
+                    }
+                });
+            }
+            const liveP = [];
+            for (const pt of CONTRA.parts) { pt.x += pt.vx; pt.y += pt.vy; pt.vy += 0.2; pt.life--; if (pt.life > 0) liveP.push(pt); else CONTRA.pool.parts.push(pt); }
+            CONTRA.parts = liveP;
+            CONTRA.pops = CONTRA.pops.filter((pp) => { pp.y -= 0.5; return --pp.life > 0; });
+            contraUpdateHUD();
+        }
+
+        function contraUpdateHUD() {
+            const st = CONTRA.stage;
+            const p1 = CONTRA.players[0], p2 = CONTRA.players[1];
+            const WCOL = { N: '#5a5a68', M: '#c9a20a', S: '#c96a2a', L: '#1d8fc4', R: '#3fae5c' };
+            const block = (p, tag) => {
+                if (!p) return '';
+                let hearts = '';
+                for (let i = 0; i < p.hp; i++) hearts += '<i></i>';
+                return '<i class="cg-face" style="background:' + p.ch.color + '"></i><b style="color:' + p.ch.color + '">' + tag + '</b> <span class="cg-hearts">' + hearts + '</span><span class="cg-lv">×' + Math.max(0, p.lives + 1) + '</span> <i class="cg-wpn" style="background:' + (WCOL[p.weapon] || WCOL.N) + '">' + p.weapon + '</i>';
+            };
+            document.getElementById('cg-p1').innerHTML = block(p1, 'P1');
+            document.getElementById('cg-p2').innerHTML = CONTRA.coOp ? block(p2, 'P2') : '';
+            document.getElementById('cg-stage').innerText = 'MÀN ' + (CONTRA.stageIdx + 1) + '/' + CONTRA.stages.length + ' • ' + st.name.split(': ').pop();
+            document.getElementById('cg-score').innerText = CONTRA.score;
+            if (st.type === 'side') {
+                document.getElementById('cg-fill').style.width = Math.min(100, Math.max(...CONTRA.players.map((p) => p.x)) / (st.len - 200) * 100) + '%';
+                const g = CONTRA.gate;
+                const showBoss = g && g.entered;
+                document.getElementById('cg-bosswrap').style.display = showBoss ? 'block' : 'none';
+                if (showBoss) document.getElementById('cg-bossfill').style.width = Math.max(0, g.coreHp / g.coreMax * 100) + '%';
+            } else {
+                const bs = CONTRA.base;
+                const targetProgress = bs ? Math.min(1, bs.kills / st.targets) : 0;
+                const coreProgress = bs && bs.core && bs.kills >= st.targets ? Math.max(0, 1 - bs.core.hp / st.coreHp) : 0;
+                document.getElementById('cg-fill').style.width = Math.min(100, targetProgress * 60 + coreProgress * 40) + '%';
+                document.getElementById('cg-bosswrap').style.display = bs && bs.core && !bs.core.dead && bs.kills >= st.targets ? 'block' : 'none';
+                if (bs && bs.core) document.getElementById('cg-bossfill').style.width = Math.max(0, bs.core.hp / bs.core.max * 100) + '%';
+            }
+        }
+
+        function contraShowOverlay(title) {
+            const hi = parseInt(localStorage.getItem('cc_contra_hi')) || 0;
+            const isRecord = CONTRA.score > hi;
+            if (isRecord) localStorage.setItem('cc_contra_hi', String(CONTRA.score));
+            const overlay = document.getElementById('cg-overlay');
+            document.getElementById('cg-over-title').innerText = title;
+            document.getElementById('cg-over-score').innerText = 'ĐIỂM ' + CONTRA.score + ' • MÀN ' + Math.min(CONTRA.stageIdx + 1, CONTRA.stages.length) + '/' + CONTRA.stages.length + (isRecord ? ' • KỶ LỤC MỚI' : ' • KỶ LỤC ' + hi);
+            const seconds = Math.floor(CONTRA.stats.frames / 60);
+            const time = Math.floor(seconds / 60) + ':' + String(seconds % 60).padStart(2, '0');
+            document.getElementById('cg-over-stats').innerHTML =
+                '<span>HẠ GỤC<b>' + CONTRA.stats.kills + '</b></span>' +
+                '<span>HY SINH<b>' + CONTRA.stats.deaths + '</b></span>' +
+                '<span>THỜI GIAN<b>' + time + '</b></span>';
+            overlay.classList.toggle('is-win', CONTRA.state === 'win');
+            overlay.style.display = 'flex';
+        }
+
+        function contraDraw() {
+            const cv = document.getElementById('contra-canvas'), ctx = cv.getContext('2d');
+            const st = CONTRA.stage, cam = Math.round(CONTRA.cam);
+            ctx.save();
+            if (CONTRA.shake > 0.02) {
+                const amt = CONTRA.shake * CONTRA.shake;
+                ctx.translate((Math.random() - 0.5) * 12 * amt, (Math.random() - 0.5) * 9 * amt);
+                CONTRA.shake *= 0.88;
+            } else CONTRA.shake = 0;
+            if (st.type === 'side') contraDrawSide(ctx, st, cam);
+            else contraDrawBase(ctx, st);
+            if (CONTRA.paused) {
+                ctx.fillStyle = 'rgba(5,5,10,.72)'; ctx.fillRect(0, 0, CONTRA.W, CONTRA.H);
+                ctx.fillStyle = '#f7d51d'; ctx.font = '26px VT323, monospace'; ctx.textAlign = 'center';
+                ctx.fillText('TẠM DỪNG', CONTRA.W / 2, CONTRA.H / 2 - 6);
+                ctx.fillStyle = '#ddd'; ctx.font = '13px VT323, monospace';
+                ctx.fillText('Nhấn P hoặc nút phát để tiếp tục', CONTRA.W / 2, CONTRA.H / 2 + 16);
+                ctx.textAlign = 'left';
+            }
+            ctx.restore();
+        }
+
+        function contraDrawSide(ctx, st, cam) {
+            ctx.fillStyle = '#0b0f1e'; ctx.fillRect(0, 0, CONTRA.W, CONTRA.H);
+            ctx.fillStyle = 'rgba(255,255,255,.8)';
+            CONTRA.stars.forEach((s) => { ctx.fillRect(Math.round(s.x - cam * 0.25) % CONTRA.W, s.y, s.s, s.s); });
+            ctx.fillStyle = st.pal.bld;
+            for (let i = 0; i < 14; i++) {
+                const bx = ((i * 97 - cam * 0.5) % (CONTRA.W + 120) + CONTRA.W + 120) % (CONTRA.W + 120) - 60;
+                const bh = 60 + (i % 4) * 26;
+                ctx.fillRect(bx, CONTRA.GROUND - bh, 64, bh);
+            }
+            ctx.fillStyle = st.pal.win;
+            for (let i = 0; i < 14; i++) {
+                const bx = ((i * 97 - cam * 0.5) % (CONTRA.W + 120) + CONTRA.W + 120) % (CONTRA.W + 120) - 60;
+                const bh = 60 + (i % 4) * 26;
+                ctx.fillRect(bx + 10, CONTRA.GROUND - bh + 12, 5, 5); ctx.fillRect(bx + 40, CONTRA.GROUND - bh + 30, 5, 5);
+            }
+            ctx.fillStyle = 'rgba(0,0,0,.4)';
+            for (let i = 0; i < 10; i++) {
+                const bx = ((i * 151 - cam * 0.75) % (CONTRA.W + 160) + CONTRA.W + 160) % (CONTRA.W + 160) - 80;
+                ctx.fillRect(bx, CONTRA.GROUND - 30 - (i % 3) * 16, 50, 70);
+                ctx.fillRect(bx + 8, CONTRA.GROUND - 40 - (i % 3) * 16, 34, 12);
+            }
+            // NUOC (vung khong co dat) — co the boi
+            const sorted = [...CONTRA.terrain].sort((a, b2) => a.x - b2.x);
+            const waterSpans = [];
+            let cursor = 0;
+            sorted.forEach((s) => { if (s.x > cursor) waterSpans.push([cursor, s.x - cursor]); cursor = Math.max(cursor, s.x + s.w); });
+            if (cursor < CONTRA.stage.len + 200) waterSpans.push([cursor, CONTRA.stage.len + 200 - cursor]);
+            waterSpans.forEach(([wx, ww]) => {
+                if (wx + ww < cam || wx > cam + CONTRA.W) return;
+                ctx.fillStyle = st.pal.water; ctx.fillRect(wx - cam, CONTRA.WATER_TOP, ww, CONTRA.H - CONTRA.WATER_TOP);
+                ctx.fillStyle = st.pal.waterTop;
+                for (let wx2 = 0; wx2 < ww; wx2 += 12) {
+                    const wy = CONTRA.WATER_TOP + Math.sin(CONTRA.frame * 0.1 + wx2 * 0.3) * 1.5;
+                    ctx.fillRect(wx - cam + wx2, wy, 10, 2);
+                }
+            });
+            // dat bac thang
+            CONTRA.terrain.forEach((s) => {
+                if (s.x + s.w < cam || s.x > cam + CONTRA.W) return;
+                const sx2 = s.x - cam;
+                ctx.fillStyle = st.pal.ground; ctx.fillRect(sx2, s.top, s.w, CONTRA.H - s.top);
+                ctx.fillStyle = st.pal.gTop; ctx.fillRect(sx2, s.top, s.w, 5);
+                ctx.fillStyle = 'rgba(0,0,0,.3)';
+                for (let dx2 = sx2 + 6; dx2 < sx2 + s.w - 8; dx2 += 18) ctx.fillRect(dx2, s.top + 12, 6, 4);
+                ctx.fillStyle = 'rgba(255,255,255,.08)'; ctx.fillRect(sx2, s.top + 5, s.w, 1);
+            });
+            // nen tang one-way (cau + tang cao)
+            CONTRA.platforms.forEach((pl) => {
+                if (pl.x + pl.w < cam || pl.x > cam + CONTRA.W) return;
+                const px = pl.x - cam;
+                ctx.fillStyle = st.pal.plat; ctx.fillRect(px, pl.y, pl.w, 14);
+                ctx.fillStyle = st.pal.platTop; ctx.fillRect(px, pl.y, pl.w, 3);
+                ctx.fillStyle = 'rgba(0,0,0,.35)';
+                for (let gx2 = px + 6; gx2 < px + pl.w - 5; gx2 += 14) ctx.fillRect(gx2, pl.y + 5, 3, 8);
+            });
+            const drawSpr = (spr, x, y, face) => {
+                ctx.save();
+                if (face < 0) { ctx.translate(Math.round(x - cam) + spr.width, Math.round(y)); ctx.scale(-1, 1); ctx.drawImage(spr, 0, 0); }
+                else ctx.drawImage(spr, Math.round(x - cam), Math.round(y));
+                ctx.restore();
+            };
+            CONTRA.enemies.forEach((e) => {
+                if (e.tele && CONTRA.frame % 4 < 2) {
+                    ctx.fillStyle = '#ff3b5c';
+                    ctx.fillRect(Math.round(e.x - cam) + 8, Math.round(e.y) - 8, 3, 3);
+                    ctx.fillRect(Math.round(e.x - cam) + 8, Math.round(e.y) - 3, 3, 2);
+                }
+                drawSpr(e.spr, e.x, e.y, e.face);
+                if (e.flash > 0) {
+                    ctx.globalAlpha = 0.75; ctx.fillStyle = '#fff';
+                    ctx.fillRect(Math.round(e.x - cam), Math.round(e.y), e.w, e.h);
+                    ctx.globalAlpha = 1;
+                }
+            });
+            // CONG chua
+            const g = CONTRA.gate;
+            if (g && g.x - cam < CONTRA.W + 60) {
+                const gx = g.x - cam;
+                ctx.fillStyle = st.pal.wall || '#2a1a20';
+                ctx.fillRect(gx, 0, CONTRA.W - gx + 60, CONTRA.H);
+                ctx.fillStyle = 'rgba(0,0,0,.32)';
+                for (let yy = 6; yy < CONTRA.H; yy += 18) {
+                    const off = ((yy / 18) | 0) % 2 ? 13 : 0;
+                    for (let xx = gx + 6 + off; xx < CONTRA.W + 60; xx += 26) ctx.fillRect(xx, yy, 20, 3);
+                }
+                ctx.fillStyle = 'rgba(255,255,255,.06)'; ctx.fillRect(gx, 0, 4, CONTRA.H);
+                // lõi nhấp nháy (flash trắng khi trúng đạn)
+                const blink = CONTRA.frame % 30 < 15;
+                ctx.fillStyle = '#17130e'; ctx.fillRect(g.coreX - cam - 12, g.coreY - 10, 24, 20);
+                ctx.fillStyle = g.coreFlash > 0 ? '#ffffff' : (blink ? '#ff3b5c' : '#ffd9c9');
+                ctx.fillRect(g.coreX - cam - 9, g.coreY - 7, 18, 14);
+                if (g.coreFlash > 0) g.coreFlash--;
+                if (blink && g.coreFlash <= 0) { ctx.fillStyle = 'rgba(255,59,92,.35)'; ctx.fillRect(g.coreX - cam - 13, g.coreY - 11, 26, 22); }
+                // thu phao
+                g.turrets.forEach((t) => {
+                    if (!t.alive) {
+                        ctx.fillStyle = 'rgba(0,0,0,.5)';
+                        ctx.fillRect(t.x - cam, t.y + 4, 14, 8);
+                        return;
+                    }
+                    ctx.fillStyle = '#3d3d4d'; ctx.fillRect(t.x - cam, t.y, 14, 12);
+                    ctx.fillStyle = '#101018'; ctx.fillRect(t.x - cam - 6, t.y + 4, 8, 4);
+                    if (t.flash > 0) { ctx.fillStyle = '#ffe27a'; ctx.fillRect(t.x - cam - 7, t.y + 3, 5, 5); }
+                    if (t.flash > 0) t.flash--;
+                });
+            }
+            CONTRA.players.forEach((p) => {
+                if (p.out) return;
+                if (p.inv > 0 && CONTRA.frame % 4 < 2) return;
+                const bob = (p.onGround && Math.abs(p.vx) > 0.5) ? (CONTRA.frame >> 3) & 1 : 0;
+                const spr = contraSpriteCached(p.charKey);
+                if (p.prone) ctx.drawImage(spr, Math.round(p.x - cam), Math.round(p.y + 8), spr.width, 14);
+                else drawSpr(spr, p.x, p.y - bob, p.face);
+                if (bob && CONTRA.frame % 10 === 0 && !p.inWater) CONTRA.parts.push({ x: p.x + 3, y: p.y + 20, vx: -p.face * 0.8, vy: -0.6, life: 12 });
+                if (p.mf > 0) {
+                    ctx.fillStyle = '#ffe27a';
+                    ctx.fillRect(Math.round(p.mx - cam) - 2, Math.round(p.my) - 2, 4, 4);
+                    ctx.fillStyle = '#fff';
+                    ctx.fillRect(Math.round(p.mx - cam), Math.round(p.my), 2, 2);
+                }
+            });
+            // mat nuoc ve DE LEN nua duoi nhan vat dang boi
+            waterSpans.forEach(([wx, ww]) => {
+                if (wx + ww < cam || wx > cam + CONTRA.W) return;
+                ctx.fillStyle = st.pal.waterTop;
+                for (let wx2 = 0; wx2 < ww; wx2 += 12) {
+                    const wy = CONTRA.WATER_TOP + Math.sin(CONTRA.frame * 0.1 + wx2 * 0.3) * 1.5;
+                    ctx.fillRect(wx - cam + wx2, wy, 10, 2);
+                }
+                ctx.fillStyle = 'rgba(22,63,122,.45)';
+                ctx.fillRect(wx - cam, CONTRA.WATER_TOP + 3, ww, 8);
+            });
+            // pod bay
+            CONTRA.pods.forEach((pod) => {
+                if (!pod.spawned || pod.dead) return;
+                const px = Math.round(pod.x - cam);
+                ctx.fillStyle = '#c23b2e'; ctx.fillRect(px, Math.round(pod.y), 18, 8);
+                ctx.fillStyle = '#f5f2e8'; ctx.fillRect(px + 2, Math.round(pod.y) + 2, 14, 4);
+                ctx.fillStyle = CONTRA.frame % 14 < 7 ? '#f7d51d' : '#e76e55';
+                ctx.fillRect(px + 7, Math.round(pod.y) + 8, 4, 3);
+            });
+            // drop vu khi
+            CONTRA.drops.forEach((d) => {
+                if (d.taken) return;
+                const dy = Math.round(d.y + (d.landed ? Math.sin(CONTRA.frame * 0.1) * 1.5 : 0));
+                const dx = Math.round(d.x - cam);
+                ctx.fillStyle = '#17130e'; ctx.fillRect(dx - 1, dy - 1, 16, 14);
+                ctx.fillStyle = '#f5f2e8'; ctx.fillRect(dx, dy, 14, 12);
+                ctx.fillStyle = d.type === 'S' ? '#ff8c42' : d.type === 'M' ? '#c9a20a' : d.type === 'L' ? '#57d9ff' : '#7dff9a';
+                ctx.font = '11px VT323, monospace';
+                ctx.fillText(d.type, dx + 4, dy + 10);
+            });
+            CONTRA.hearts.forEach((h) => {
+                if (h.taken) return;
+                const hy = h.y0 + Math.sin(h.t * 3) * 5;
+                const hx = Math.round(h.x - cam);
+                ctx.fillStyle = '#ff3b5c';
+                ctx.fillRect(hx + 2, hy, 5, 4); ctx.fillRect(hx + 11, hy, 5, 4);
+                ctx.fillRect(hx, hy + 3, 18, 5);
+                ctx.fillRect(hx + 3, hy + 8, 12, 4);
+                ctx.fillRect(hx + 6, hy + 12, 6, 4);
+            });
+            CONTRA.bullets.forEach((bl) => {
+                const bw = bl.laser ? 11 : bl.spread ? 6 : 7, bh = bl.laser ? 4 : bl.spread ? 6 : 4;
+                ctx.fillStyle = bl.laser ? '#57d9ff' : bl.spread ? '#ff8c42' : '#f7d51d';
+                ctx.fillRect(Math.round(bl.x - cam) - 1, Math.round(bl.y) - 1, bw, bh);
+                ctx.fillStyle = '#ffffff';
+                ctx.fillRect(Math.round(bl.x - cam) + 1, Math.round(bl.y), 2, 2);
+            });
+            CONTRA.ebullets.forEach((bl) => {
+                ctx.fillStyle = '#ff6b4a';
+                ctx.fillRect(Math.round(bl.x - cam) - 3, Math.round(bl.y) - 3, 6, 6);
+                ctx.fillStyle = '#ffe27a';
+                ctx.fillRect(Math.round(bl.x - cam) - 1, Math.round(bl.y) - 1, 3, 3);
+            });
+            ctx.fillStyle = '#ffe27a';
+            CONTRA.parts.forEach((pt) => ctx.fillRect(Math.round(pt.x - cam), Math.round(pt.y), 2, 2));
+            ctx.font = '9px VT323, monospace';
+            CONTRA.pops.forEach((pp) => {
+                ctx.fillStyle = pp.life > 20 ? '#f7d51d' : 'rgba(247,213,29,.5)';
+                ctx.fillText(pp.txt, Math.round(pp.x - cam), Math.round(pp.y));
+            });
+        }
+
+        function contraDrawBase(ctx, st) {
+            const VPY = CONTRA.H * 0.42;
+            ctx.fillStyle = '#07100e'; ctx.fillRect(0, 0, CONTRA.W, CONTRA.H);
+            ctx.strokeStyle = 'rgba(87, 217, 255, .12)';
+            for (let i = -4; i <= 4; i++) {
+                ctx.beginPath();
+                ctx.moveTo(CONTRA.W / 2 + i * 30, VPY);
+                ctx.lineTo(CONTRA.W / 2 + i * 150, CONTRA.H);
+                ctx.stroke();
+            }
+            for (let i = 1; i <= 6; i++) {
+                const y = VPY + (CONTRA.H - VPY) * (i / 6) * (i / 6);
+                ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(CONTRA.W, y); ctx.stroke();
+            }
+            const grd = ctx.createLinearGradient(0, VPY, 0, CONTRA.H);
+            grd.addColorStop(0, '#0d1a16'); grd.addColorStop(1, st.pal.ground);
+            ctx.fillStyle = grd; ctx.fillRect(0, VPY, CONTRA.W, CONTRA.H - VPY);
+            ctx.fillStyle = st.pal.gTop; ctx.fillRect(0, CONTRA.GROUND, CONTRA.W, 4);
+            ctx.fillStyle = 'rgba(0,0,0,.5)';
+            ctx.fillRect(CONTRA.W / 2 - 46, VPY - 6, 92, CONTRA.H - VPY + 6);
+            const bs = CONTRA.base;
+            if (bs && bs.core && !bs.core.dead) {
+                const open = bs.core.open;
+                ctx.fillStyle = open ? '#57d9ff' : '#1a332c';
+                ctx.fillRect(CONTRA.W / 2 - 26, VPY - 40, 52, 34);
+                ctx.fillStyle = '#0a1512';
+                ctx.fillRect(CONTRA.W / 2 - 20, VPY - 34, 40, 22);
+                if (open) { ctx.fillStyle = '#aef4ff'; ctx.fillRect(CONTRA.W / 2 - 12, VPY - 28, 24, 10); }
+            }
+            const drawScaled = (spr, lane, z) => {
+                const size = Math.max(6, 22 * (0.25 + z * 1.15));
+                const sx2 = CONTRA.W / 2 + lane * 150 * z - size / 2;
+                const sy2 = CONTRA.H * 0.46 + (CONTRA.GROUND + 10 - CONTRA.H * 0.46) * z - size;
+                ctx.drawImage(spr, Math.round(sx2), Math.round(sy2), Math.round(size), Math.round(size));
+            };
+            CONTRA.enemies.forEach((e) => drawScaled(e.spr, e.lane, e.z));
+            CONTRA.players.forEach((p) => {
+                if (p.out) return;
+                if (p.inv > 0 && CONTRA.frame % 4 < 2) return;
+                const spr = contraSpriteCached(p.charKey);
+                if (p.prone) ctx.drawImage(spr, Math.round(p.x), Math.round(p.y + 8), spr.width, 14);
+                else ctx.drawImage(spr, Math.round(p.x), Math.round(p.y));
+            });
+            CONTRA.bullets.forEach((bl) => {
+                const by = CONTRA.H * 0.44 + (CONTRA.GROUND - CONTRA.H * 0.44) * bl.z;
+                const bx = CONTRA.W / 2 + bl.lane * 150 * bl.z;
+                ctx.fillStyle = bl.laser ? '#57d9ff' : '#f7d51d';
+                const s = 2 + bl.z * 4;
+                ctx.fillRect(Math.round(bx), Math.round(by), Math.round(s), Math.round(s));
+            });
+            ctx.fillStyle = '#ff6b4a';
+            CONTRA.ebullets.forEach((bl) => ctx.fillRect(Math.round(bl.x) - 2, Math.round(bl.y) - 2, 4, 4));
+            ctx.fillStyle = '#ffe27a';
+            CONTRA.parts.forEach((pt) => ctx.fillRect(Math.round(pt.x), Math.round(pt.y), 2, 2));
+        }
+
+        const CONTRA_KEYMAP = {
+            KeyA: [0, 'left'], KeyD: [0, 'right'], KeyW: [0, 'up'], KeyS: [0, 'down'], KeyF: [0, 'fire'], KeyJ: [0, 'fire'],
+            ArrowLeft: [1, 'left'], ArrowRight: [1, 'right'], ArrowUp: [1, 'up'], ArrowDown: [1, 'down'], KeyK: [1, 'fire']
+        };
+        document.addEventListener('keydown', (e) => {
+            if (!document.getElementById('contra-game-screen').classList.contains('active')) return;
+            const m = CONTRA_KEYMAP[e.code];
+            if (m) {
+                let slot = m[0];
+                if (!CONTRA.coOp && slot === 1 && CONTRA.players[0]) slot = 0;
+                const p = CONTRA.players[slot];
+                if (p) { p.keys[m[1]] = true; if (e.code.startsWith('Arrow')) e.preventDefault(); }
+            }
+            if (e.code === 'Space') { if (CONTRA.players[0]) CONTRA.players[0].jumpQueued = true; e.preventDefault(); }
+            if (e.code === 'KeyL') { const p = CONTRA.players[CONTRA.coOp ? 1 : 0]; if (p) p.jumpQueued = true; }
+            if ((e.code === 'KeyP' || e.code === 'Escape') && !e.repeat) { contraTogglePause(); e.preventDefault(); }
+        });
+        document.addEventListener('keyup', (e) => {
+            const m = CONTRA_KEYMAP[e.code];
+            if (m) {
+                let slot = m[0];
+                if (!CONTRA.coOp && slot === 1 && CONTRA.players[0]) slot = 0;
+                const p = CONTRA.players[slot];
+                if (p) p.keys[m[1]] = false;
+            }
+        });
+        document.querySelectorAll('.ct-btn').forEach((btn) => {
+            const k = btn.dataset.k;
+            const on = (ev) => {
+                ev.preventDefault();
+                const p = CONTRA.players[0];
+                if (!p || CONTRA.paused || CONTRA.state !== 'play') return;
+                btn.classList.add('is-held');
+                if (btn.setPointerCapture) btn.setPointerCapture(ev.pointerId);
+                if (k === 'jump') p.jumpQueued = true; else p.keys[k] = true;
+            };
+            const off = (ev) => {
+                ev.preventDefault();
+                btn.classList.remove('is-held');
+                const p = CONTRA.players[0];
+                if (p && k !== 'jump') p.keys[k] = false;
+            };
+            btn.addEventListener('pointerdown', on);
+            btn.addEventListener('pointerup', off);
+            btn.addEventListener('pointercancel', off);
+            btn.addEventListener('lostpointercapture', off);
+        });
+        window.addEventListener('blur', () => {
+            if (!CONTRA.running || CONTRA.state !== 'play') return;
+            contraClearInputs();
+            if (!CONTRA.paused) {
+                CONTRA.paused = true;
+                const btn = document.getElementById('cg-pause');
+                btn.innerText = '▶'; btn.setAttribute('aria-label', 'Tiếp tục');
+            }
+        });
+        document.addEventListener('visibilitychange', () => {
+            if (!document.hidden || !CONTRA.running || CONTRA.state !== 'play') return;
+            contraClearInputs();
+            CONTRA.paused = true;
+            const btn = document.getElementById('cg-pause');
+            btn.innerText = '▶'; btn.setAttribute('aria-label', 'Tiếp tục');
+        });
     </script>
 </body>
 </html>
