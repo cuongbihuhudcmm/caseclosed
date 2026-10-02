@@ -943,7 +943,7 @@
         .ct-jump, .ct-fire { width: 76px; height: 76px; border-radius: 50%; font-size: 17px; }
         .ct-jump { background: rgba(20, 65, 138, .66); }
         .ct-fire { background: rgba(138, 30, 20, .66); width: 88px; height: 88px; font-size: 19px; }
-        @media screen and (max-width: 560px) { .contra-logo { letter-spacing: 5px; } .ct-pad { grid-template: repeat(3, 44px) / repeat(3, 44px); } .ct-btn { width: 44px; height: 44px; font-size: 17px; } .ct-jump, .ct-fire { width: 62px; height: 62px; } .ct-fire { width: 74px; height: 74px; } }
+        @media screen and (max-width: 560px) { .contra-logo { letter-spacing: 5px; } .ct-pad { grid-template: repeat(3, 44px) / repeat(3, 44px); } .ct-btn { width: 44px; height: 44px; font-size: 17px; } .ct-jump, .ct-fire { width: 62px; height: 62px; } .ct-fire { width: 74px; height: 74px; } #custom-pair-setting > div { grid-template-columns: 1fr !important; } }
 
         /* --- CONTRA FULLSCREEN --- */
         body.contra-full { overflow: hidden; }
@@ -1076,6 +1076,26 @@
                 <div id="c4-timer-setting" style="margin-top: 15px; padding-top: 10px; border-top: 1px dashed #555;">
                     <span style="font-size: 20px; color: #e74c3c;" class="text-pop">Thời gian C4 (phút): </span>
                     <input type="number" id="input-timer" class="nes-input is-dark" value="5" min="1" max="60" style="width: 80px; display: inline-block; text-align: center; font-size: 24px!important; padding: 5px!important;">
+                </div>
+            </div>
+
+            <div style="text-align:left; margin-bottom:15px; padding:12px; border:2px solid #f7d51d; background:#000; box-shadow:2px 2px 0 #000;">
+                <label style="color:#fff; font-size:16px; display:block; cursor:pointer;">
+                    <input type="checkbox" id="cb-custom-pair" class="nes-checkbox is-dark" onchange="updateCustomPairSettings()">
+                    <span>Dùng cặp từ tùy chỉnh cho ván này</span>
+                </label>
+                <div id="custom-pair-setting" style="display:none; margin-top:14px; padding-top:12px; border-top:1px dashed #555;">
+                    <div style="display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:10px;">
+                        <div class="nes-field">
+                            <label for="custom-word-a" style="color:#ddd; font-size:16px;">Từ thứ nhất</label>
+                            <input type="text" id="custom-word-a" class="nes-input is-dark" maxlength="40" autocomplete="off" placeholder="Ví dụ: Cà phê">
+                        </div>
+                        <div class="nes-field">
+                            <label for="custom-word-b" style="color:#ddd; font-size:16px;">Từ thứ hai</label>
+                            <input type="text" id="custom-word-b" class="nes-input is-dark" maxlength="40" autocomplete="off" placeholder="Ví dụ: Trà">
+                        </div>
+                    </div>
+                    <p style="margin:10px 0 0; color:#f7d51d; font-size:15px; line-height:1.35;" class="text-pop">Hệ thống sẽ bí mật xáo 2 từ để chọn từ của Thám tử và Áo Đen.</p>
                 </div>
             </div>
 
@@ -2548,6 +2568,7 @@
             
             updateMenuButtons();
             updateC4Settings();
+            updateCustomPairSettings();
             syncMusicButton();
             drawPixelArt('mode-dan', spriteDetective, 5);
             drawPixelArt('mode-spy', spriteSpy, 5);
@@ -2635,6 +2656,7 @@
             releaseWakeLock();
             currentSessionId = 'CASE_' + Date.now(); playerNamesInput = []; globalScores = {}; playedHistory = [];
             currentScoreSettings = { ...DEFAULT_SCORE_SETTINGS };
+            resetCustomPairSettings();
             updateNameList(); updateRoleCount(); switchScreen('setup-screen'); 
         }
 
@@ -2666,6 +2688,7 @@
             if(s) {
                 currentSessionId = id; playerNamesInput = s.players || []; globalScores = s.scores || {}; playedHistory = s.history || [];
                 currentScoreSettings = Object.assign({}, DEFAULT_SCORE_SETTINGS, s.scoreSettings || {});
+                resetCustomPairSettings();
                 updateNameList(); updateRoleCount(); switchScreen('setup-screen');
             }
         }
@@ -3981,8 +4004,6 @@
             { a: "Cáp quang", b: "Wifi nhà hàng xóm", tier: "chuan" },
         ].map((item, id) => ({ a: item.a, b: item.b, tier: item.tier, id }));
 
-        const COOLDOWN_LIMIT = Math.min(100, rawWordDatabase.length - 10);
-
         /* --- 7. START GAME --- */
         function startGame() {
             if (!document.getElementById('setup-screen').classList.contains('active')) return;
@@ -3990,6 +4011,22 @@
             let numSpies = parseInt(document.getElementById('input-spies').value) || 0, numKids = parseInt(document.getElementById('input-kids').value) || 0;
             if (playerNamesInput.length < 4) { showModal("<div style='text-align:center'>Cần tối thiểu 4 người để lập chuyên án!</div>", "alert"); return; }
             if (playerNamesInput.length - numSpies - numKids < numSpies + numKids) { showModal("<div style='text-align:center'>Lỗi chiến thuật!<br><span style='color:#e76e55'>Thám tử ít hơn tổng số tội phạm.</span></div>", "alert"); return; }
+
+            const customEnabled = document.getElementById('cb-custom-pair').checked;
+            let customPair = null;
+            if (customEnabled) {
+                const wordA = document.getElementById('custom-word-a').value.trim().replace(/\s+/g, ' ');
+                const wordB = document.getElementById('custom-word-b').value.trim().replace(/\s+/g, ' ');
+                if (!wordA || !wordB) {
+                    showModal("<div style='text-align:center'>Hãy nhập đủ hai từ cho cặp tùy chỉnh.</div>", "alert");
+                    return;
+                }
+                if (normalizeWordKey(wordA) === normalizeWordKey(wordB)) {
+                    showModal("<div style='text-align:center'>Hai từ tùy chỉnh phải khác nhau.</div>", "alert");
+                    return;
+                }
+                customPair = { a: wordA, b: wordB, id: customPairId(wordA, wordB) };
+            }
 
             createCaseMeta();
             const defuserEnabled = document.getElementById('cb-defuser').checked;
@@ -3999,7 +4036,8 @@
                 kids: numKids,
                 civilians: playerNamesInput.length - numSpies - numKids,
                 timerMinutes: defuserEnabled ? Math.max(1, configuredMinutes) : 0,
-                defuserEnabled
+                defuserEnabled,
+                customPair
             };
             renderGameSummary();
             switchScreen('game-summary-screen');
@@ -4009,11 +4047,13 @@
             const config = pendingGameConfig;
             renderCaseIdentity();
             const c4Label = config.defuserEnabled ? 'C4: BẬT' : 'C4: TẮT';
+            const wordSource = config.customPair ? 'CẶP TÙY CHỈNH<br>PHÂN PHE NGẪU NHIÊN' : `KHO ${rawWordDatabase.length} CẶP<br>KHÔNG LẶP CẶP`;
             document.getElementById('game-summary-details').innerHTML = `
                 <div style="padding:12px; background:#000; border:2px solid #3498db;"><span style="color:#3498db;">THÁM TỬ</span><br><b style="font-size:30px;">${config.civilians}</b></div>
                 <div style="padding:12px; background:#000; border:2px solid #e76e55;"><span style="color:#e76e55;">ÁO ĐEN</span><br><b style="font-size:30px;">${config.spies}</b></div>
                 <div style="padding:12px; background:#000; border:2px solid #209cee;"><span style="color:#209cee;">SIÊU TRỘM</span><br><b style="font-size:30px;">${config.kids}</b></div>
                 <div style="padding:12px; background:#000; border:2px solid #f7d51d;"><span style="color:#f7d51d;">C4 / THỜI GIAN</span><br><b style="font-size:22px;">${c4Label}<br>${config.defuserEnabled ? config.timerMinutes + ' PHÚT' : 'KHÔNG ÁP DỤNG'}</b></div>
+                <div style="grid-column:1 / -1; padding:12px; background:#000; border:2px solid #95a5a6;"><span style="color:#95a5a6;">NGUỒN MẬT LỆNH</span><br><b style="font-size:22px;">${wordSource}</b></div>
             `;
         }
 
@@ -4025,7 +4065,7 @@
             isDefuserMode = config.defuserEnabled;
             defuserPinCode = "";
             
-            generateWordsAndRoles(config.civilians, config.spies, config.kids);
+            generateWordsAndRoles(config.civilians, config.spies, config.kids, config.customPair);
             
             players = playerNamesInput.map(n => { return {id: n, isAlive: true, role: null, word: null, isDefuser: false}; });
             
@@ -4061,6 +4101,30 @@
             input.disabled = !enabled;
             panel.style.opacity = enabled ? '1' : '0.45';
             if (enabled && (!parseInt(input.value) || parseInt(input.value) < 1)) input.value = 5;
+        }
+
+        function updateCustomPairSettings() {
+            const enabled = document.getElementById('cb-custom-pair').checked;
+            const panel = document.getElementById('custom-pair-setting');
+            panel.style.display = enabled ? 'block' : 'none';
+            panel.querySelectorAll('input').forEach((input) => { input.disabled = !enabled; });
+        }
+
+        function resetCustomPairSettings() {
+            const checkbox = document.getElementById('cb-custom-pair');
+            if (!checkbox) return;
+            checkbox.checked = false;
+            document.getElementById('custom-word-a').value = '';
+            document.getElementById('custom-word-b').value = '';
+            updateCustomPairSettings();
+        }
+
+        function normalizeWordKey(word) {
+            return String(word).normalize('NFC').trim().replace(/\s+/g, ' ').toLocaleLowerCase('vi-VN');
+        }
+
+        function customPairId(wordA, wordB) {
+            return 'custom:' + [normalizeWordKey(wordA), normalizeWordKey(wordB)].sort().join('|');
         }
 
         function updateTimerUI() {
@@ -4133,15 +4197,36 @@
             return arr;
         }
 
-        function generateWordsAndRoles(civs, spies, kids) {
-            if (playedHistory.length > COOLDOWN_LIMIT) playedHistory = playedHistory.slice(playedHistory.length - COOLDOWN_LIMIT);
-            let availableWords = rawWordDatabase.filter(w => !playedHistory.includes(w.id));
-            if (availableWords.length === 0) { availableWords = rawWordDatabase; playedHistory = []; }
-            // C4 chỉ dùng nhóm cặp từ đã tuyển chọn; ván thường giữ toàn bộ kho từ hợp lệ.
-            const c4Words = isDefuserMode ? availableWords.filter(w => w.tier === 'c4') : [];
-            const wordPool = c4Words.length > 0 ? c4Words : availableWords;
-            const randomPair = wordPool[Math.floor(Math.random() * wordPool.length)];
-            playedHistory.push(randomPair.id); saveData();
+        function pickBuiltInWordPair() {
+            // C4 chỉ dùng nhóm đã tuyển chọn. Ván thường dùng toàn bộ kho.
+            const eligible = isDefuserMode ? rawWordDatabase.filter((pair) => pair.tier === 'c4') : rawWordDatabase;
+            const eligibleIds = new Set(eligible.map((pair) => pair.id));
+            let unusedPairs = eligible.filter((pair) => !playedHistory.includes(pair.id));
+
+            // Chỉ khi đã dùng hết pool phù hợp mới mở một chu kỳ mới cho pool đó.
+            if (unusedPairs.length === 0) {
+                playedHistory = playedHistory.filter((id) => typeof id !== 'number' || !eligibleIds.has(id));
+                unusedPairs = eligible.slice();
+            }
+
+            // Tránh lặp cả từng từ đơn nếu vẫn còn cặp chưa dùng đáp ứng điều kiện.
+            const usedTerms = new Set();
+            playedHistory.forEach((id) => {
+                if (typeof id !== 'number') return;
+                const pair = rawWordDatabase[id];
+                if (!pair) return;
+                usedTerms.add(normalizeWordKey(pair.a));
+                usedTerms.add(normalizeWordKey(pair.b));
+            });
+            const freshTermPairs = unusedPairs.filter((pair) => !usedTerms.has(normalizeWordKey(pair.a)) && !usedTerms.has(normalizeWordKey(pair.b)));
+            const pool = freshTermPairs.length > 0 ? freshTermPairs : unusedPairs;
+            return pool[Math.floor(Math.random() * pool.length)];
+        }
+
+        function generateWordsAndRoles(civs, spies, kids, customPair = null) {
+            const randomPair = customPair || pickBuiltInWordPair();
+            if (!playedHistory.includes(randomPair.id)) playedHistory.push(randomPair.id);
+            saveData();
 
             const isA = Math.random() < 0.5; civilianWordToGuess = isA ? randomPair.a : randomPair.b; spyWordToGuess = isA ? randomPair.b : randomPair.a;
             
@@ -4179,7 +4264,7 @@
         function rerollWords() {
             showModal("<div style='text-align:center'>Hủy bỏ tài liệu cũ và lấy từ mới?</div>", "confirm", () => {
                 let s = parseInt(document.getElementById('input-spies').value)||0, k = parseInt(document.getElementById('input-kids').value)||0;
-                generateWordsAndRoles(playerNamesInput.length - s - k, s, k);
+                generateWordsAndRoles(playerNamesInput.length - s - k, s, k, pendingGameConfig ? pendingGameConfig.customPair : null);
                 players.forEach(p => { p.role = null; p.word = null; p.isDefuser = false; });
                 
                 pillPickCounter = 0;
